@@ -85,8 +85,8 @@ namespace RP.Math
         public static Vector4 Max(Vector4 a, Vector4 b) => new Vector4(
             Math.Max(a.X, b.X), Math.Max(a.Y, b.Y), Math.Max(a.Z, b.Z), Math.Max(a.W, b.W));
         public static Vector4 Clamp(Vector4 v, Vector4 min, Vector4 max) => new Vector4(
-            Math.Clamp(v.X, min.X, max.X), Math.Clamp(v.Y, min.Y, max.Y),
-            Math.Clamp(v.Z, min.Z, max.Z), Math.Clamp(v.W, min.W, max.W));
+            FloatMath.Clamp(v.X, min.X, max.X), FloatMath.Clamp(v.Y, min.Y, max.Y),
+            FloatMath.Clamp(v.Z, min.Z, max.Z), FloatMath.Clamp(v.W, min.W, max.W));
         public Vector4 Abs() => new Vector4(Math.Abs(X), Math.Abs(Y), Math.Abs(Z), Math.Abs(W));
         public bool IsNaN() => float.IsNaN(X) || float.IsNaN(Y) || float.IsNaN(Z) || float.IsNaN(W);
         public bool IsZero(float tolerance = 0f) =>
@@ -95,8 +95,12 @@ namespace RP.Math
         /// <summary>The XYZ part, dropping W — e.g. to read a homogeneous point's coordinates.</summary>
         public Vector3 XYZ => new Vector3(X, Y, Z);
 
+#if NET6_0_OR_GREATER
+        // GPU/SIMD interop offered only on modern TFMs (see the note in Vector3) to keep netstandard2.0
+        // free of the System.Numerics.Vectors dependency.
         public static implicit operator System.Numerics.Vector4(Vector4 v) => new System.Numerics.Vector4(v.X, v.Y, v.Z, v.W);
         public static implicit operator Vector4(System.Numerics.Vector4 v) => new Vector4(v.X, v.Y, v.Z, v.W);
+#endif
         public static implicit operator Vector4((float x, float y, float z, float w) t) => new Vector4(t.x, t.y, t.z, t.w);
         public void Deconstruct(out float x, out float y, out float z, out float w)
         {
@@ -111,7 +115,7 @@ namespace RP.Math
             Math.Abs(X - other.X) <= tolerance && Math.Abs(Y - other.Y) <= tolerance &&
             Math.Abs(Z - other.Z) <= tolerance && Math.Abs(W - other.W) <= tolerance;
         public override bool Equals(object? obj) => obj is Vector4 other && Equals(other);
-        public override int GetHashCode() => HashCode.Combine(X, Y, Z, W);
+        public override int GetHashCode() => FloatMath.CombineHash(X, Y, Z, W);
         public override string ToString() => $"({X}, {Y}, {Z}, {W})";
     }
 }

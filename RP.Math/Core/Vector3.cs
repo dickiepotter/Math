@@ -220,7 +220,7 @@ namespace RP.Math
 
         /// <summary>Clamps each component into the box defined by <paramref name="min"/>/<paramref name="max"/>.</summary>
         public static Vector3 Clamp(Vector3 v, Vector3 min, Vector3 max) => new Vector3(
-            Math.Clamp(v.X, min.X, max.X), Math.Clamp(v.Y, min.Y, max.Y), Math.Clamp(v.Z, min.Z, max.Z));
+            FloatMath.Clamp(v.X, min.X, max.X), FloatMath.Clamp(v.Y, min.Y, max.Y), FloatMath.Clamp(v.Z, min.Z, max.Z));
 
         /// <summary>Per-component absolute value.</summary>
         public Vector3 Abs() => new Vector3(Math.Abs(X), Math.Abs(Y), Math.Abs(Z));
@@ -243,12 +243,18 @@ namespace RP.Math
         /// loss by writing the cast. This is the deliberate "edge of the world" conversion before GPU upload.</summary>
         public static explicit operator Vector3(Vector3d v) => new Vector3((float)v.X, (float)v.Y, (float)v.Z);
 
+#if NET6_0_OR_GREATER
+        // System.Numerics.Vector2/3/4 live in a separate assembly that the netstandard2.0 target does not
+        // reference by default; this lossless GPU/SIMD interop is therefore offered only on modern TFMs
+        // (which is where the engine consumes RP.Math anyway), keeping netstandard2.0 dependency-free.
+
         /// <summary>Interop with <see cref="System.Numerics.Vector3"/> (same precision) for GPU upload and
         /// SIMD paths — lossless, so implicit both ways.</summary>
         public static implicit operator System.Numerics.Vector3(Vector3 v) => new System.Numerics.Vector3(v.X, v.Y, v.Z);
 
         /// <summary>Interop from <see cref="System.Numerics.Vector3"/>.</summary>
         public static implicit operator Vector3(System.Numerics.Vector3 v) => new Vector3(v.X, v.Y, v.Z);
+#endif
 
         /// <summary>Repack from a tuple.</summary>
         public static implicit operator Vector3((float x, float y, float z) t) => new Vector3(t.x, t.y, t.z);
@@ -277,7 +283,7 @@ namespace RP.Math
 
         public override bool Equals(object? obj) => obj is Vector3 other && Equals(other);
 
-        public override int GetHashCode() => HashCode.Combine(X, Y, Z);
+        public override int GetHashCode() => FloatMath.CombineHash(X, Y, Z);
 
         public override string ToString() => $"({X}, {Y}, {Z})";
 

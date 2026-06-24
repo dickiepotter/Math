@@ -102,14 +102,18 @@ namespace RP.Math
         public static Vector2 Min(Vector2 a, Vector2 b) => new Vector2(Math.Min(a.X, b.X), Math.Min(a.Y, b.Y));
         public static Vector2 Max(Vector2 a, Vector2 b) => new Vector2(Math.Max(a.X, b.X), Math.Max(a.Y, b.Y));
         public static Vector2 Clamp(Vector2 v, Vector2 min, Vector2 max) =>
-            new Vector2(Math.Clamp(v.X, min.X, max.X), Math.Clamp(v.Y, min.Y, max.Y));
+            new Vector2(FloatMath.Clamp(v.X, min.X, max.X), FloatMath.Clamp(v.Y, min.Y, max.Y));
         public Vector2 Abs() => new Vector2(Math.Abs(X), Math.Abs(Y));
         public bool IsNaN() => float.IsNaN(X) || float.IsNaN(Y);
         public bool IsZero(float tolerance = 0f) =>
             tolerance == 0f ? (X == 0f && Y == 0f) : LengthSquared <= tolerance * tolerance;
 
+#if NET6_0_OR_GREATER
+        // GPU/SIMD interop offered only on modern TFMs (see the note in Vector3) to keep netstandard2.0
+        // free of the System.Numerics.Vectors dependency.
         public static implicit operator System.Numerics.Vector2(Vector2 v) => new System.Numerics.Vector2(v.X, v.Y);
         public static implicit operator Vector2(System.Numerics.Vector2 v) => new Vector2(v.X, v.Y);
+#endif
         public static implicit operator Vector2((float x, float y) t) => new Vector2(t.x, t.y);
         public void Deconstruct(out float x, out float y)
         {
@@ -121,7 +125,7 @@ namespace RP.Math
         public bool ApproximatelyEquals(Vector2 other, float tolerance = 1e-5f) =>
             Math.Abs(X - other.X) <= tolerance && Math.Abs(Y - other.Y) <= tolerance;
         public override bool Equals(object? obj) => obj is Vector2 other && Equals(other);
-        public override int GetHashCode() => HashCode.Combine(X, Y);
+        public override int GetHashCode() => FloatMath.CombineHash(X, Y);
         public override string ToString() => $"({X}, {Y})";
     }
 }
