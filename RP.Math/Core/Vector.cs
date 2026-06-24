@@ -53,9 +53,12 @@ namespace RP.Math
     /// IComparable has been implemened on the Vector type however comparing two vectors has no meaning, we are comparing the magnitude of two vectors for convinience. 
     /// It would be more accurate to compare the magnitudes explicitly.
     /// </remarks>
+    // Renamed from `Vector` to `Vector3d` to sit in a named vector family (Vector2/3/4 float +
+    // Vector2d/3d/4d double). The name `Vector` is preserved as an assembly-wide alias
+    // (see GlobalAliases.cs) so existing code and tests keep compiling unchanged.
     [ImmutableObject(true), Serializable]
-    public struct Vector
-        : IComparable, IComparable<Vector>, IEquatable<Vector>, IFormattable
+    public struct Vector3d
+        : IComparable, IComparable<Vector3d>, IEquatable<Vector3d>, IFormattable
     {
 
         #region Class Variables
@@ -90,7 +93,7 @@ namespace RP.Math
         /// This results in the need for pre-initialisation initialisation of the Vector components to 0 
         /// Due to the necessity for struct's variables to be set in the constructor before moving control
         /// </implementation>
-        public Vector(double x, double y, double z)
+        public Vector3d(double x, double y, double z)
         {
             this.x = x;
             this.y = y;
@@ -107,7 +110,7 @@ namespace RP.Math
         /// <exception cref="System.ArgumentException">
         /// Thrown if the array argument does not contain exactly three components 
         /// </exception>
-        public Vector(double[] xyz)
+        public Vector3d(double[] xyz)
         {
             if (xyz.Length == 3)
             {
@@ -128,7 +131,7 @@ namespace RP.Math
         /// <implementation>
         /// Copies values from Vector v1 to this vector, does not hold a reference to object v1 
         /// </implementation>
-        public Vector(Vector v1)
+        public Vector3d(Vector v1)
         {
             this.x = v1.X;
             this.y = v1.Y;
