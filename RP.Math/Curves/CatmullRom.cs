@@ -152,6 +152,58 @@ namespace RP.Math
             local = scaled - index;
         }
 
+        /// <summary>
+        /// The acceleration (<c>d²P/dt²</c>) on the spline at parameter <paramref name="t"/>, taken on the
+        /// active segment. Like <see cref="Tangent(double)"/> it is expressed in the segment's local
+        /// parameter, so its magnitude jumps across joins — but the curvature and frame built from it are
+        /// invariant to that scaling and so vary smoothly.
+        /// </summary>
+        public Vector Acceleration(double t)
+        {
+            ResolveSegment(t, out int index, out double local);
+            return this.Segment(index).Acceleration(local);
+        }
+
+        #endregion
+
+        #region Frames, length and sampling
+
+        /// <summary>The unit tangent (heading) at parameter <paramref name="t"/>.</summary>
+        public Vector TangentDirection(double t) => CurveMath.TangentDirection(this.Tangent, t);
+
+        /// <summary>The curvature κ at parameter <paramref name="t"/> (zero where the spline is straight).</summary>
+        public double Curvature(double t) => CurveMath.Curvature(this.Tangent(t), this.Acceleration(t));
+
+        /// <summary>The Frenet frame (position + tangent/normal/binormal) at parameter <paramref name="t"/>.</summary>
+        public CurveFrame Frame(double t) => CurveMath.Frame(this.PointAt(t), this.Tangent(t), this.Acceleration(t));
+
+        /// <summary>An approximation of the spline's arc length, summed over <paramref name="segments"/> even chords.</summary>
+        public double Length(int segments) => CurveMath.Length(this.PointAt, 0, 1, segments);
+
+        /// <summary>An approximation of the spline's arc length using a sensible default sample count.</summary>
+        public double Length() => this.Length(64);
+
+        /// <summary>The arc length between parameters <paramref name="t0"/> and <paramref name="t1"/>.</summary>
+        public double LengthBetween(double t0, double t1, int segments = 64) => CurveMath.Length(this.PointAt, t0, t1, segments);
+
+        /// <summary>The parameter at which the arc length from the start first reaches <paramref name="distance"/> (clamped to [0, 1]).</summary>
+        public double ParameterAtDistance(double distance, int segments = 64) => CurveMath.ParameterAtDistance(this.PointAt, distance, segments);
+
+        /// <summary>The point a given arc-length <paramref name="distance"/> along the spline from the start.</summary>
+        public Vector PointAtDistance(double distance, int segments = 64) => this.PointAt(this.ParameterAtDistance(distance, segments));
+
+        /// <summary>Evenly sample <paramref name="count"/> + 1 points along the spline.</summary>
+        public Vector[] Sample(int count) => CurveMath.Sample(this.PointAt, count);
+
+        /// <summary>An axis-aligned bounding box fitted to <paramref name="segments"/> + 1 samples of the spline.</summary>
+        public BoundingBox BoundingBox(int segments = 64) => CurveMath.BoundingBox(this.PointAt, segments);
+
+        /// <summary>The point on the spline closest to <paramref name="target"/> (sampled then refined).</summary>
+        public Vector ClosestPoint(Vector target, int segments = 64) => CurveMath.ClosestPoint(this.PointAt, target, segments, out _);
+
+        /// <summary>The point on the spline closest to <paramref name="target"/>, also reporting its parameter <paramref name="t"/>.</summary>
+        public Vector ClosestPoint(Vector target, out double t, int segments = 64) => CurveMath.ClosestPoint(this.PointAt, target, segments, out t);
+
         #endregion
 
         #region Equality and formatting

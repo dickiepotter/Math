@@ -115,6 +115,63 @@ namespace RP.Math
                  + (h11 * this.endTangent);
         }
 
+        /// <summary>
+        /// The acceleration (<c>d²P/dt²</c>) at parameter <paramref name="t"/>, the exact second derivative of
+        /// the cubic basis: <c>(12t−6)P0 + (6t−4)M0 + (−12t+6)P1 + (6t−2)M1</c>.
+        /// </summary>
+        public Vector Acceleration(double t)
+        {
+            double h00 = (12 * t) - 6;
+            double h10 = (6 * t) - 4;
+            double h01 = (-12 * t) + 6;
+            double h11 = (6 * t) - 2;
+
+            return (h00 * this.startPoint)
+                 + (h10 * this.startTangent)
+                 + (h01 * this.endPoint)
+                 + (h11 * this.endTangent);
+        }
+
+        #endregion
+
+        #region Frames, length and sampling
+
+        /// <summary>The unit tangent (heading) at parameter <paramref name="t"/>.</summary>
+        public Vector TangentDirection(double t) => CurveMath.TangentDirection(this.Tangent, t);
+
+        /// <summary>The curvature κ at parameter <paramref name="t"/> (zero where the segment is straight).</summary>
+        public double Curvature(double t) => CurveMath.Curvature(this.Tangent(t), this.Acceleration(t));
+
+        /// <summary>The Frenet frame (position + tangent/normal/binormal) at parameter <paramref name="t"/>.</summary>
+        public CurveFrame Frame(double t) => CurveMath.Frame(this.PointAt(t), this.Tangent(t), this.Acceleration(t));
+
+        /// <summary>An approximation of the segment's arc length, summed over <paramref name="segments"/> even chords.</summary>
+        public double Length(int segments) => CurveMath.Length(this.PointAt, 0, 1, segments);
+
+        /// <summary>An approximation of the segment's arc length using a sensible default sample count.</summary>
+        public double Length() => this.Length(64);
+
+        /// <summary>The arc length between parameters <paramref name="t0"/> and <paramref name="t1"/>.</summary>
+        public double LengthBetween(double t0, double t1, int segments = 64) => CurveMath.Length(this.PointAt, t0, t1, segments);
+
+        /// <summary>The parameter at which the arc length from the start first reaches <paramref name="distance"/> (clamped to [0, 1]).</summary>
+        public double ParameterAtDistance(double distance, int segments = 64) => CurveMath.ParameterAtDistance(this.PointAt, distance, segments);
+
+        /// <summary>The point a given arc-length <paramref name="distance"/> along the segment from the start.</summary>
+        public Vector PointAtDistance(double distance, int segments = 64) => this.PointAt(this.ParameterAtDistance(distance, segments));
+
+        /// <summary>Evenly sample <paramref name="count"/> + 1 points along the segment.</summary>
+        public Vector[] Sample(int count) => CurveMath.Sample(this.PointAt, count);
+
+        /// <summary>An axis-aligned bounding box fitted to <paramref name="segments"/> + 1 samples of the segment.</summary>
+        public BoundingBox BoundingBox(int segments = 64) => CurveMath.BoundingBox(this.PointAt, segments);
+
+        /// <summary>The point on the segment closest to <paramref name="target"/> (sampled then refined).</summary>
+        public Vector ClosestPoint(Vector target, int segments = 64) => CurveMath.ClosestPoint(this.PointAt, target, segments, out _);
+
+        /// <summary>The point on the segment closest to <paramref name="target"/>, also reporting its parameter <paramref name="t"/>.</summary>
+        public Vector ClosestPoint(Vector target, out double t, int segments = 64) => CurveMath.ClosestPoint(this.PointAt, target, segments, out t);
+
         #endregion
 
         #region Operators
