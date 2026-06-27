@@ -22,7 +22,7 @@ namespace RP.Math
     /// "<c>…OrDefault</c>" safety pattern for the degenerate zero-length case.</para>
     /// </remarks>
     [Serializable]
-    public readonly struct Vector3 : IEquatable<Vector3>
+    public readonly struct Vector3 : IEquatable<Vector3>, IFormattable
     {
         /// <summary>The X component.</summary>
         public readonly float X;
@@ -286,6 +286,271 @@ namespace RP.Math
         public override int GetHashCode() => FloatMath.CombineHash(X, Y, Z);
 
         public override string ToString() => $"({X}, {Y}, {Z})";
+
+        #endregion
+
+        #region Vector3d-name parity and added capabilities
+
+        // ---- Magnitude aliases ----
+
+        /// <summary>The vector's magnitude — an alias of <see cref="Length"/> matching <see cref="Vector3d"/>.</summary>
+        public float Magnitude => Length;
+
+        /// <summary>The vector's squared magnitude — an alias of <see cref="LengthSquared"/>.</summary>
+        public float MagnitudeSquared => LengthSquared;
+
+        // ---- Dot / Cross aliases ----
+
+        /// <summary>The dot product — alias of <see cref="Dot(Vector3, Vector3)"/> matching <see cref="Vector3d"/>.</summary>
+        public static float DotProduct(Vector3 a, Vector3 b) => Dot(a, b);
+
+        /// <summary>The dot product of this vector with another — alias of <see cref="Dot(Vector3)"/>.</summary>
+        public float DotProduct(Vector3 other) => Dot(this, other);
+
+        /// <summary>The cross product — alias of <see cref="Cross(Vector3, Vector3)"/>.</summary>
+        public static Vector3 CrossProduct(Vector3 a, Vector3 b) => Cross(a, b);
+
+        /// <summary>The cross product of this vector with another — alias of <see cref="Cross(Vector3)"/>.</summary>
+        public Vector3 CrossProduct(Vector3 other) => Cross(this, other);
+
+        /// <summary>The scalar triple product <c>a · (b × c)</c> — the signed volume of the parallelepiped
+        /// spanned by the three vectors (the determinant of the matrix with them as rows).</summary>
+        public static float MixedProduct(Vector3 a, Vector3 b, Vector3 c) => Dot(a, Cross(b, c));
+
+        /// <summary>The scalar triple product of this vector with two others: <c>this · (b × c)</c>.</summary>
+        public float MixedProduct(Vector3 b, Vector3 c) => MixedProduct(this, b, c);
+
+        // ---- Projection, rejection, reflection ----
+
+        /// <summary>The vector resolute of <paramref name="v"/> along <paramref name="direction"/>;
+        /// <see cref="Zero"/> when the direction is zero.</summary>
+        public static Vector3 Projection(Vector3 v, Vector3 direction) => v.Project(direction);
+
+        /// <summary>The vector resolute of this vector along <paramref name="direction"/> — alias of <see cref="Project(Vector3)"/>.</summary>
+        public Vector3 Projection(Vector3 direction) => Project(direction);
+
+        /// <summary>Vector projection — static alias of <see cref="Project(Vector3)"/>.</summary>
+        public static Vector3 Project(Vector3 v, Vector3 direction) => v.Project(direction);
+
+        /// <summary>The component of <paramref name="v"/> perpendicular to <paramref name="direction"/>.</summary>
+        public static Vector3 Rejection(Vector3 v, Vector3 direction) => v.Reject(direction);
+
+        /// <summary>The component of this vector perpendicular to <paramref name="direction"/> — alias of <see cref="Reject(Vector3)"/>.</summary>
+        public Vector3 Rejection(Vector3 direction) => Reject(direction);
+
+        /// <summary>Vector rejection — static alias of <see cref="Reject(Vector3)"/>.</summary>
+        public static Vector3 Reject(Vector3 v, Vector3 direction) => v.Reject(direction);
+
+        /// <summary>Reflect a vector off a surface with the given <paramref name="normal"/> — static form of <see cref="Reflect(Vector3)"/>.</summary>
+        public static Vector3 Reflect(Vector3 v, Vector3 normal) => v.Reflect(normal);
+
+        /// <summary>Reflect <paramref name="v"/> <i>about</i> the line through <paramref name="line"/>
+        /// (mirroring it across that direction), preserving magnitude.</summary>
+        public static Vector3 Reflection(Vector3 v, Vector3 line) => 2f * Projection(v, line) - v;
+
+        /// <summary>Reflect this vector about the line through <paramref name="line"/>.</summary>
+        public Vector3 Reflection(Vector3 line) => Reflection(this, line);
+
+        // ---- Interpolation ----
+
+        /// <summary>Interpolate (or extrapolate) between two vectors.</summary>
+        /// <exception cref="ArgumentOutOfRangeException">When <paramref name="t"/> is outside [0, 1] and
+        /// extrapolation is not allowed.</exception>
+        public static Vector3 Interpolate(Vector3 a, Vector3 b, float t, bool allowExtrapolation)
+        {
+            if (!allowExtrapolation && (t > 1f || t < 0f))
+            {
+                throw new ArgumentOutOfRangeException(nameof(t), t, "Control parameter must be a value between 0 & 1");
+            }
+
+            return new Vector3(
+                a.X * (1f - t) + b.X * t,
+                a.Y * (1f - t) + b.Y * t,
+                a.Z * (1f - t) + b.Z * t);
+        }
+
+        /// <summary>Interpolate between two vectors (t in [0, 1]).</summary>
+        public static Vector3 Interpolate(Vector3 a, Vector3 b, float t) => Interpolate(a, b, t, false);
+
+        /// <summary>Interpolate between this vector and another (t in [0, 1]).</summary>
+        public Vector3 Interpolate(Vector3 other, float t) => Interpolate(this, other, t, false);
+
+        /// <summary>Interpolate, or extrapolate, between this vector and another.</summary>
+        public Vector3 Interpolate(Vector3 other, float t, bool allowExtrapolation) => Interpolate(this, other, t, allowExtrapolation);
+
+        /// <summary>Spherically interpolate between two vectors, blending direction along the shortest arc and
+        /// magnitude linearly; falls back to <see cref="Lerp"/> when (anti)parallel or either is zero.</summary>
+        public static Vector3 Slerp(Vector3 a, Vector3 b, float t)
+        {
+            var na = a.NormalizeOrDefault();
+            var nb = b.NormalizeOrDefault();
+
+            float dot = Dot(na, nb);
+            if (dot > 1f) { dot = 1f; }
+            else if (dot < -1f) { dot = -1f; }
+
+            float theta = (float)Math.Acos(dot);
+            float sinTheta = (float)Math.Sin(theta);
+
+            if (sinTheta < 1e-6f)
+            {
+                return Interpolate(a, b, t, true);
+            }
+
+            float wa = (float)(Math.Sin((1f - t) * theta) / sinTheta);
+            float wb = (float)(Math.Sin(t * theta) / sinTheta);
+            return wa * a + wb * b;
+        }
+
+        /// <summary>Spherically interpolate between this vector and another.</summary>
+        public Vector3 Slerp(Vector3 other, float t) => Slerp(this, other, t);
+
+        // ---- Component-wise min/max aliases ----
+
+        /// <summary>The component-wise minimum — alias of <see cref="Min(Vector3, Vector3)"/>.</summary>
+        public static Vector3 ComponentMin(Vector3 a, Vector3 b) => Min(a, b);
+
+        /// <summary>The component-wise minimum of this vector and another.</summary>
+        public Vector3 ComponentMin(Vector3 other) => Min(this, other);
+
+        /// <summary>The component-wise maximum — alias of <see cref="Max(Vector3, Vector3)"/>.</summary>
+        public static Vector3 ComponentMax(Vector3 a, Vector3 b) => Max(a, b);
+
+        /// <summary>The component-wise maximum of this vector and another.</summary>
+        public Vector3 ComponentMax(Vector3 other) => Max(this, other);
+
+        // ---- Component maths ----
+
+        /// <summary>The absolute value of each component — alias of <see cref="Abs"/>.</summary>
+        public static Vector3 AbsComponents(Vector3 v) => v.Abs();
+
+        /// <summary>The absolute value of each of this vector's components.</summary>
+        public Vector3 AbsComponents() => Abs();
+
+        /// <summary>The square root of each component.</summary>
+        public static Vector3 SqrtComponents(Vector3 v) => new Vector3((float)Math.Sqrt(v.X), (float)Math.Sqrt(v.Y), (float)Math.Sqrt(v.Z));
+
+        /// <summary>The square root of each of this vector's components.</summary>
+        public Vector3 SqrtComponents() => SqrtComponents(this);
+
+        /// <summary>The square of each component.</summary>
+        public static Vector3 SqrComponents(Vector3 v) => new Vector3(v.X * v.X, v.Y * v.Y, v.Z * v.Z);
+
+        /// <summary>The square of each of this vector's components.</summary>
+        public Vector3 SqrComponents() => SqrComponents(this);
+
+        /// <summary>Raise each component to <paramref name="power"/>.</summary>
+        public static Vector3 PowComponents(Vector3 v, float power) => new Vector3((float)Math.Pow(v.X, power), (float)Math.Pow(v.Y, power), (float)Math.Pow(v.Z, power));
+
+        /// <summary>Raise each of this vector's components to <paramref name="power"/>.</summary>
+        public Vector3 PowComponents(float power) => PowComponents(this, power);
+
+        /// <summary>The sum of the components.</summary>
+        public static float SumComponents(Vector3 v) => v.X + v.Y + v.Z;
+
+        /// <summary>The sum of this vector's components.</summary>
+        public float SumComponents() => SumComponents(this);
+
+        /// <summary>The sum of the squares of the components.</summary>
+        public static float SumComponentSqrs(Vector3 v) => v.X * v.X + v.Y * v.Y + v.Z * v.Z;
+
+        /// <summary>The sum of the squares of this vector's components.</summary>
+        public float SumComponentSqrs() => SumComponentSqrs(this);
+
+        // ---- Rounding ----
+
+        /// <summary>Round each component to the nearest integral value.</summary>
+        public static Vector3 Round(Vector3 v) => new Vector3((float)Math.Round((double)v.X), (float)Math.Round((double)v.Y), (float)Math.Round((double)v.Z));
+
+        /// <summary>Round each component to the given number of fractional <paramref name="digits"/>.</summary>
+        public static Vector3 Round(Vector3 v, int digits) => new Vector3((float)Math.Round((double)v.X, digits), (float)Math.Round((double)v.Y, digits), (float)Math.Round((double)v.Z, digits));
+
+        /// <summary>Round each component to the nearest integral value using the given midpoint <paramref name="mode"/>.</summary>
+        public static Vector3 Round(Vector3 v, MidpointRounding mode) => new Vector3((float)Math.Round((double)v.X, mode), (float)Math.Round((double)v.Y, mode), (float)Math.Round((double)v.Z, mode));
+
+        /// <summary>Round each component to the given <paramref name="digits"/> using the given midpoint <paramref name="mode"/>.</summary>
+        public static Vector3 Round(Vector3 v, int digits, MidpointRounding mode) => new Vector3((float)Math.Round((double)v.X, digits, mode), (float)Math.Round((double)v.Y, digits, mode), (float)Math.Round((double)v.Z, digits, mode));
+
+        /// <summary>Round each component to the nearest integral value.</summary>
+        public Vector3 Round() => Round(this);
+
+        /// <summary>Round each component to the given number of fractional <paramref name="digits"/>.</summary>
+        public Vector3 Round(int digits) => Round(this, digits);
+
+        /// <summary>Round each component to the nearest integral value using the given midpoint <paramref name="mode"/>.</summary>
+        public Vector3 Round(MidpointRounding mode) => Round(this, mode);
+
+        /// <summary>Round each component to the given <paramref name="digits"/> using the given midpoint <paramref name="mode"/>.</summary>
+        public Vector3 Round(int digits, MidpointRounding mode) => Round(this, digits, mode);
+
+        // ---- Distance instance overloads ----
+
+        /// <summary>The distance between this vector and another.</summary>
+        public float Distance(Vector3 other) => Distance(this, other);
+
+        /// <summary>The squared distance between this vector and another.</summary>
+        public float DistanceSquared(Vector3 other) => DistanceSquared(this, other);
+
+        // ---- Decisions ----
+
+        /// <summary>Whether this vector's length is one within the default tolerance — alias of <see cref="IsUnit"/>.</summary>
+        public bool IsUnitVector() => IsUnit();
+
+        /// <summary>Whether this vector's length is one within the given <paramref name="tolerance"/>.</summary>
+        public bool IsUnitVector(float tolerance) => IsUnit(tolerance);
+
+        /// <summary>Whether two vectors are perpendicular within <paramref name="tolerance"/> (on the normalized dot).</summary>
+        public static bool IsPerpendicular(Vector3 a, Vector3 b, float tolerance = 1e-6f) =>
+            Math.Abs(Dot(a.NormalizeOrDefault(), b.NormalizeOrDefault())) <= tolerance;
+
+        /// <summary>Whether this vector is perpendicular to another within <paramref name="tolerance"/>.</summary>
+        public bool IsPerpendicular(Vector3 other, float tolerance = 1e-6f) => IsPerpendicular(this, other, tolerance);
+
+        /// <summary>Approximate equality within <paramref name="tolerance"/> — alias of <see cref="ApproximatelyEquals"/>.</summary>
+        public bool Equals(Vector3 other, float tolerance) => ApproximatelyEquals(other, tolerance);
+
+        // ---- Constants ----
+
+        /// <summary>The smallest vector possible (each component <see cref="float.MinValue"/>).</summary>
+        public static Vector3 MinValue => new Vector3(float.MinValue, float.MinValue, float.MinValue);
+
+        /// <summary>The largest vector possible (each component <see cref="float.MaxValue"/>).</summary>
+        public static Vector3 MaxValue => new Vector3(float.MaxValue, float.MaxValue, float.MaxValue);
+
+        /// <summary>The smallest positive (non-zero) vector possible (each component <see cref="float.Epsilon"/>).</summary>
+        public static Vector3 Epsilon => new Vector3(float.Epsilon, float.Epsilon, float.Epsilon);
+
+        /// <summary>Vector with components of NaN.</summary>
+        public static Vector3 NaN => new Vector3(float.NaN, float.NaN, float.NaN);
+
+        // ---- IFormattable ----
+
+        /// <summary>Formatted textual description of the vector.</summary>
+        /// <param name="format">'x', 'y', 'z' or '' followed by a standard numeric format string.</param>
+        /// <param name="formatProvider">The culture specific formatting provider.</param>
+        public string ToString(string? format, IFormatProvider? formatProvider)
+        {
+            if (string.IsNullOrEmpty(format))
+            {
+                return string.Format("({0}, {1}, {2})", X, Y, Z);
+            }
+
+            char firstChar = format![0];
+            string? remainder = format.Length > 1 ? format.Substring(1) : null;
+
+            switch (firstChar)
+            {
+                case 'x': return X.ToString(remainder, formatProvider);
+                case 'y': return Y.ToString(remainder, formatProvider);
+                case 'z': return Z.ToString(remainder, formatProvider);
+                default:
+                    return string.Format(
+                        "({0}, {1}, {2})",
+                        X.ToString(format, formatProvider),
+                        Y.ToString(format, formatProvider),
+                        Z.ToString(format, formatProvider));
+            }
+        }
 
         #endregion
     }
