@@ -97,7 +97,7 @@ namespace RP.Math
         /// the box corner farthest along the plane normal is checked; if even that corner is outside, the
         /// whole box is. Conservative (rare false positives at the corners), never a false negative.
         /// </summary>
-        public bool Intersects(Box box)
+        public bool Intersects(BoundingBox box)
         {
             Vector min = box.Min;
             Vector max = box.Max;

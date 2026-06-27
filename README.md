@@ -34,7 +34,7 @@ more.*
 - [`OrthogonalAxes` — coordinate conventions](#orthogonalaxes)
 - [Curves: `Bezier`, `Hermite`, `CatmullRom`](#curves-bezier-hermite-catmullrom)
 - [Shapes: conceptual and placed](#shapes-conceptual-and-placed)
-- [Bounding volumes: `Box` and `BoundingSphere`](#bounding-volumes-box-and-boundingsphere)
+- [Bounding volumes: `BoundingBox` and `BoundingSphere`](#bounding-volumes-boundingbox-and-boundingsphere)
 - [Supporting numeric helpers](#supporting-numeric-helpers)
 - [Points of interest](#points-of-interest)
 - [Future considerations](#future-considerations)
@@ -172,7 +172,7 @@ graph TD
 | **`Matrix`** | A 4×4 transformation matrix. | The general linear-algebra workhorse for transforms. |
 | **`OrthogonalAxes`** | A coordinate-system convention (which way is up, right, far, and its handedness). | A constant label chosen per project — not a position or an orientation. |
 | **`Bezier`**, **`Hermite`**, **`CatmullRom`** | Smooth curves through space. | Extend the straight-line/arc interpolation of `Vector` to genuine curves. |
-| **`Box`**, **`BoundingSphere`** | Axis-aligned bounding volumes. | Cheap *quick-rejection* hulls — "could these possibly touch?" — distinct from the exact shapes. |
+| **`BoundingBox`**, **`BoundingSphere`** | Axis-aligned bounding volumes. | Cheap *quick-rejection* hulls — "could these possibly touch?" — distinct from the exact shapes. |
 | **`Circle`**, **`Triangle`**, **`Rectangle`**, **`Ellipse`**, **`Annulus`**, **`Sector`** | *Conceptual* flat shapes — size and proportion only, no position. | Pure intrinsic geometry: area, perimeter, angles; comparable by size. |
 | **`Sphere`**, **`Cuboid`**, **`Cylinder`**, **`Cone`**, **`Capsule`**, **`Ellipsoid`**, **`Torus`** | *Conceptual* solids — size and proportion only, no position. | Pure intrinsic geometry: volume, surface area; comparable by size. |
 | **`Placed…`** (one per conceptual shape) | A conceptual shape **placed** in space by a `Pose`. | Add world-space maths: containment, closest point, line/ray hits. |
@@ -1624,10 +1624,10 @@ existing `Sphere`, whose `Contains` has always meant "on or within".
 | `PlacedPolygon` | ordered coplanar corners | any simple polygon (convex or concave); robust area/normal/centroid, crossing-number containment |
 | `PlacedTetrahedron` | four corners | the simplest solid; barycentric containment, per-face intersection |
 
-> **"Cuboid", not "Box".** The solid box is named `Cuboid` so the name `Box` stays free for the
-> axis-aligned *bounding* box (a different idea — the box that just contains something, used for quick
-> rejection — and the reason the earlier `BoundingBox` was removed rather than renamed). That
-> [`Box`](#bounding-volumes-box-and-boundingsphere) now exists, alongside a `BoundingSphere`.
+> **"Cuboid", not "Box".** The solid box is named `Cuboid` to keep the plain word *box* for the
+> axis-aligned *bounding* box — a different idea: the box that just contains something, used for quick
+> rejection rather than as a shape in its own right. That type is
+> [`BoundingBox`](#bounding-volumes-boundingbox-and-boundingsphere), the partner of `BoundingSphere`.
 
 ### Vertex-defined shapes
 
@@ -1701,28 +1701,28 @@ centre)` and `PlacedSphere.At(sphere, centre)` are the everyday factories.
 
 ---
 
-## Bounding volumes: `Box` and `BoundingSphere`
+## Bounding volumes: `BoundingBox` and `BoundingSphere`
 
 The exact shapes above answer questions precisely — and sometimes expensively. A **bounding volume** is
 the opposite trade: a crude hull that is cheap to test, used for **quick rejection** — the fast "could
 these two things *possibly* touch?" you run before any exact geometry. Both types are immutable, built on
 `Vector`, and treat themselves as filled regions (`Contains` means "on or within").
 
-### `Box` — the axis-aligned bounding box (AABB)
+### `BoundingBox` — the axis-aligned bounding box (AABB)
 
-A `Box` is described by two opposite corners, a `Min` and a `Max`, with faces parallel to the coordinate
-planes. Because the faces never tilt, containment and overlap are just per-axis number comparisons — which
-is the whole point. (This is the `Box` the [shapes note](#the-shapes) reserved the name for; it is a
-different idea from the oriented solid [`Cuboid`](#shapes-conceptual-and-placed), which can sit at any
-angle.)
+A `BoundingBox` is described by two opposite corners, a `Min` and a `Max`, with faces parallel to the
+coordinate planes. Because the faces never tilt, containment and overlap are just per-axis number
+comparisons — which is the whole point. (This is the bounding box the [shapes note](#the-shapes) keeps the
+plain word *box* free for; it is a different idea from the oriented solid
+[`Cuboid`](#shapes-conceptual-and-placed), which can sit at any angle.)
 
 ```csharp
-Box b   = Box.FromPoints(p0, p1, p2);          // smallest AABB enclosing some points
-Box ce  = Box.FromCenterExtents(centre, half); // …or from a centre and half-size
+BoundingBox b   = BoundingBox.FromPoints(p0, p1, p2);          // smallest AABB enclosing some points
+BoundingBox ce  = BoundingBox.FromCenterExtents(centre, half); // …or from a centre and half-size
 bool in = b.Contains(point);
 bool hit = b.Intersects(other);                 // touching faces count
 Vector near = b.ClosestPoint(point);            // clamps the point into the box
-Box grown = b.Merge(other).Expand(0.1);         // union, then a safety margin
+BoundingBox grown = b.Merge(other).Expand(0.1); // union, then a safety margin
 ```
 
 Line and ray hits use the **slab method**: an AABB is the overlap of three pairs of parallel planes
@@ -1959,4 +1959,4 @@ types follow a settled conceptual/placed split — `Circle`, `Sphere`, `Triangle
 `PerspectiveFieldOfView`, `Orthographic`) with a perspective-divide `Transform`; `Quaternion` gained
 direction-based construction (`FromToRotation`, `LookRotation`); `Plane` gained plane-plane intersection;
 every placed shape gained `DistanceTo`; and two new families joined: the curves (`Bezier`, `Hermite`,
-`CatmullRom`) and the axis-aligned bounding volumes (`Box`, `BoundingSphere`).
+`CatmullRom`) and the axis-aligned bounding volumes (`BoundingBox`, `BoundingSphere`).

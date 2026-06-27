@@ -5,7 +5,7 @@ namespace RP.Math.Sample.SpaceFlight
     using Microsoft.Xna.Framework;
     using Microsoft.Xna.Framework.Graphics;
 
-    using RVector = RP.Math.Vector;
+    using RVector = RP.Math.Vector3d;
 
     /// <summary>
     /// Builds the scene geometry procedurally (no content pipeline). Each builder emits a triangle list

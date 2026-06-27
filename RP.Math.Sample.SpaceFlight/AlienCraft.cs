@@ -3,7 +3,7 @@ namespace RP.Math.Sample.SpaceFlight
     using System;
     using Microsoft.Xna.Framework.Graphics;
 
-    using RVector = RP.Math.Vector;
+    using RVector = RP.Math.Vector3d;
 
     /// <summary>
     /// One alien spacecraft: a procedurally-built mesh, a current <see cref="Pose"/>, a motion behaviour,

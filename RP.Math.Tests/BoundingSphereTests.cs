@@ -47,11 +47,11 @@ namespace RP.Math.Tests
         }
 
         [TestMethod, TestCategory("Intersection")]
-        public void Intersects_Box_Test()
+        public void Intersects_BoundingBox_Test()
         {
             var s = new BoundingSphere(new Vector(0, 0, 0), 2);
-            s.Intersects(new Box(new Vector(1, 1, 1), new Vector(5, 5, 5))).Should().BeTrue();
-            s.Intersects(new Box(new Vector(3, 3, 3), new Vector(5, 5, 5))).Should().BeFalse();
+            s.Intersects(new BoundingBox(new Vector(1, 1, 1), new Vector(5, 5, 5))).Should().BeTrue();
+            s.Intersects(new BoundingBox(new Vector(3, 3, 3), new Vector(5, 5, 5))).Should().BeFalse();
         }
 
         [TestMethod, TestCategory("Queries")]

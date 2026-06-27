@@ -69,14 +69,14 @@ namespace RP.Math.Tests.Bounds
         [TestMethod]
         public void Intersects_BoxAtOrigin_IsVisible()
         {
-            var box = Box.FromMinMax(new Vector(-1, -1, -1), new Vector(1, 1, 1));
+            var box = BoundingBox.FromMinMax(new Vector(-1, -1, -1), new Vector(1, 1, 1));
             MakeFrustum().Intersects(box).Should().BeTrue();
         }
 
         [TestMethod]
         public void Intersects_BoxFarToTheSide_IsCulled()
         {
-            var box = Box.FromMinMax(new Vector(90, -1, -1), new Vector(92, 1, 1));
+            var box = BoundingBox.FromMinMax(new Vector(90, -1, -1), new Vector(92, 1, 1));
             MakeFrustum().Intersects(box).Should().BeFalse();
         }
     }

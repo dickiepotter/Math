@@ -49,7 +49,7 @@ namespace RP.Math.Sample.SpaceFlight
         private VertexPositionColor[] _grid = null!;
         private VertexPositionColor[] _arenaWire = null!;
         private VertexPositionColor[] _playerMesh = null!;
-        private Box _arena;
+        private BoundingBox _arena;
         private CatmullRom _saucerPath = null!;
         private Bezier _dartPath = null!;
         private static readonly Plane Scanner = Plane.XZ; // the y = 0 reference plane drawn as the grid
@@ -205,10 +205,10 @@ namespace RP.Math.Sample.SpaceFlight
                     }));
             }
 
-            // Arena bounds: fit a box around every craft (Box.FromPoints) then pad it (FromCenterHalfExtents).
+            // Arena bounds: fit a box around every craft (BoundingBox.FromPoints) then pad it (FromCenterHalfExtents).
             var centres = new List<Vector>();
             foreach (var c in _craft) centres.Add(c.Pose.Position);
-            Box hull = Box.FromPoints(centres.ToArray());
+            BoundingBox hull = BoundingBox.FromPoints(centres.ToArray());
             _arena = hull.Expand(14); // pad the fitted box outward by a uniform margin
 
             _grid = MeshFactory.GridAndAxes(40, 4);
@@ -246,7 +246,7 @@ namespace RP.Math.Sample.SpaceFlight
             _velocity = _velocity.ClampMagnitude(MaxSpeed);
             _player = _player.Translate(_velocity * dt);
 
-            // --- Keep the player inside the arena (Box.ClosestPoint), killing the outward velocity --------
+            // --- Keep the player inside the arena (BoundingBox.ClosestPoint), killing the outward velocity --------
             if (!_arena.Contains(_player.Position))
             {
                 Vector clamped = _arena.ClosestPoint(_player.Position);

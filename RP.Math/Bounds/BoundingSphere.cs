@@ -8,13 +8,13 @@ namespace RP.Math
 
     /// <summary>
     /// A <b>bounding sphere</b>: a centre and a radius used as a cheap stand-in for the thing it encloses.
-    /// Like an axis-aligned <see cref="Box"/>, it exists for <i>quick rejection</i> — the overlap test
+    /// Like an axis-aligned <see cref="BoundingBox"/>, it exists for <i>quick rejection</i> — the overlap test
     /// between two spheres is a single distance comparison — but it is rotation-independent, so it does not
     /// need re-fitting when the enclosed object turns.
     /// </summary>
     /// <remarks>
     /// <para>
-    /// This is the bounding-volume partner of <see cref="Box"/>. It is distinct from
+    /// This is the bounding-volume partner of <see cref="BoundingBox"/>. It is distinct from
     /// <see cref="PlacedSphere"/>: that is a geometric sphere with full surface/volume maths and exact
     /// line/ray hits, whereas this is a lightweight enclosing volume focused on containment and overlap.
     /// Treated as a filled ball: <see cref="Contains(Vector)"/> means "on or within".
@@ -166,7 +166,7 @@ namespace RP.Math
         }
 
         /// <summary>Whether this sphere overlaps the axis-aligned <paramref name="box"/> (touching counts as intersecting).</summary>
-        public bool Intersects(Box box)
+        public bool Intersects(BoundingBox box)
         {
             // The sphere meets the box exactly when the box's closest point is within the radius.
             return box.DistanceTo(this.center) <= this.radius;

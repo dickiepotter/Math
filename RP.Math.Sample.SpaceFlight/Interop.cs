@@ -4,7 +4,7 @@ namespace RP.Math.Sample.SpaceFlight
 
     // RP.Math and MonoGame both define Vector/Matrix/Quaternion; alias the RP.Math ones so the
     // two worlds never get confused at a call site.
-    using RVector = RP.Math.Vector;
+    using RVector = RP.Math.Vector3d;
     using RMatrix = RP.Math.Matrix;
 
     /// <summary>

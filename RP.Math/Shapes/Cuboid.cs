@@ -13,8 +13,8 @@ namespace RP.Math
     /// This type holds only the intrinsic shape — the three edge lengths — with no position or
     /// orientation. Its volume, surface area and space diagonal depend solely on those, so cuboids can be
     /// compared by size on their own. To place one in space, pair it with a position; see
-    /// <see cref="PlacedCuboid"/>. The name "cuboid" is used rather than "box" so the name <c>Box</c>
-    /// stays free for a future axis-aligned <i>bounding</i> box.
+    /// <see cref="PlacedCuboid"/>. This solid is named "cuboid" rather than "box" to leave the plain
+    /// word for the axis-aligned <i>bounding</i> box, <see cref="BoundingBox"/>.
     /// </remarks>
     /// <author>Richard Potter BSc(Hons)</author>
     [Serializable]

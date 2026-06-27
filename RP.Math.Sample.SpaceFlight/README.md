@@ -74,7 +74,7 @@ pairing a left-handed convention with the right-handed view/projection would mir
   `Pose.ToMatrix` (model).
 * **OrthogonalAxes** — `MathsYUp` convention, `Up` / `Right` / `Forward`, `Handedness`.
 * **Geometry** — `Ray` + `PointAt` (targeting laser), `Plane` `SignedDistanceTo` / `SideOf` (scanner plane).
-* **Bounds** — `BoundingSphere` broad-phase (`Intersects`), `Box.FromPoints` / `Expand` / `Contains` /
+* **Bounds** — `BoundingSphere` broad-phase (`Intersects`), `BoundingBox.FromPoints` / `Expand` / `Contains` /
   `ClosestPoint` (the arena).
 * **Curves** — `Bezier.Cubic` and `CatmullRom` with `PointAt` / `Tangent` (patrol paths).
 * **Shapes** — `PlacedSphere`, `PlacedCuboid`, `PlacedCylinder`, `PlacedCone`, `PlacedCapsule`,

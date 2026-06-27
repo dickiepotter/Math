@@ -15,8 +15,8 @@ namespace RP.Math
     /// </summary>
     /// <remarks>
     /// <para>
-    /// This is the bounding box reserved for the name <c>Box</c> in the shapes documentation — a different
-    /// idea from the oriented solid <see cref="Cuboid"/>, which can sit at any angle. An AABB is always
+    /// This is the bounding-box partner of <see cref="BoundingSphere"/> — a different idea from the
+    /// oriented solid <see cref="Cuboid"/>, which can sit at any angle. An AABB is always
     /// axis-aligned and lives directly in world space (it carries its own corners), so it has no separate
     /// conceptual/placed split.
     /// </para>
@@ -27,7 +27,7 @@ namespace RP.Math
     /// </remarks>
     /// <author>Richard Potter BSc(Hons)</author>
     [Serializable]
-    public struct Box : IEquatable<Box>, IFormattable
+    public struct BoundingBox : IEquatable<BoundingBox>, IFormattable
     {
         #region Fields
 
@@ -43,7 +43,7 @@ namespace RP.Math
         /// on each axis becomes <see cref="Min"/> and the larger <see cref="Max"/> — you need not pass them
         /// in any particular order.
         /// </summary>
-        public Box(Vector cornerA, Vector cornerB)
+        public BoundingBox(Vector cornerA, Vector cornerB)
         {
             this.min = cornerA.ComponentMin(cornerB);
             this.max = cornerA.ComponentMax(cornerB);
@@ -54,19 +54,19 @@ namespace RP.Math
         #region Factories
 
         /// <summary>A box from its minimum and maximum corners (sorted per axis, as the constructor does).</summary>
-        public static Box FromMinMax(Vector min, Vector max)
+        public static BoundingBox FromMinMax(Vector min, Vector max)
         {
-            return new Box(min, max);
+            return new BoundingBox(min, max);
         }
 
         /// <summary>
         /// A box from its <paramref name="center"/> and half-size <paramref name="extents"/> (the distance
         /// from the centre to a face along each axis). Negative extents are treated as their absolute value.
         /// </summary>
-        public static Box FromCenterExtents(Vector center, Vector extents)
+        public static BoundingBox FromCenterExtents(Vector center, Vector extents)
         {
             Vector e = extents.AbsComponents();
-            return new Box(center - e, center + e);
+            return new BoundingBox(center - e, center + e);
         }
 
         /// <summary>
@@ -75,7 +75,7 @@ namespace RP.Math
         /// </summary>
         /// <exception cref="ArgumentNullException">Thrown if <paramref name="points"/> is null.</exception>
         /// <exception cref="ArgumentException">Thrown if no points are supplied.</exception>
-        public static Box FromPoints(params Vector[] points)
+        public static BoundingBox FromPoints(params Vector[] points)
         {
             if (points == null) throw new ArgumentNullException(nameof(points));
             return FromPoints((IEnumerable<Vector>)points);
@@ -84,7 +84,7 @@ namespace RP.Math
         /// <summary>The smallest box that contains all of <paramref name="points"/>.</summary>
         /// <exception cref="ArgumentNullException">Thrown if <paramref name="points"/> is null.</exception>
         /// <exception cref="ArgumentException">Thrown if no points are supplied.</exception>
-        public static Box FromPoints(IEnumerable<Vector> points)
+        public static BoundingBox FromPoints(IEnumerable<Vector> points)
         {
             if (points == null) throw new ArgumentNullException(nameof(points));
 
@@ -106,7 +106,7 @@ namespace RP.Math
             }
 
             if (!any) throw new ArgumentException(NO_POINTS, nameof(points));
-            return new Box(lo, hi);
+            return new BoundingBox(lo, hi);
         }
 
         #endregion
@@ -188,13 +188,13 @@ namespace RP.Math
         }
 
         /// <summary>Whether <paramref name="other"/> lies entirely on or within this box.</summary>
-        public bool Contains(Box other)
+        public bool Contains(BoundingBox other)
         {
             return this.Contains(other.min) && this.Contains(other.max);
         }
 
         /// <summary>Whether this box overlaps <paramref name="other"/> (touching faces count as intersecting).</summary>
-        public bool Intersects(Box other)
+        public bool Intersects(BoundingBox other)
         {
             return this.min.X <= other.max.X && this.max.X >= other.min.X
                 && this.min.Y <= other.max.Y && this.max.Y >= other.min.Y
@@ -218,22 +218,22 @@ namespace RP.Math
         #region Combination
 
         /// <summary>The smallest box containing both this one and <paramref name="point"/>.</summary>
-        public Box Merge(Vector point)
+        public BoundingBox Merge(Vector point)
         {
-            return new Box(this.min.ComponentMin(point), this.max.ComponentMax(point));
+            return new BoundingBox(this.min.ComponentMin(point), this.max.ComponentMax(point));
         }
 
         /// <summary>The smallest box containing both this one and <paramref name="other"/> (their union).</summary>
-        public Box Merge(Box other)
+        public BoundingBox Merge(BoundingBox other)
         {
-            return new Box(this.min.ComponentMin(other.min), this.max.ComponentMax(other.max));
+            return new BoundingBox(this.min.ComponentMin(other.min), this.max.ComponentMax(other.max));
         }
 
         /// <summary>A copy grown by <paramref name="margin"/> on every side (shrunk if negative).</summary>
-        public Box Expand(double margin)
+        public BoundingBox Expand(double margin)
         {
             Vector m = new Vector(margin, margin, margin);
-            return new Box(this.min - m, this.max + m);
+            return new BoundingBox(this.min - m, this.max + m);
         }
 
         #endregion
@@ -338,13 +338,13 @@ namespace RP.Math
         #region Operators
 
         /// <summary>Equality of both corners.</summary>
-        public static bool operator ==(Box b1, Box b2)
+        public static bool operator ==(BoundingBox b1, BoundingBox b2)
         {
             return b1.min == b2.min && b1.max == b2.max;
         }
 
         /// <summary>Inequality of either corner.</summary>
-        public static bool operator !=(Box b1, Box b2)
+        public static bool operator !=(BoundingBox b1, BoundingBox b2)
         {
             return !(b1 == b2);
         }
@@ -356,17 +356,17 @@ namespace RP.Math
         /// <summary>Equality with another object.</summary>
         public override bool Equals(object? other)
         {
-            return other is Box b && this.Equals(b);
+            return other is BoundingBox b && this.Equals(b);
         }
 
         /// <summary>Equality with another box (both corners).</summary>
-        public bool Equals(Box other)
+        public bool Equals(BoundingBox other)
         {
             return this == other;
         }
 
         /// <summary>Equality with another box within an absolute tolerance on every corner component.</summary>
-        public bool Equals(Box other, double tolerance)
+        public bool Equals(BoundingBox other, double tolerance)
         {
             return this.min.Equals(other.min, tolerance) && this.max.Equals(other.max, tolerance);
         }
@@ -384,17 +384,17 @@ namespace RP.Math
             max = this.max;
         }
 
-        /// <summary>A string of the form <c>Box[min → max]</c>.</summary>
+        /// <summary>A string of the form <c>BoundingBox[min → max]</c>.</summary>
         public override string ToString()
         {
             return this.ToString(null, CultureInfo.CurrentCulture);
         }
 
-        /// <summary>A formatted string of the form <c>Box[min → max]</c> where components use <paramref name="format"/>.</summary>
+        /// <summary>A formatted string of the form <c>BoundingBox[min → max]</c> where components use <paramref name="format"/>.</summary>
         public string ToString(string? format, IFormatProvider? formatProvider)
         {
             return string.Format(
-                "Box[{0} → {1}]",
+                "BoundingBox[{0} → {1}]",
                 this.min.ToString(),
                 this.max.ToString());
         }
