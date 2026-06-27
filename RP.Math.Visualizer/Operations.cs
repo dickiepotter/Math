@@ -376,6 +376,125 @@ public static class Operations
                        SceneItem.Plane(new Vector(0, 0, 0), c.B, "#4472c4", "plane")); },
             Input.B);
 
+        // ---- Curves: Bézier / Catmull–Rom built from A, B, C, with a moving Frenet frame ----
+        Add("bezier", "Bézier curve (A → B, control C)", "Curves", "Bezier(A, C, B).PointAt(t)",
+            "A quadratic Bézier from A to B pulled toward control point C. The marker rides the curve at t; "
+            + "the small triad is the Frenet frame (tangent / normal / binormal) there.",
+            c => {
+                var curve = new Bezier(c.A, c.C, c.B);
+                var p = curve.PointAt(c.Control);
+                var extras = new List<SceneItem>();
+                extras.AddRange(Polyline(curve.Sample(48), "#ffd166"));
+                extras.Add(SceneItem.Point(c.C, "#b39ddb", "control C"));
+                extras.AddRange(FrameAxes(curve.Frame(c.Control)));
+                return OpResult.Vec(p).AsPoint().With(extras.ToArray());
+            },
+            Input.B, Input.C, Input.Control);
+        Add("catmullRom", "Catmull–Rom (0 → A → B → C)", "Curves", "CatmullRom(O,A,B,C).PointAt(t)",
+            "A spline that passes through the origin, A, B and C in turn. The marker rides it at t.",
+            c => {
+                var spline = new CatmullRom(new Vector(0, 0, 0), c.A, c.B, c.C);
+                var p = spline.PointAt(c.Control);
+                var extras = new List<SceneItem>();
+                extras.AddRange(Polyline(spline.Sample(64), "#06d6a0"));
+                extras.AddRange(FrameAxes(spline.Frame(c.Control)));
+                return OpResult.Vec(p).AsPoint().With(extras.ToArray());
+            },
+            Input.B, Input.C, Input.Control);
+        Add("bezierLength", "Bézier arc length (A → B, control C)", "Curves", "Bezier(A, C, B).Length()",
+            "The arc length of the quadratic Bézier from A to B with control C (sampled).",
+            c => {
+                var curve = new Bezier(c.A, c.C, c.B);
+                return OpResult.Num(curve.Length())
+                    .With(Polyline(curve.Sample(48), "#ffd166").ToArray());
+            },
+            Input.B, Input.C);
+        Add("bezierClosest", "Closest point on Bézier to A", "Curves", "Bezier(O, C, B).ClosestPoint(A)",
+            "The point on the Bézier (origin → B, control C) nearest A, with the perpendicular drawn in.",
+            c => {
+                var curve = new Bezier(new Vector(0, 0, 0), c.C, c.B);
+                var p = curve.ClosestPoint(c.A);
+                var extras = new List<SceneItem>();
+                extras.AddRange(Polyline(curve.Sample(48), "#ffd166"));
+                extras.Add(SceneItem.Segment(c.A, p, "#6f7a88", "perp"));
+                return OpResult.Vec(p).AsPoint().With(extras.ToArray());
+            },
+            Input.B, Input.C);
+
+        // ---- Bounding volumes fitted to A, B, C ----
+        Add("aabb", "Bounding box of A, B, C", "Bounds", "BoundingBox.FromPoints(A, B, C)",
+            "The smallest axis-aligned box containing A, B and C. The result value is its volume; the box is drawn as a wireframe.",
+            c => {
+                var box = BoundingBox.FromPoints(c.A, c.B, c.C);
+                return OpResult.Num(box.Volume).With(BoxEdges(box, "#4472c4"));
+            },
+            Input.B, Input.C);
+        Add("bsphere", "Bounding sphere of A, B, C", "Bounds", "BoundingSphere.FromPoints(A, B, C)",
+            "A small sphere (Ritter's algorithm) containing A, B and C. The result value is its radius; three rings show the sphere.",
+            c => {
+                var s = BoundingSphere.FromPoints(c.A, c.B, c.C);
+                return OpResult.Num(s.Radius)
+                    .With(SphereRings(s.Center, s.Radius, "#ef476f").ToArray())
+                    .AsPoint();
+            },
+            Input.B, Input.C);
+
         return ops;
+    }
+
+    // ---- Scene helpers for the curve / bounds operations ----
+
+    private static IEnumerable<SceneItem> Polyline(Vector[] points, string color)
+    {
+        for (int i = 1; i < points.Length; i++)
+        {
+            yield return SceneItem.Segment(points[i - 1], points[i], color);
+        }
+    }
+
+    private static IEnumerable<SceneItem> FrameAxes(CurveFrame f, double scale = 1.0)
+    {
+        yield return SceneItem.Segment(f.Position, f.Position + f.Tangent * scale, "#ff7ac6", "T");
+        yield return SceneItem.Segment(f.Position, f.Position + f.Normal * scale, "#7ac6ff", "N");
+        yield return SceneItem.Segment(f.Position, f.Position + f.Binormal * scale, "#c6ff7a", "B");
+    }
+
+    private static SceneItem[] BoxEdges(BoundingBox box, string color)
+    {
+        Vector[] k = box.Corners;
+        // Corner index layout: bit0 = X, bit1 = Y, bit2 = Z (min/max).
+        int[,] edges =
+        {
+            { 0, 1 }, { 1, 3 }, { 3, 2 }, { 2, 0 }, // bottom (z = min)
+            { 4, 5 }, { 5, 7 }, { 7, 6 }, { 6, 4 }, // top (z = max)
+            { 0, 4 }, { 1, 5 }, { 2, 6 }, { 3, 7 }, // verticals
+        };
+
+        var items = new SceneItem[edges.GetLength(0)];
+        for (int e = 0; e < edges.GetLength(0); e++)
+        {
+            items[e] = SceneItem.Segment(k[edges[e, 0]], k[edges[e, 1]], color);
+        }
+
+        return items;
+    }
+
+    private static IEnumerable<SceneItem> SphereRings(Vector center, double radius, string color)
+    {
+        const int steps = 32;
+        for (int i = 0; i < steps; i++)
+        {
+            double a0 = 2 * Math.PI * i / steps;
+            double a1 = 2 * Math.PI * (i + 1) / steps;
+            double c0 = Math.Cos(a0), s0 = Math.Sin(a0), c1 = Math.Cos(a1), s1 = Math.Sin(a1);
+
+            // Three great circles in the XY, XZ and YZ planes.
+            yield return SceneItem.Segment(
+                center + new Vector(c0, s0, 0) * radius, center + new Vector(c1, s1, 0) * radius, color);
+            yield return SceneItem.Segment(
+                center + new Vector(c0, 0, s0) * radius, center + new Vector(c1, 0, s1) * radius, color);
+            yield return SceneItem.Segment(
+                center + new Vector(0, c0, s0) * radius, center + new Vector(0, c1, s1) * radius, color);
+        }
     }
 }
