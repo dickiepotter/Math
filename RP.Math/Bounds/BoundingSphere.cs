@@ -298,6 +298,78 @@ namespace RP.Math
 
         #endregion
 
+        #region Factories from other volumes
+
+        /// <summary>The smallest sphere that encloses the axis-aligned <paramref name="box"/> (centred on the box, reaching its corners).</summary>
+        public static BoundingSphere FromBox(BoundingBox box)
+        {
+            return new BoundingSphere(box.Center, box.Extents.Magnitude);
+        }
+
+        #endregion
+
+        #region Transform, translate and interpolate
+
+        /// <summary>A copy moved by <paramref name="offset"/> (the radius is unchanged).</summary>
+        public BoundingSphere Translate(Vector offset)
+        {
+            return new BoundingSphere(this.center + offset, this.radius);
+        }
+
+        /// <summary>
+        /// This sphere placed by <paramref name="pose"/>. A pose is a rigid motion (rotation + translation),
+        /// so only the centre moves — the radius is preserved exactly.
+        /// </summary>
+        public BoundingSphere Transform(Pose pose)
+        {
+            return new BoundingSphere(pose.Apply(this.center), this.radius);
+        }
+
+        /// <summary>
+        /// This sphere transformed by <paramref name="matrix"/>. The centre is transformed as a point and the
+        /// radius is scaled by the largest of the matrix's three axis scale factors, so a non-uniform scale
+        /// yields the enclosing sphere (conservative, never too small).
+        /// </summary>
+        public BoundingSphere Transform(Matrix matrix)
+        {
+            Vector o = matrix * Vector.Origin;
+            double sx = (matrix * Vector.XAxis - o).Magnitude;
+            double sy = (matrix * Vector.YAxis - o).Magnitude;
+            double sz = (matrix * Vector.ZAxis - o).Magnitude;
+            double scale = Math.Max(sx, Math.Max(sy, sz));
+
+            return new BoundingSphere(matrix * this.center, this.radius * scale);
+        }
+
+        /// <summary>Linearly interpolate between two spheres — centre and radius blended (<paramref name="t"/> in [0, 1]).</summary>
+        public static BoundingSphere Lerp(BoundingSphere a, BoundingSphere b, double t)
+        {
+            return new BoundingSphere(
+                a.center + (b.center - a.center) * t,
+                a.radius + (b.radius - a.radius) * t);
+        }
+
+        #endregion
+
+        #region Box containment
+
+        /// <summary>Whether the axis-aligned <paramref name="box"/> lies entirely on or within this sphere.</summary>
+        public bool Contains(BoundingBox box)
+        {
+            // The whole box is inside iff its farthest corner from the centre is within the radius.
+            Vector c = this.center;
+            Vector min = box.Min;
+            Vector max = box.Max;
+            var farthest = new Vector(
+                Math.Abs(min.X - c.X) > Math.Abs(max.X - c.X) ? min.X : max.X,
+                Math.Abs(min.Y - c.Y) > Math.Abs(max.Y - c.Y) ? min.Y : max.Y,
+                Math.Abs(min.Z - c.Z) > Math.Abs(max.Z - c.Z) ? min.Z : max.Z);
+
+            return c.DistanceSquared(farthest) <= this.radius * this.radius;
+        }
+
+        #endregion
+
         #region Messages
 
         private const string NO_POINTS = "At least one point is required to build a bounding sphere.";

@@ -401,6 +401,138 @@ namespace RP.Math
 
         #endregion
 
+        #region Transform, translate and interpolate
+
+        /// <summary>
+        /// The smallest axis-aligned box that contains this box after it is moved by <paramref name="offset"/>.
+        /// (A pure translation keeps the box axis-aligned, so this is exact.)
+        /// </summary>
+        public BoundingBox Translate(Vector offset)
+        {
+            return new BoundingBox(this.min + offset, this.max + offset);
+        }
+
+        /// <summary>
+        /// The smallest axis-aligned box that contains this box after every corner is transformed by
+        /// <paramref name="matrix"/>. A rotation tilts the box, so the result is re-fitted around the eight
+        /// transformed corners and is generally larger than the original (the standard cost of staying
+        /// axis-aligned).
+        /// </summary>
+        public BoundingBox Transform(Matrix matrix)
+        {
+            Vector[] corners = this.Corners;
+            Vector lo = matrix * corners[0];
+            Vector hi = lo;
+            for (int i = 1; i < corners.Length; i++)
+            {
+                Vector p = matrix * corners[i];
+                lo = lo.ComponentMin(p);
+                hi = hi.ComponentMax(p);
+            }
+
+            return new BoundingBox(lo, hi);
+        }
+
+        /// <summary>
+        /// The smallest axis-aligned box that contains this box after every corner is placed by
+        /// <paramref name="pose"/> (re-fitted around the transformed corners, as <see cref="Transform(Matrix)"/>).
+        /// </summary>
+        public BoundingBox Transform(Pose pose)
+        {
+            Vector[] corners = this.Corners;
+            Vector lo = pose.Apply(corners[0]);
+            Vector hi = lo;
+            for (int i = 1; i < corners.Length; i++)
+            {
+                Vector p = pose.Apply(corners[i]);
+                lo = lo.ComponentMin(p);
+                hi = hi.ComponentMax(p);
+            }
+
+            return new BoundingBox(lo, hi);
+        }
+
+        /// <summary>Linearly interpolate between two boxes, corner by corner (<paramref name="t"/> in [0, 1]).</summary>
+        public static BoundingBox Lerp(BoundingBox a, BoundingBox b, double t)
+        {
+            return new BoundingBox(
+                a.min + (b.min - a.min) * t,
+                a.max + (b.max - a.max) * t);
+        }
+
+        #endregion
+
+        #region Sphere queries and box intersection
+
+        /// <summary>Whether this box overlaps the <paramref name="sphere"/> (touching counts as intersecting).</summary>
+        public bool Intersects(BoundingSphere sphere)
+        {
+            // Mirrors BoundingSphere.Intersects(BoundingBox): they meet when the box's closest point is within the radius.
+            return this.DistanceTo(sphere.Center) <= sphere.Radius;
+        }
+
+        /// <summary>Whether the <paramref name="sphere"/> lies entirely on or within this box.</summary>
+        public bool Contains(BoundingSphere sphere)
+        {
+            Vector c = sphere.Center;
+            double r = sphere.Radius;
+            return c.X - r >= this.min.X && c.X + r <= this.max.X
+                && c.Y - r >= this.min.Y && c.Y + r <= this.max.Y
+                && c.Z - r >= this.min.Z && c.Z + r <= this.max.Z;
+        }
+
+        /// <summary>
+        /// The overlap of this box and <paramref name="other"/>, or an empty box when they are disjoint.
+        /// Use <see cref="IsEmpty"/> to detect the disjoint case.
+        /// </summary>
+        public BoundingBox Intersection(BoundingBox other)
+        {
+            Vector lo = this.min.ComponentMax(other.min);
+            Vector hi = this.max.ComponentMin(other.max);
+
+            if (lo.X > hi.X || lo.Y > hi.Y || lo.Z > hi.Z)
+            {
+                return Empty;
+            }
+
+            return new BoundingBox(lo, hi, unsorted: true);
+        }
+
+        /// <summary>The smallest box containing both this one and <paramref name="other"/> — an alias of <see cref="Merge(BoundingBox)"/>.</summary>
+        public BoundingBox Union(BoundingBox other) => this.Merge(other);
+
+        #endregion
+
+        #region Empty accumulator
+
+        /// <summary>
+        /// Direct (unsorted) corner constructor for the inverted <see cref="Empty"/> sentinel and for
+        /// intersection results that are already known to be ordered.
+        /// </summary>
+        private BoundingBox(Vector min, Vector max, bool unsorted)
+        {
+            this.min = min;
+            this.max = max;
+        }
+
+        /// <summary>
+        /// The "inverted" empty box (min at +∞, max at −∞). It contains nothing, but merging any point or box
+        /// into it yields exactly that point or box — so it is the correct starting value when accumulating a
+        /// bounding box over a sequence with <see cref="Merge(Vector)"/>.
+        /// </summary>
+        public static readonly BoundingBox Empty = new BoundingBox(
+            new Vector(double.PositiveInfinity, double.PositiveInfinity, double.PositiveInfinity),
+            new Vector(double.NegativeInfinity, double.NegativeInfinity, double.NegativeInfinity),
+            unsorted: true);
+
+        /// <summary>Whether the box is degenerate/inverted on any axis (its <see cref="Max"/> is below its <see cref="Min"/>).</summary>
+        public bool IsEmpty
+        {
+            get { return this.max.X < this.min.X || this.max.Y < this.min.Y || this.max.Z < this.min.Z; }
+        }
+
+        #endregion
+
         #region Messages
 
         private const string NO_POINTS = "At least one point is required to build a bounding box.";

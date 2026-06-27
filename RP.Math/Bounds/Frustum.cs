@@ -67,6 +67,9 @@ namespace RP.Math
 
         private Plane[] Planes => new[] { Left, Right, Bottom, Top, Near, Far };
 
+        /// <summary>The six bounding planes in the order left, right, bottom, top, near, far (normals inward).</summary>
+        public System.Collections.Generic.IReadOnlyList<Plane> AllPlanes => this.Planes;
+
         /// <summary>True if the point lies inside (or on) all six planes.</summary>
         public bool Contains(Vector point)
         {
@@ -112,6 +115,42 @@ namespace RP.Math
                     n.Z >= 0 ? max.Z : min.Z);
 
                 if (plane.SignedDistanceTo(positive) < 0) return false;
+            }
+
+            return true;
+        }
+
+        /// <summary>True if the whole sphere is inside the frustum (its centre is at least its radius inside every plane).</summary>
+        public bool Contains(BoundingSphere sphere)
+        {
+            foreach (Plane plane in Planes)
+            {
+                if (plane.SignedDistanceTo(sphere.Center) < sphere.Radius) return false;
+            }
+
+            return true;
+        }
+
+        /// <summary>
+        /// True if the whole axis-aligned box is inside the frustum. Uses the "negative vertex" test: for
+        /// each plane, the box corner farthest against the inward normal must still be inside; if it is, every
+        /// corner is.
+        /// </summary>
+        public bool Contains(BoundingBox box)
+        {
+            Vector min = box.Min;
+            Vector max = box.Max;
+
+            foreach (Plane plane in Planes)
+            {
+                Vector n = plane.Normal;
+                // The vertex of the box farthest AGAINST the inward normal (the last corner to be inside).
+                var negative = new Vector(
+                    n.X >= 0 ? min.X : max.X,
+                    n.Y >= 0 ? min.Y : max.Y,
+                    n.Z >= 0 ? min.Z : max.Z);
+
+                if (plane.SignedDistanceTo(negative) < 0) return false;
             }
 
             return true;
