@@ -46,6 +46,19 @@ namespace RP.Math.Noise
         /// <summary>A stable hash identifying the cell that owns the nearest feature point.</summary>
         public readonly uint CellHash;
 
+        /// <summary>
+        /// A stable hash identifying the cell that owns the <i>second</i>-nearest feature point.
+        /// </summary>
+        /// <remarks>
+        /// Reported because knowing only the winning cell is not enough to blend between regions. A
+        /// consumer partitioning a world into territories needs to know not just which region a point is
+        /// in, but which region is next door, so it can cross-fade the two near their shared border. Without
+        /// it, any property that differs between neighbours — terrain height, climate, which creatures
+        /// spawn — changes discontinuously the instant the border is crossed, and a height field that does
+        /// that produces a sheer cliff running along every boundary.
+        /// </remarks>
+        public readonly uint SecondCellHash;
+
         /// <summary>The integer coordinate of the cell that owns the nearest feature point.</summary>
         public readonly int CellX;
 
@@ -55,11 +68,12 @@ namespace RP.Math.Noise
         /// <summary>The integer coordinate of the cell that owns the nearest feature point (0 in 2D).</summary>
         public readonly int CellZ;
 
-        internal CellularSample(double f1, double f2, uint cellHash, int cellX, int cellY, int cellZ)
+        internal CellularSample(double f1, double f2, uint cellHash, uint secondCellHash, int cellX, int cellY, int cellZ)
         {
             this.F1 = f1;
             this.F2 = f2;
             this.CellHash = cellHash;
+            this.SecondCellHash = secondCellHash;
             this.CellX = cellX;
             this.CellY = cellY;
             this.CellZ = cellZ;
@@ -70,6 +84,21 @@ namespace RP.Math.Noise
         /// draw the <i>edges</i> of the cellular pattern rather than its interiors.
         /// </summary>
         public double Edge => this.F2 - this.F1;
+
+        /// <summary>
+        /// How firmly this point belongs to its own cell rather than the neighbouring one, in
+        /// <c>[0, 1]</c>: 0 exactly on the border, rising to 1 at the cell's heart.
+        /// </summary>
+        /// <param name="bandWidth">How wide the transition band is, in the same units the field was
+        /// sampled in. Wider bands give softer, longer blends.</param>
+        public double Certainty(double bandWidth)
+        {
+            if (bandWidth <= 0.0) return 1.0;
+            double t = this.Edge / bandWidth;
+            if (t <= 0.0) return 0.0;
+            if (t >= 1.0) return 1.0;
+            return t * t * (3.0 - (2.0 * t));
+        }
     }
 
     /// <summary>
@@ -126,7 +155,7 @@ namespace RP.Math.Noise
         {
             int cx = PerlinNoise.FastFloor(x), cy = PerlinNoise.FastFloor(y);
             double f1 = double.MaxValue, f2 = double.MaxValue;
-            uint bestHash = 0;
+            uint bestHash = 0, secondHash = 0;
             int bestX = cx, bestY = cy;
             double offset = (1.0 - this.Jitter) * 0.5; // pull points toward the centre as jitter falls
 
@@ -143,6 +172,7 @@ namespace RP.Math.Noise
                     if (d < f1)
                     {
                         f2 = f1;
+                        secondHash = bestHash;
                         f1 = d;
                         bestHash = NoiseHash.Hash(nx, ny, this.Seed);
                         bestX = nx;
@@ -151,11 +181,12 @@ namespace RP.Math.Noise
                     else if (d < f2)
                     {
                         f2 = d;
+                        secondHash = NoiseHash.Hash(nx, ny, this.Seed);
                     }
                 }
             }
 
-            return new CellularSample(f1, f2, bestHash, bestX, bestY, 0);
+            return new CellularSample(f1, f2, bestHash, secondHash, bestX, bestY, 0);
         }
 
         /// <summary>The full 3D cellular result. See <see cref="SampleCellular(double, double)"/>.</summary>
@@ -163,7 +194,7 @@ namespace RP.Math.Noise
         {
             int cx = PerlinNoise.FastFloor(x), cy = PerlinNoise.FastFloor(y), cz = PerlinNoise.FastFloor(z);
             double f1 = double.MaxValue, f2 = double.MaxValue;
-            uint bestHash = 0;
+            uint bestHash = 0, secondHash = 0;
             int bestX = cx, bestY = cy, bestZ = cz;
             double offset = (1.0 - this.Jitter) * 0.5;
 
@@ -183,6 +214,7 @@ namespace RP.Math.Noise
                         if (d < f1)
                         {
                             f2 = f1;
+                            secondHash = bestHash;
                             f1 = d;
                             bestHash = NoiseHash.Hash(nx, ny, nz, this.Seed);
                             bestX = nx;
@@ -192,12 +224,13 @@ namespace RP.Math.Noise
                         else if (d < f2)
                         {
                             f2 = d;
+                            secondHash = NoiseHash.Hash(nx, ny, nz, this.Seed);
                         }
                     }
                 }
             }
 
-            return new CellularSample(f1, f2, bestHash, bestX, bestY, bestZ);
+            return new CellularSample(f1, f2, bestHash, secondHash, bestX, bestY, bestZ);
         }
 
         /// <inheritdoc />

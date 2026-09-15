@@ -369,6 +369,49 @@ namespace RP.Math.Tests.Noise
         }
 
         [TestMethod]
+        public void Worley_ReportsTheRunnerUpCellDistinctlyFromTheWinner()
+        {
+            // Needed to blend between regions: a consumer partitioning a world needs to know not only which
+            // region a point is in but which one is next door, or every property that differs between them
+            // changes discontinuously at the border.
+            var w = new WorleyNoise(Seed);
+            int distinct = 0, samples = 0;
+
+            ForEachSample2(
+                (x, y) =>
+                {
+                    CellularSample s = w.SampleCellular(x, y);
+                    samples++;
+                    if (s.SecondCellHash != s.CellHash) distinct++;
+                },
+                count: 2000);
+
+            distinct.Should().Be(samples, "the runner-up is by definition a different cell from the winner");
+        }
+
+        [TestMethod]
+        public void Worley_Certainty_IsZeroOnABorderAndOneDeepInside()
+        {
+            var w = new WorleyNoise(Seed, jitter: 0.0); // no jitter: cells are exactly the unit grid
+
+            // The centre of a cell is as far from the border as it gets.
+            w.SampleCellular(4.5, 7.5).Certainty(0.3).Should().BeApproximately(1.0, 1e-9);
+
+            // Exactly halfway between two feature points, F1 and F2 are equal, so certainty is zero.
+            w.SampleCellular(5.0, 7.5).Certainty(0.3).Should().BeApproximately(0.0, 1e-9);
+
+            // And it is monotone in between, which is what makes it usable as a blend weight.
+            double previous = -1;
+            for (double t = 0.0; t <= 0.5; t += 0.01)
+            {
+                double certainty = w.SampleCellular(4.5 + t, 7.5).Certainty(0.3);
+                certainty.Should().BeInRange(0.0, 1.0);
+                if (previous >= 0) certainty.Should().BeLessThanOrEqualTo(previous + 1e-12);
+                previous = certainty;
+            }
+        }
+
+        [TestMethod]
         public void Worley_ZeroJitter_PutsFeaturePointsAtCellCentres()
         {
             var w = new WorleyNoise(Seed, jitter: 0.0);
