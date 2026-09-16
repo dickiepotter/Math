@@ -487,6 +487,23 @@ namespace RP.Math
         /// Cross products are non commutable
         /// </implementation>
         /// <Acknowledgement>This code is adapted from CSOpenGL - Lucas Viñas Livschitz </Acknowledgement>
+        /// <summary>
+        /// Cross product of two double-precision vectors: a vector perpendicular to both, right-handed.
+        /// </summary>
+        /// <remarks>
+        /// The single-precision <c>Vector3</c> has had this since it was written; the double-precision one
+        /// did not, so anything working in world coordinates -- which in a voxel world is everything that
+        /// needs a camera basis -- had to write it out by hand at the call site. Two spellings of the same
+        /// operation is one more than is useful.
+        /// </remarks>
+        public static Vector3d Cross(Vector3d a, Vector3d b) => new Vector3d(
+            (a.Y * b.Z) - (a.Z * b.Y),
+            (a.Z * b.X) - (a.X * b.Z),
+            (a.X * b.Y) - (a.Y * b.X));
+
+        /// <summary>Cross product with another vector.</summary>
+        public Vector3d Cross(Vector3d other) => Cross(this, other);
+
         public static Vector CrossProduct(Vector v1, Vector v2)
         {
             return
