@@ -130,3 +130,40 @@ input[type=range]::-moz-range-thumb { width: 14px; height: 14px; border-radius: 
     position: fixed; bottom: 0; left: 0; right: 0;
     background: #3a1d1d; color: #ffd9d9; padding: .6rem 1rem; display: none;
 }
+
+/* ---- top navigation ---- */
+.topnav {
+    max-width: 1180px; margin: 0 auto; padding: 1rem 1.25rem .25rem;
+    display: flex; align-items: center; gap: 1.25rem; flex-wrap: wrap;
+}
+.topnav__brand { font-weight: 700; letter-spacing: .2px; }
+.topnav__brand span { color: var(--accent); }
+.topnav__link {
+    color: var(--muted); text-decoration: none; font-size: .9rem;
+    padding: .3rem 0; border-bottom: 2px solid transparent;
+}
+.topnav__link:hover { color: var(--text); }
+.topnav__link.active { color: var(--text); border-bottom-color: var(--accent); }
+
+/* ---- noise raster ---- */
+.scene--raster { display: flex; flex-direction: column; align-items: stretch; }
+.raster {
+    display: block; width: 100%; height: auto; border-radius: 8px;
+    /* The field is sampled at 256 square; let the pixels stay square rather than be smoothed away. */
+    image-rendering: pixelated;
+    background: var(--bg-soft);
+}
+.raster-error { color: #ffb27a; font-size: .9rem; line-height: 1.5; padding: 2rem 1rem; }
+
+/* ---- grouped controls ---- */
+.group { border: 1px solid var(--line); border-radius: 10px; padding: .6rem .75rem; display: flex; flex-direction: column; gap: .55rem; }
+.group__title { font-size: .8rem; color: var(--muted); text-transform: uppercase; letter-spacing: .04em; }
+
+/* ---- the calls behind the image ---- */
+.codeblock { background: var(--bg-soft); border: 1px solid var(--line); border-radius: 8px; padding: .55rem .7rem; }
+.codeblock__label {
+    display: block; font-size: .7rem; letter-spacing: .08em; text-transform: uppercase;
+    color: var(--muted); margin-bottom: .35rem;
+}
+.codeblock pre { margin: 0; overflow-x: auto; }
+.codeblock code { color: #ffce47; font-size: .8rem; line-height: 1.5; white-space: pre; }

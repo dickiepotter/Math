@@ -1,0 +1,199 @@
+@page "/noise"
+@using RP.Math.Noise
+
+<PageTitle>RP.Math — Noise fields</PageTitle>
+
+@{
+    // Sample the field, then encode it. Both run the REAL RP.Math.Noise types in the browser.
+    string? error = null;
+    string image = string.Empty;
+    var elapsed = System.Diagnostics.Stopwatch.StartNew();
+    try
+    {
+        var raster = NoiseFields.Render(cfg, cfg.Resolution);
+        image = NoiseRaster.ToPngDataUri(raster, cfg.Resolution, cfg.Resolution, NoisePalettes.Build(cfg.Palette));
+    }
+    catch (Exception ex)
+    {
+        error = $"{ex.GetType().Name}: {ex.Message}";
+    }
+
+    elapsed.Stop();
+}
+
+<header class="masthead">
+    <h1>RP.<span>Math</span> Noise fields</h1>
+    <p>Every pixel below is one call into the compiled <code>RP.Math.Noise</code> library — no shader, no
+       re-implementation, no pre-baked textures. Choose a field, stack octaves, warp the domain and shape
+       the result with the same curves a terrain generator would use, and watch the whole raster
+       recompute in the browser.</p>
+</header>
+
+<div class="workspace">
+    <section class="scene scene--raster">
+        @if (error is not null)
+        {
+            <div class="raster-error" role="alert">@error</div>
+        }
+        else
+        {
+            <img class="raster" src="@image" width="@cfg.Resolution" height="@cfg.Resolution" alt="The configured noise field" />
+        }
+
+        <div class="scene-tools">
+            <button @onclick="Reseed">⟳ New seed</button>
+            <button @onclick="Reset">Reset</button>
+            <span class="hint">seed @cfg.Seed — @(cfg.Resolution * cfg.Resolution) samples in @elapsed.ElapsedMilliseconds ms</span>
+        </div>
+    </section>
+
+    <aside class="panel">
+        <label class="field">
+            <span>Field</span>
+            <select @bind="cfg.Field">
+                <option value="@FieldKind.Perlin">Perlin — gradient, square lattice</option>
+                <option value="@FieldKind.Simplex">Simplex — gradient, simplex lattice</option>
+                <option value="@FieldKind.Value">Value — interpolated lattice values</option>
+                <option value="@FieldKind.Worley">Worley — cellular</option>
+            </select>
+        </label>
+
+        <p class="desc">@FieldBlurb</p>
+
+        @Slider("frequency (periods across)", 0.5, 16, 0.5, cfg.Frequency, v => cfg.Frequency = v)
+
+        @if (cfg.IsCoherent)
+        {
+            <label class="field">
+                <span>Fractal mode</span>
+                <select @bind="cfg.Mode">
+                    <option value="@FractalMode.Brownian">Brownian — rolling terrain</option>
+                    <option value="@FractalMode.Billow">Billow — cloud and puffy mass</option>
+                    <option value="@FractalMode.Ridged">Ridged — knife-edge crests</option>
+                    <option value="@FractalMode.Turbulence">Turbulence — folded, churning</option>
+                </select>
+            </label>
+
+            @Slider("octaves", 1, 8, 1, cfg.Octaves, v => cfg.Octaves = (int)v)
+            @Slider("lacunarity", 1.2, 4, 0.1, cfg.Lacunarity, v => cfg.Lacunarity = v)
+            @Slider("gain", 0.2, 0.8, 0.02, cfg.Gain, v => cfg.Gain = v)
+        }
+        else
+        {
+            <label class="field">
+                <span>Distance metric</span>
+                <select @bind="cfg.Metric">
+                    <option value="@DistanceMetric.Euclidean">Euclidean — rounded, organic</option>
+                    <option value="@DistanceMetric.EuclideanSquared">Euclidean² — harder edges, cheaper</option>
+                    <option value="@DistanceMetric.Manhattan">Manhattan — diamonds, crystalline</option>
+                    <option value="@DistanceMetric.Chebyshev">Chebyshev — squares, deliberately artificial</option>
+                </select>
+            </label>
+
+            <label class="field">
+                <span>Read the sample as</span>
+                <select @bind="cfg.Output">
+                    <option value="@WorleyOutput.F1">F1 — distance to nearest point</option>
+                    <option value="@WorleyOutput.Ridges">F2 − F1 — cracks and cobbles</option>
+                    <option value="@WorleyOutput.Cells">Cell hash — regions</option>
+                </select>
+            </label>
+
+            @Slider("jitter", 0, 1, 0.05, cfg.Jitter, v => cfg.Jitter = v)
+        }
+
+        <div class="group">
+            <div class="group__title">Domain warp</div>
+            @Slider("amplitude", 0, 0.4, 0.01, cfg.WarpAmplitude, v => cfg.WarpAmplitude = v)
+            @if (cfg.WarpAmplitude > 0)
+            {
+                @Slider("warp frequency", 0.25, 8, 0.25, cfg.WarpFrequency, v => cfg.WarpFrequency = v)
+                @Slider("iterations", 1, 4, 1, cfg.WarpIterations, v => cfg.WarpIterations = (int)v)
+            }
+        </div>
+
+        <div class="group">
+            <div class="group__title">Shaping curve</div>
+            <label class="field">
+                <span>Curve</span>
+                <select @bind="cfg.Curve">
+                    <option value="@ShapingCurve.None">None — the field as it is</option>
+                    <option value="@ShapingCurve.Terrace">Terrace — sedimentary bands</option>
+                    <option value="@ShapingCurve.Ridge">Ridge — fold crossings into crests</option>
+                    <option value="@ShapingCurve.Continentalness">Continentalness — buy plains, keep peaks</option>
+                </select>
+            </label>
+
+            @if (cfg.Curve != ShapingCurve.None)
+            {
+                @Slider(cfg.Curve == ShapingCurve.Continentalness ? "flatness" : "sharpness",
+                        0, 0.99, 0.01, cfg.CurveAmount, v => cfg.CurveAmount = v)
+            }
+            @if (cfg.Curve == ShapingCurve.Terrace)
+            {
+                @Slider("steps", 2, 16, 1, cfg.TerraceSteps, v => cfg.TerraceSteps = (int)v)
+            }
+        </div>
+
+        <label class="field">
+            <span>Detail — every pixel is a library call</span>
+            <select @bind="cfg.Resolution">
+                <option value="128">128 × 128 — fastest, for dragging sliders</option>
+                <option value="192">192 × 192 — balanced</option>
+                <option value="256">256 × 256 — sharp</option>
+                <option value="320">320 × 320 — slow, for a settled look</option>
+            </select>
+        </label>
+
+        <label class="field">
+            <span>Palette</span>
+            <select @bind="cfg.Palette">
+                <option value="@PaletteKind.Grey">Grey — the field as it is</option>
+                <option value="@PaletteKind.Terrain">Terrain — sea to snow</option>
+                <option value="@PaletteKind.Ember">Ember — heat</option>
+                <option value="@PaletteKind.Ice">Ice — cold and vapour</option>
+                <option value="@PaletteKind.Cells">Cells — distinct regions</option>
+            </select>
+        </label>
+
+        <div class="codeblock">
+            <span class="codeblock__label">The calls behind this image</span>
+            <pre><code>@NoiseFields.DescribeAsCode(cfg)</code></pre>
+        </div>
+    </aside>
+</div>
+
+@code {
+    private NoiseConfig cfg = new();
+
+    private readonly Random rng = new();
+
+    private string FieldBlurb => cfg.Field switch
+    {
+        FieldKind.Simplex => "Gradient noise on a simplex lattice. Fewer axis-aligned artefacts than Perlin and cheaper as dimensions rise, which is why it is the usual choice for 3D and 4D fields.",
+        FieldKind.Value => "Interpolates values stored at lattice corners rather than gradients. Blockier and cheaper — good for coarse masks and region selection, less good as visible terrain.",
+        FieldKind.Worley => "Scatters feature points and measures distance to them. F1 gives blobs; F2 − F1 finds the boundary between cells, which is how cracks, cobbles and dry riverbeds are drawn; the cell hash partitions the plane into regions with organic borders instead of a visible grid.",
+        _ => "Gradient noise on a square lattice — the classic. Smooth, well-behaved, and the safest default when you are not sure what you want.",
+    };
+
+    private void Reseed() => cfg.Seed = rng.Next(int.MinValue, int.MaxValue);
+
+    private void Reset() => cfg = new NoiseConfig();
+
+    private RenderFragment Slider(string label, double min, double max, double step, double value, Action<double> set) => b =>
+    {
+        b.OpenElement(0, "label"); b.AddAttribute(1, "class", "field slider");
+        b.OpenElement(2, "span"); b.AddContent(3, $"{label}: {value.ToString("0.###", CultureInfo.InvariantCulture)}"); b.CloseElement();
+        b.OpenElement(4, "input");
+        b.AddAttribute(5, "type", "range");
+        b.AddAttribute(6, "min", min); b.AddAttribute(7, "max", max); b.AddAttribute(8, "step", step);
+        b.AddAttribute(9, "value", value.ToString(CultureInfo.InvariantCulture));
+        b.AddAttribute(10, "oninput", EventCallback.Factory.Create<ChangeEventArgs>(this, e =>
+        {
+            if (double.TryParse(Convert.ToString(e.Value, CultureInfo.InvariantCulture),
+                    NumberStyles.Any, CultureInfo.InvariantCulture, out var v)) set(v);
+        }));
+        b.CloseElement();
+        b.CloseElement();
+    };
+}

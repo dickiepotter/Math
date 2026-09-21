@@ -35,6 +35,7 @@ more.*
 - [Curves: `Bezier`, `Hermite`, `CatmullRom`](#curves-bezier-hermite-catmullrom)
 - [Shapes: conceptual and placed](#shapes-conceptual-and-placed)
 - [Bounding volumes: `BoundingBox` and `BoundingSphere`](#bounding-volumes-boundingbox-and-boundingsphere)
+- [Noise: procedural fields](#noise-procedural-fields)
 - [Supporting numeric helpers](#supporting-numeric-helpers)
 - [Points of interest](#points-of-interest)
 - [Future considerations](#future-considerations)
@@ -1751,6 +1752,101 @@ bool hitsBox  = s.Intersects(box);
 bool hitsBall = s.Intersects(other);
 BoundingSphere grown = s.Merge(extraPoint);
 ```
+
+---
+
+## Noise: procedural fields
+
+Everything above answers a question about a *particular* shape you already have. `RP.Math.Noise`
+answers a different one: **what should be here?** — asked at every point of a space you have not
+built yet. It is the maths behind generated terrain, cloud, marble, rust, cave systems and the
+scattering of trees across a continent.
+
+A noise field is a function from a coordinate to a number, and the whole discipline rests on three
+properties that an ordinary random number does not have. A field is **pure** — the same coordinate
+always gives the same value, so a world can be regenerated from a seed rather than stored. It is
+**total** — defined everywhere, a million units from the origin as readily as at it, so a world need
+have no edge. And it is **coherent** — nearby points give nearby values, which is the difference
+between a landscape and television static.
+
+```csharp
+var field = new PerlinNoise(seed: 1337);
+double height = field.Sample(x, y);        // approximately [-1, 1], smooth, repeatable
+```
+
+### The four fields
+
+| Type | What it is | What it looks like |
+|---|---|---|
+| `PerlinNoise` | Gradient noise on a square lattice | The classic. Smooth rolling shapes; the safe default |
+| `SimplexNoise` | Gradient noise on a simplex lattice | Fewer axis-aligned artefacts, and cheaper as dimensions rise |
+| `ValueNoise` | Interpolated lattice *values* | Blockier and cheapest — good for coarse masks |
+| `WorleyNoise` | Distance to scattered feature points | Cells: cobbles, cracked mud, scales, territory |
+
+The three coherent fields implement `INoise2`, `INoise3` and `INoise4`, so anything that layers or
+warps a field can hold any of them without knowing which.
+
+`WorleyNoise` is the odd one out, and deliberately so: one lookup returns a `CellularSample` that
+answers three different questions at once. `F1` — the distance to the nearest feature point — gives
+rounded blobs. `F2 - F1` is near zero exactly where two cells are equidistant, which is the cell
+*boundary*, and that is how cracks, dry riverbeds and cobbled paths are drawn. And `CellHash` gives
+each cell a stable identity, which is the cleanest way to divide a world into regions — biomes,
+territories, districts — with organic borders rather than a visible grid.
+
+### Stacking: `FractalNoise2` and `FractalNoise3`
+
+One octave of noise has features at one size, which reads as artificial because nothing in nature
+does. Summing copies at doubling frequency and halving amplitude gives detail at every scale:
+
+```csharp
+var terrain = new FractalNoise2(new SimplexNoise(seed), octaves: 6, frequency: 3,
+                                lacunarity: 2.0, gain: 0.5, mode: FractalMode.Ridged);
+```
+
+`lacunarity` is how much finer each octave is; `gain` is how much quieter. `FractalMode` changes what
+each octave contributes before it is summed, and it is the single biggest lever on the result:
+
+- **`Brownian`** — octaves summed as they come: rolling terrain, cloud, rock.
+- **`Billow`** — each octave folded about zero, turning crossings into bulges: puffy, organic mass.
+- **`Ridged`** — folded *and* inverted, so crossings become sharp crests: mountain ranges with
+  knife-edge ridges and eroded gullies.
+- **`Turbulence`** — folded without normalising back, giving a churned, flame-like field.
+
+### Warping: `DomainWarp2` and `DomainWarp3`
+
+Fractal noise still has a tell — a certain evenness, passages of similar width meeting at similar
+angles. Domain warping distorts **where** the field is sampled rather than what it returns, which
+stretches some features and pinches others:
+
+```csharp
+var warped = DomainWarp2.Simplex(terrain, seed, amplitude: 0.15, frequency: 2, iterations: 2);
+```
+
+It costs one extra field sample per axis and is the cheapest thing that makes generated ground look
+eroded rather than generated.
+
+### Shaping: `NoiseCurves`
+
+Raw noise spends most of its time in the middle of its range, so terrain slopes constantly and there
+is nowhere flat to build, farm or fight. `NoiseCurves` reshapes the *distribution*:
+
+- `Continentalness` compresses the middle band into plains while leaving the tails their full height,
+  so you gain flat ground without losing the mountains or the ocean trenches.
+- `Terrace` quantises into flat bands with ramps between — sedimentary cliffs and stepped mesas.
+- `Ridge` folds a finished field about zero, the per-sample form of `FractalMode.Ridged`.
+- `SmoothMin` / `SmoothMax` combine two fields without leaving a visible fold line where they meet.
+- `Bias`, `Gain`, `Remap`, `SmoothStep`, `SmootherStep` and `Spline` are the ordinary shaping kit.
+
+### Determinism: `NoiseHash`
+
+Every field draws its randomness from `NoiseHash`, an integer avalanche hash rather than a `Random`
+instance. That is what makes the fields pure and thread-safe: eight workers generating eight chunks
+call the same function with the same coordinates and get the same answer, with no shared state and no
+seams. `NoiseHash.Derive(seed, label)` splits one world seed into independent sub-seeds, so the cave
+field and the ore field do not accidentally correlate.
+
+> **Try it.** The [visualizer](RP.Math.Visualizer)'s *Noise fields* page renders any of these
+> configurations live in the browser, running this library — every pixel is one `Sample` call.
 
 ---
 
