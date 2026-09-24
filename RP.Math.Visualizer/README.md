@@ -71,6 +71,12 @@ dotnet publish RP.Math.Visualizer -c Release
 The output under `bin/Release/net8.0/publish/wwwroot` is a static site that can be hosted anywhere
 (GitHub Pages, any static host).
 
+`.github/workflows/pages.yml` does this on every push to `master` and deploys the result to GitHub
+Pages, after running the library's tests. It sets `<base href>` to the repository's Pages path and
+adds a `404.html` copy of `index.html`, so opening `/noise` directly still reaches the app. To switch
+it on once, open the repository's **Settings → Pages** and set **Build and deployment → Source** to
+**GitHub Actions**. The visualizer then appears at `https://<owner>.github.io/<repository>/`.
+
 ## How it's wired
 
 - `Operations.cs` — a data-driven catalogue of every operation, each with a `Func<OpContext, OpResult>`

@@ -1,0 +1,66 @@
+# Publishes the RP.Math visualizer to GitHub Pages. It is a Blazor WebAssembly app, so the
+# published wwwroot is already a static site: the only changes are the <base href>, which must name
+# the /<repository>/ path Pages serves a project site from, and a 404.html copy of index.html so
+# that opening /noise directly still boots the app and lets its router take over.
+#
+# One-off setup: Settings → Pages → Build and deployment → Source: "GitHub Actions".
+name: Deploy visualizer to GitHub Pages
+
+on:
+  push:
+    branches: [master]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  pages: write
+  id-token: write
+
+# One deployment at a time; a newer push waits rather than cancelling one in flight.
+concurrency:
+  group: pages
+  cancel-in-progress: false
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: 8.0.x
+
+      # A visualizer drawing the wrong answer is worse than a stale one.
+      - name: Test the library
+        run: dotnet test RP.Math.Tests --configuration Release
+
+      - name: Publish the visualizer
+        run: dotnet publish RP.Math.Visualizer --configuration Release --output publish
+
+      - id: pages
+        uses: actions/configure-pages@v5
+
+      - name: Point the app at the Pages path
+        env:
+          BASE_PATH: ${{ steps.pages.outputs.base_path }}
+        run: |
+          site=publish/wwwroot
+          sed -i "s#<base href=\"/\" />#<base href=\"${BASE_PATH}/\" />#" "$site/index.html"
+          grep -q "<base href=\"${BASE_PATH}/\" />" "$site/index.html"
+          cp "$site/index.html" "$site/404.html"
+          touch "$site/.nojekyll"
+
+      - uses: actions/upload-pages-artifact@v3
+        with:
+          path: publish/wwwroot
+
+  deploy:
+    needs: build
+    runs-on: ubuntu-latest
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    steps:
+      - id: deployment
+        uses: actions/deploy-pages@v4
