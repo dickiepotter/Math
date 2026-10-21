@@ -1,7 +1,5 @@
 namespace RP.Math.Tests
 {
-    using FluentAssertions;
-
     using Microsoft.VisualStudio.TestTools.UnitTesting;
 
     using Math = System.Math;
@@ -21,14 +19,14 @@ namespace RP.Math.Tests
         public void Construction_ShouldNormalizeTheAxis_Test()
         {
             var aa = new AxisAngle(new Vector(0, 0, 5), new Angle(1));
-            aa.Axis.Magnitude.Should().BeApproximately(1, Tolerance);
-            aa.Axis.Equals(new Vector(0, 0, 1), Tolerance).Should().BeTrue();
+            Assert.AreEqual(1, aa.Axis.Magnitude, Tolerance);
+            Assert.IsTrue(aa.Axis.Equals(new Vector(0, 0, 1), Tolerance));
         }
 
         [TestMethod, TestCategory("Construction")]
         public void Identity_ShouldHaveZeroAngle_Test()
         {
-            AxisAngle.Identity.Angle.Rad.Should().BeApproximately(0, Tolerance);
+            Assert.AreEqual(0, AxisAngle.Identity.Angle.Rad, Tolerance);
         }
 
         #endregion
@@ -39,7 +37,7 @@ namespace RP.Math.Tests
         public void Rotate_QuarterTurnAboutZ_ShouldTakeXToY_Test()
         {
             var aa = new AxisAngle(new Vector(0, 0, 1), new Angle(Math.PI / 2));
-            aa.Rotate(new Vector(1, 0, 0)).Equals(new Vector(0, 1, 0), LooseTolerance).Should().BeTrue();
+            Assert.IsTrue(aa.Rotate(new Vector(1, 0, 0)).Equals(new Vector(0, 1, 0), LooseTolerance));
         }
 
         [TestMethod, TestCategory("Rotate")]
@@ -48,7 +46,7 @@ namespace RP.Math.Tests
             var aa = new AxisAngle(new Vector(1, 2, 3), new Angle(0.9));
             var v = new Vector(4, -1, 2);
 
-            aa.Rotate(v).Equals(aa.ToQuaternion().Rotate(v), LooseTolerance).Should().BeTrue();
+            Assert.IsTrue(aa.Rotate(v).Equals(aa.ToQuaternion().Rotate(v), LooseTolerance));
         }
 
         [TestMethod, TestCategory("Rotate")]
@@ -56,7 +54,7 @@ namespace RP.Math.Tests
         {
             var axis = new Vector(1, 2, 3);
             var aa = new AxisAngle(axis, new Angle(1.234));
-            aa.Rotate(axis).Equals(axis, LooseTolerance).Should().BeTrue();
+            Assert.IsTrue(aa.Rotate(axis).Equals(axis, LooseTolerance));
         }
 
         #endregion
@@ -69,7 +67,7 @@ namespace RP.Math.Tests
             var aa = new AxisAngle(new Vector(0, 1, 1), new Angle(0.7));
             var v = new Vector(3, 4, 5);
 
-            aa.Inverse().Rotate(aa.Rotate(v)).Equals(v, LooseTolerance).Should().BeTrue();
+            Assert.IsTrue(aa.Inverse().Rotate(aa.Rotate(v)).Equals(v, LooseTolerance));
         }
 
         #endregion
@@ -83,7 +81,7 @@ namespace RP.Math.Tests
             var aa = AxisAngle.FromQuaternion(q);
 
             // Same represented rotation (quaternion double-cover means the components may differ in sign).
-            aa.ToQuaternion().AngleTo(q).Rad.Should().BeApproximately(0, LooseTolerance);
+            Assert.AreEqual(0, aa.ToQuaternion().AngleTo(q).Rad, LooseTolerance);
         }
 
         [TestMethod, TestCategory("Conversion")]
@@ -92,7 +90,7 @@ namespace RP.Math.Tests
             var aa = new AxisAngle(new Vector(0, 1, 0), new Angle(Math.PI / 3));
             var v = new Vector(1, 2, 3);
 
-            aa.ToRotation().Rotate(v).Equals(aa.Rotate(v), LooseTolerance).Should().BeTrue();
+            Assert.IsTrue(aa.ToRotation().Rotate(v).Equals(aa.Rotate(v), LooseTolerance));
         }
 
         #endregion
@@ -106,10 +104,10 @@ namespace RP.Math.Tests
             var flipped = new AxisAngle(new Vector(0, 0, -1), new Angle(-0.5));
 
             // Same physical rotation expressed two ways.
-            aa.Equals(flipped, LooseTolerance).Should().BeTrue();
+            Assert.IsTrue(aa.Equals(flipped, LooseTolerance));
 
             // ...but the raw fields differ, so plain Equals does not.
-            aa.Equals(flipped).Should().BeFalse();
+            Assert.IsFalse(aa.Equals(flipped));
         }
 
         #endregion

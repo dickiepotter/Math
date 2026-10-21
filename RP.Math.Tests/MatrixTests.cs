@@ -1,7 +1,5 @@
 namespace RP.Math.Tests
 {
-    using FluentAssertions;
-
     using Microsoft.VisualStudio.TestTools.UnitTesting;
 
     /// <summary>
@@ -18,7 +16,7 @@ namespace RP.Math.Tests
             for (var i = 0; i < 4; i++)
             for (var j = 0; j < 4; j++)
             {
-                m[i, j].Should().Be(i == j ? 1d : 0d, "identity element [{0},{1}]", i, j);
+                Assert.AreEqual(i == j ? 1d : 0d, m[i, j], "identity element [{0},{1}]", i, j);
             }
         }
 
@@ -26,7 +24,7 @@ namespace RP.Math.Tests
         public void Identity_TimesIdentity_ShouldBeIdentity_Test()
         {
             var product = Matrix.Identity * Matrix.Identity;
-            product.IsIdentity.Should().BeTrue();
+            Assert.IsTrue(product.IsIdentity);
         }
 
         [TestMethod, TestCategory("Matrix")]
@@ -34,15 +32,15 @@ namespace RP.Math.Tests
         {
             var v = new Vector(2, 3, 4);
             var result = Matrix.Identity * v;
-            result.X.Should().Be(2);
-            result.Y.Should().Be(3);
-            result.Z.Should().Be(4);
+            Assert.AreEqual(2, result.X);
+            Assert.AreEqual(3, result.Y);
+            Assert.AreEqual(4, result.Z);
         }
 
         [TestMethod, TestCategory("Matrix")]
         public void Transpose_OfIdentity_ShouldBeIdentity_Test()
         {
-            Matrix.Identity.Transpose().IsIdentity.Should().BeTrue();
+            Assert.IsTrue(Matrix.Identity.Transpose().IsIdentity);
         }
 
         [TestMethod, TestCategory("Matrix")]
@@ -61,7 +59,7 @@ namespace RP.Math.Tests
             for (var i = 0; i < 4; i++)
             for (var j = 0; j < 4; j++)
             {
-                t[i, j].Should().Be(m[j, i]);
+                Assert.AreEqual(m[j, i], t[i, j]);
             }
         }
 
@@ -70,15 +68,15 @@ namespace RP.Math.Tests
         {
             var translate = Matrix.TranslationMatrix(10, 20, 30);
             var moved = translate * new Vector(1, 2, 3);
-            moved.X.Should().Be(11);
-            moved.Y.Should().Be(22);
-            moved.Z.Should().Be(33);
+            Assert.AreEqual(11, moved.X);
+            Assert.AreEqual(22, moved.Y);
+            Assert.AreEqual(33, moved.Z);
         }
 
         [TestMethod, TestCategory("Matrix")]
         public void Determinant_OfIdentity_ShouldBeOne_Test()
         {
-            Matrix.Identity.Determinant.Should().BeApproximately(1d, 1e-9);
+            Assert.AreEqual(1d, Matrix.Identity.Determinant, 1e-9);
         }
     }
 }

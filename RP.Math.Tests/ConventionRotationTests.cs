@@ -1,4 +1,3 @@
-using FluentAssertions;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 
 namespace RP.Math.Tests
@@ -23,8 +22,8 @@ namespace RP.Math.Tests
             var r = v.Yaw(new Angle(System.Math.PI / 4), axes);
 
             // Rotating about Up cannot change how far along Up you are, nor the length.
-            Vector.DotProduct(r, axes.Up).Should().BeApproximately(Vector.DotProduct(v, axes.Up), Tol);
-            r.Magnitude.Should().BeApproximately(v.Magnitude, Tol);
+            Assert.AreEqual(Vector.DotProduct(v, axes.Up), Vector.DotProduct(r, axes.Up), Tol);
+            Assert.AreEqual(v.Magnitude, r.Magnitude, Tol);
         }
 
         [TestMethod]
@@ -35,7 +34,7 @@ namespace RP.Math.Tests
 
             var r = v.Pitch(new Angle(0.6), axes);
 
-            Vector.DotProduct(r, axes.Right).Should().BeApproximately(Vector.DotProduct(v, axes.Right), Tol);
+            Assert.AreEqual(Vector.DotProduct(v, axes.Right), Vector.DotProduct(r, axes.Right), Tol);
         }
 
         [TestMethod]
@@ -47,7 +46,7 @@ namespace RP.Math.Tests
 
             var roundTrip = v.Yaw(new Angle(0.9), axes).Yaw(new Angle(-0.9), axes);
 
-            roundTrip.Equals(v, Tol).Should().BeTrue();
+            Assert.IsTrue(roundTrip.Equals(v, Tol));
         }
 
         // ---- The whole point: handedness is carried by the convention, not chosen here ----------
@@ -64,8 +63,8 @@ namespace RP.Math.Tests
             var openGl = v.Roll(new Angle(rad), OrthogonalAxes.OpenGL);
             var unity = v.Roll(new Angle(rad), OrthogonalAxes.Unity);
 
-            openGl.Equals(unity, Tol).Should().BeFalse("the two frames disagree on which way is forward");
-            openGl.Equals(v.Roll(new Angle(-rad), OrthogonalAxes.Unity), Tol).Should().BeTrue();
+            Assert.IsFalse(openGl.Equals(unity, Tol), "the two frames disagree on which way is forward");
+            Assert.IsTrue(openGl.Equals(v.Roll(new Angle(-rad), OrthogonalAxes.Unity), Tol));
         }
 
         [TestMethod]
@@ -79,12 +78,12 @@ namespace RP.Math.Tests
             double rad = System.Math.PI / 3;
 
             // DirectX / Unity: Forward = +Z, so Roll matches the literal RotateZ(+rad).
-            v.Roll(new Angle(rad), OrthogonalAxes.DirectX)
-                .Equals(v.RotateZ(rad), Tol).Should().BeTrue("DirectX forward is +Z");
+            Assert.IsTrue(v.Roll(new Angle(rad), OrthogonalAxes.DirectX)
+                .Equals(v.RotateZ(rad), Tol), "DirectX forward is +Z");
 
             // OpenGL: Forward = -Z, so Roll(+rad) equals the literal RotateZ(-rad).
-            v.Roll(new Angle(rad), OrthogonalAxes.OpenGL)
-                .Equals(v.RotateZ(-rad), Tol).Should().BeTrue("OpenGL forward is -Z");
+            Assert.IsTrue(v.Roll(new Angle(rad), OrthogonalAxes.OpenGL)
+                .Equals(v.RotateZ(-rad), Tol), "OpenGL forward is -Z");
         }
 
         // ---- Quaternion.FromYawPitchRoll(..., axes) and Attitude --------------------------------
@@ -101,7 +100,7 @@ namespace RP.Math.Tests
             var viaAttitude = new Attitude(y, p, r).Rotate(v, axes);
             var viaQuaternion = Quaternion.FromYawPitchRoll(y, p, r, axes).Rotate(v);
 
-            viaAttitude.Equals(viaQuaternion, Tol).Should().BeTrue();
+            Assert.IsTrue(viaAttitude.Equals(viaQuaternion, Tol));
         }
 
         [TestMethod]
@@ -115,7 +114,7 @@ namespace RP.Math.Tests
             var viaYpr = Quaternion.FromYawPitchRoll(y, new Angle(0), new Angle(0), axes).Rotate(v);
             var viaAxis = v.Yaw(y, axes);
 
-            viaYpr.Equals(viaAxis, Tol).Should().BeTrue();
+            Assert.IsTrue(viaYpr.Equals(viaAxis, Tol));
         }
 
         // ---- LineSegment.Yaw / Pitch / Roll -----------------------------------------------------
@@ -127,8 +126,8 @@ namespace RP.Math.Tests
 
             var yawed = seg.Yaw(new Angle(0.7), OrthogonalAxes.OpenGL);
 
-            yawed.Tail.Should().Be(seg.Tail);
-            yawed.Length.Should().BeApproximately(seg.Length, Tol);
+            Assert.AreEqual(seg.Tail, yawed.Tail);
+            Assert.AreEqual(seg.Length, yawed.Length, Tol);
         }
 
         // ---- Attitude.FromQuaternion(q, axes): the convention-aware read-back ---------------------
@@ -142,7 +141,7 @@ namespace RP.Math.Tests
             var att = Attitude.FromQuaternion(q, OrthogonalAxes.OpenGL);
             var v = new Vector(1, 2, 3);
 
-            att.Rotate(v, OrthogonalAxes.OpenGL).Equals(q.Rotate(v), Tol).Should().BeTrue();
+            Assert.IsTrue(att.Rotate(v, OrthogonalAxes.OpenGL).Equals(q.Rotate(v), Tol));
         }
 
         [TestMethod]
@@ -151,7 +150,7 @@ namespace RP.Math.Tests
             var att = new Attitude(new Angle(0.4), new Angle(-0.3), new Angle(0.8));
             var axes = OrthogonalAxes.Blender; // right-handed
 
-            Attitude.FromQuaternion(att.ToQuaternion(axes), axes).Equals(att, Tol).Should().BeTrue();
+            Assert.IsTrue(Attitude.FromQuaternion(att.ToQuaternion(axes), axes).Equals(att, Tol));
         }
 
         [TestMethod]
@@ -160,7 +159,7 @@ namespace RP.Math.Tests
             var att = new Attitude(new Angle(0.4), new Angle(-0.3), new Angle(0.8));
             var axes = OrthogonalAxes.DirectX; // left-handed
 
-            Attitude.FromQuaternion(att.ToQuaternion(axes), axes).Equals(att, Tol).Should().BeTrue();
+            Assert.IsTrue(Attitude.FromQuaternion(att.ToQuaternion(axes), axes).Equals(att, Tol));
         }
     }
 }

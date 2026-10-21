@@ -1,7 +1,5 @@
 namespace RP.Math.Tests
 {
-    using FluentAssertions;
-
     using Microsoft.VisualStudio.TestTools.UnitTesting;
 
     /// <summary>
@@ -24,34 +22,34 @@ namespace RP.Math.Tests
         [TestMethod, TestCategory("Rotation")]
         public void Yaw_UnderDirectX_ShouldMatchRotateY_Test()
         {
-            Sample.Yaw(Quarter, DirectX).Equals(Sample.RotateY(Quarter), Tol).Should().BeTrue();
-            Vector.Yaw(Sample, Quarter, DirectX).Equals(Vector.RotateY(Sample, Quarter), Tol).Should().BeTrue();
+            Assert.IsTrue(Sample.Yaw(Quarter, DirectX).Equals(Sample.RotateY(Quarter), Tol));
+            Assert.IsTrue(Vector.Yaw(Sample, Quarter, DirectX).Equals(Vector.RotateY(Sample, Quarter), Tol));
         }
 
         [TestMethod, TestCategory("Rotation")]
         public void Pitch_UnderDirectX_ShouldMatchRotateX_Test()
         {
-            Sample.Pitch(Quarter, DirectX).Equals(Sample.RotateX(Quarter), Tol).Should().BeTrue();
-            Vector.Pitch(Sample, Quarter, DirectX).Equals(Vector.RotateX(Sample, Quarter), Tol).Should().BeTrue();
+            Assert.IsTrue(Sample.Pitch(Quarter, DirectX).Equals(Sample.RotateX(Quarter), Tol));
+            Assert.IsTrue(Vector.Pitch(Sample, Quarter, DirectX).Equals(Vector.RotateX(Sample, Quarter), Tol));
         }
 
         [TestMethod, TestCategory("Rotation")]
         public void Roll_UnderDirectX_ShouldMatchRotateZ_Test()
         {
-            Sample.Roll(Quarter, DirectX).Equals(Sample.RotateZ(Quarter), Tol).Should().BeTrue();
-            Vector.Roll(Sample, Quarter, DirectX).Equals(Vector.RotateZ(Sample, Quarter), Tol).Should().BeTrue();
+            Assert.IsTrue(Sample.Roll(Quarter, DirectX).Equals(Sample.RotateZ(Quarter), Tol));
+            Assert.IsTrue(Vector.Roll(Sample, Quarter, DirectX).Equals(Vector.RotateZ(Sample, Quarter), Tol));
         }
 
         [TestMethod, TestCategory("Rotation")]
         public void RotateXYZ_AngleOverloads_ShouldEqualRadianForms_Test()
         {
-            Sample.RotateX(Quarter).Equals(Sample.RotateX(Quarter.Rad), Tol).Should().BeTrue();
-            Sample.RotateY(Quarter).Equals(Sample.RotateY(Quarter.Rad), Tol).Should().BeTrue();
-            Sample.RotateZ(Quarter).Equals(Sample.RotateZ(Quarter.Rad), Tol).Should().BeTrue();
+            Assert.IsTrue(Sample.RotateX(Quarter).Equals(Sample.RotateX(Quarter.Rad), Tol));
+            Assert.IsTrue(Sample.RotateY(Quarter).Equals(Sample.RotateY(Quarter.Rad), Tol));
+            Assert.IsTrue(Sample.RotateZ(Quarter).Equals(Sample.RotateZ(Quarter.Rad), Tol));
 
-            Vector.RotateX(Sample, Quarter).Equals(Vector.RotateX(Sample, Quarter.Rad), Tol).Should().BeTrue();
-            Vector.RotateY(Sample, Quarter).Equals(Vector.RotateY(Sample, Quarter.Rad), Tol).Should().BeTrue();
-            Vector.RotateZ(Sample, Quarter).Equals(Vector.RotateZ(Sample, Quarter.Rad), Tol).Should().BeTrue();
+            Assert.IsTrue(Vector.RotateX(Sample, Quarter).Equals(Vector.RotateX(Sample, Quarter.Rad), Tol));
+            Assert.IsTrue(Vector.RotateY(Sample, Quarter).Equals(Vector.RotateY(Sample, Quarter.Rad), Tol));
+            Assert.IsTrue(Vector.RotateZ(Sample, Quarter).Equals(Vector.RotateZ(Sample, Quarter.Rad), Tol));
         }
 
         #endregion
@@ -61,14 +59,14 @@ namespace RP.Math.Tests
         [TestMethod, TestCategory("Rotation")]
         public void Roll_NinetyDegrees_UnderDirectX_ShouldTakeXAxisToYAxis_Test()
         {
-            new Vector(1, 0, 0).Roll(new Angle(90, AngleUnits.DEG), DirectX)
-                .Equals(new Vector(0, 1, 0), 1e-9).Should().BeTrue();
+            Assert.IsTrue(new Vector(1, 0, 0).Roll(new Angle(90, AngleUnits.DEG), DirectX)
+                .Equals(new Vector(0, 1, 0), 1e-9));
         }
 
         [TestMethod, TestCategory("Rotation")]
         public void Yaw_FullTurn_ShouldReturnToStart_Test()
         {
-            Sample.Yaw(new Angle(360, AngleUnits.DEG), DirectX).Equals(Sample, 1e-9).Should().BeTrue();
+            Assert.IsTrue(Sample.Yaw(new Angle(360, AngleUnits.DEG), DirectX).Equals(Sample, 1e-9));
         }
 
         #endregion

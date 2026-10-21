@@ -2,7 +2,6 @@ namespace RP.Math.Tests
 {
     using System;
 
-    using FluentAssertions;
 
     using Microsoft.VisualStudio.TestTools.UnitTesting;
 
@@ -19,50 +18,50 @@ namespace RP.Math.Tests
         public void Volume_Test()
         {
             var e = new Ellipsoid(3, 2, 1);
-            e.Volume.Should().BeApproximately((4.0 / 3.0) * Math.PI * 6, Tol);
-            e.IsSphere(Tol).Should().BeFalse();
-            new Ellipsoid(2, 2, 2).IsSphere(Tol).Should().BeTrue();
+            Assert.AreEqual((4.0 / 3.0) * Math.PI * 6, e.Volume, Tol);
+            Assert.IsFalse(e.IsSphere(Tol));
+            Assert.IsTrue(new Ellipsoid(2, 2, 2).IsSphere(Tol));
         }
 
         [TestMethod, TestCategory("Conceptual")]
         public void NegativeAxis_ShouldThrow_Test()
         {
             Action act = () => new Ellipsoid(1, -1, 1);
-            act.Should().Throw<ArgumentOutOfRangeException>();
+            Assert.ThrowsException<ArgumentOutOfRangeException>(act);
         }
 
         [TestMethod, TestCategory("Placed")]
         public void Contains_Test()
         {
             var e = PlacedEllipsoid.AxisAligned(new Ellipsoid(3, 2, 1), new Vector(0, 0, 0));
-            e.Contains(new Vector(3, 0, 0), LooseTol).Should().BeTrue();
-            e.Contains(new Vector(0, 0, 1), LooseTol).Should().BeTrue();
-            e.Contains(new Vector(3.1, 0, 0), Tol).Should().BeFalse();
-            e.Contains(new Vector(1, 1, 0.5), Tol).Should().BeTrue();
+            Assert.IsTrue(e.Contains(new Vector(3, 0, 0), LooseTol));
+            Assert.IsTrue(e.Contains(new Vector(0, 0, 1), LooseTol));
+            Assert.IsFalse(e.Contains(new Vector(3.1, 0, 0), Tol));
+            Assert.IsTrue(e.Contains(new Vector(1, 1, 0.5), Tol));
         }
 
         [TestMethod, TestCategory("Placed")]
         public void ClosestPoint_OnAxisAndGeneric_Test()
         {
             var e = PlacedEllipsoid.AxisAligned(new Ellipsoid(3, 2, 1), new Vector(0, 0, 0));
-            e.ClosestPoint(new Vector(10, 0, 0)).Equals(new Vector(3, 0, 0), LooseTol).Should().BeTrue();
-            e.ClosestPoint(new Vector(0, 0, 10)).Equals(new Vector(0, 0, 1), LooseTol).Should().BeTrue();
+            Assert.IsTrue(e.ClosestPoint(new Vector(10, 0, 0)).Equals(new Vector(3, 0, 0), LooseTol));
+            Assert.IsTrue(e.ClosestPoint(new Vector(0, 0, 10)).Equals(new Vector(0, 0, 1), LooseTol));
 
             Vector p = e.ClosestPoint(new Vector(10, 10, 10));
             double onSurface = ((p.X * p.X) / 9.0) + ((p.Y * p.Y) / 4.0) + (p.Z * p.Z);
-            onSurface.Should().BeApproximately(1, LooseTol);
+            Assert.AreEqual(1, onSurface, LooseTol);
         }
 
         [TestMethod, TestCategory("Placed")]
         public void TryIntersect_Test()
         {
             var e = PlacedEllipsoid.AxisAligned(new Ellipsoid(3, 2, 1), new Vector(0, 0, 0));
-            e.TryIntersect(new Ray(new Vector(10, 0, 0), new Vector(-1, 0, 0)), out Vector p).Should().BeTrue();
-            p.Equals(new Vector(3, 0, 0), LooseTol).Should().BeTrue();
+            Assert.IsTrue(e.TryIntersect(new Ray(new Vector(10, 0, 0), new Vector(-1, 0, 0)), out Vector p));
+            Assert.IsTrue(p.Equals(new Vector(3, 0, 0), LooseTol));
 
-            e.TryIntersect(new Line(new Vector(0, 0, 0), new Vector(0, 0, 1)), out Vector near, out Vector far).Should().BeTrue();
-            near.Equals(new Vector(0, 0, -1), LooseTol).Should().BeTrue();
-            far.Equals(new Vector(0, 0, 1), LooseTol).Should().BeTrue();
+            Assert.IsTrue(e.TryIntersect(new Line(new Vector(0, 0, 0), new Vector(0, 0, 1)), out Vector near, out Vector far));
+            Assert.IsTrue(near.Equals(new Vector(0, 0, -1), LooseTol));
+            Assert.IsTrue(far.Equals(new Vector(0, 0, 1), LooseTol));
         }
     }
 }

@@ -1,7 +1,5 @@
 namespace RP.Math.Tests
 {
-    using FluentAssertions;
-
     using Microsoft.VisualStudio.TestTools.UnitTesting;
 
     /// <summary>
@@ -22,25 +20,25 @@ namespace RP.Math.Tests
         {
             // Unit cuboid: half-extents of 1 at the origin.
             var c = PlacedCuboid.AxisAligned(new Cuboid(2, 2, 2), new Vector(0, 0, 0));
-            c.DistanceTo(new Vector(0, 0, 0)).Should().BeApproximately(0, Tol);   // inside
-            c.DistanceTo(new Vector(3, 0, 0)).Should().BeApproximately(2, Tol);   // 2 beyond the +x face
+            Assert.AreEqual(0, c.DistanceTo(new Vector(0, 0, 0)), Tol);   // inside
+            Assert.AreEqual(2, c.DistanceTo(new Vector(3, 0, 0)), Tol);   // 2 beyond the +x face
         }
 
         [TestMethod, TestCategory("DistanceTo")]
         public void DistanceTo_OnFlatShape_IsPerpendicularGap_AndZeroOnRegion_Test()
         {
             var disc = PlacedCircle.InXYPlane(new Circle(5), new Vector(0, 0, 0));
-            disc.DistanceTo(new Vector(1, 1, 0)).Should().BeApproximately(0, Tol);    // on the disc
-            disc.DistanceTo(new Vector(0, 0, 4)).Should().BeApproximately(4, Tol);    // straight above the centre
-            disc.DistanceTo(new Vector(10, 0, 0)).Should().BeApproximately(5, Tol);   // 5 past the rim, in-plane
+            Assert.AreEqual(0, disc.DistanceTo(new Vector(1, 1, 0)), Tol);    // on the disc
+            Assert.AreEqual(4, disc.DistanceTo(new Vector(0, 0, 4)), Tol);    // straight above the centre
+            Assert.AreEqual(5, disc.DistanceTo(new Vector(10, 0, 0)), Tol);   // 5 past the rim, in-plane
         }
 
         [TestMethod, TestCategory("DistanceTo")]
         public void DistanceTo_OnSphere_IsZeroInside_AndAgreesWithSignedOutside_Test()
         {
             var s = PlacedSphere.At(new Sphere(2), new Vector(0, 0, 0));
-            s.DistanceTo(new Vector(1, 0, 0)).Should().BeApproximately(0, Tol);   // inside → clamped to zero
-            s.DistanceTo(new Vector(5, 0, 0)).Should().BeApproximately(3, Tol);   // 3 outside the surface
+            Assert.AreEqual(0, s.DistanceTo(new Vector(1, 0, 0)), Tol);   // inside → clamped to zero
+            Assert.AreEqual(3, s.DistanceTo(new Vector(5, 0, 0)), Tol);   // 3 outside the surface
         }
 
         #endregion
@@ -53,9 +51,9 @@ namespace RP.Math.Tests
             var t = PlacedTriangle.FromVertices(new Vector(0, 0, 0), new Vector(4, 0, 0), new Vector(0, 4, 0));
             var line = new Line(new Vector(1, 1, 5), new Vector(0, 0, -1));
 
-            t.TryIntersect(line, out Vector near, out Vector far).Should().BeTrue();
-            near.Equals(new Vector(1, 1, 0), LooseTol).Should().BeTrue();
-            far.Equals(near, LooseTol).Should().BeTrue();
+            Assert.IsTrue(t.TryIntersect(line, out Vector near, out Vector far));
+            Assert.IsTrue(near.Equals(new Vector(1, 1, 0), LooseTol));
+            Assert.IsTrue(far.Equals(near, LooseTol));
         }
 
         [TestMethod, TestCategory("LineIntersect")]
@@ -65,9 +63,9 @@ namespace RP.Math.Tests
                 new Vector(2, 2, 0), new Vector(-2, 2, 0), new Vector(-2, -2, 0), new Vector(2, -2, 0));
             var line = new Line(new Vector(1, 1, 5), new Vector(0, 0, -1));
 
-            square.TryIntersect(line, out Vector near, out Vector far).Should().BeTrue();
-            near.Equals(new Vector(1, 1, 0), LooseTol).Should().BeTrue();
-            far.Equals(near, LooseTol).Should().BeTrue();
+            Assert.IsTrue(square.TryIntersect(line, out Vector near, out Vector far));
+            Assert.IsTrue(near.Equals(new Vector(1, 1, 0), LooseTol));
+            Assert.IsTrue(far.Equals(near, LooseTol));
         }
 
         [TestMethod, TestCategory("LineIntersect")]
@@ -75,13 +73,12 @@ namespace RP.Math.Tests
         {
             var a = PlacedAnnulus.InXYPlane(new Annulus(2, 5), new Vector(0, 0, 0));
 
-            a.TryIntersect(new Line(new Vector(3, 0, 5), new Vector(0, 0, -1)), out Vector near, out Vector far)
-                .Should().BeTrue();
-            near.Equals(new Vector(3, 0, 0), LooseTol).Should().BeTrue();
-            far.Equals(near, LooseTol).Should().BeTrue();
+            Assert.IsTrue(a.TryIntersect(new Line(new Vector(3, 0, 5), new Vector(0, 0, -1)), out Vector near, out Vector far));
+            Assert.IsTrue(near.Equals(new Vector(3, 0, 0), LooseTol));
+            Assert.IsTrue(far.Equals(near, LooseTol));
 
             // Straight down through the central hole: crosses the plane but misses the filled ring.
-            a.TryIntersect(new Line(new Vector(0, 0, 5), new Vector(0, 0, -1)), out _, out _).Should().BeFalse();
+            Assert.IsFalse(a.TryIntersect(new Line(new Vector(0, 0, 5), new Vector(0, 0, -1)), out _, out _));
         }
 
         #endregion

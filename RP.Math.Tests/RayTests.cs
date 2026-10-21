@@ -1,7 +1,5 @@
 namespace RP.Math.Tests
 {
-    using FluentAssertions;
-
     using Microsoft.VisualStudio.TestTools.UnitTesting;
 
     /// <summary>Unit tests for the <see cref="Ray"/> type.</summary>
@@ -14,30 +12,30 @@ namespace RP.Math.Tests
         public void Constructor_ShouldNormalizeDirection_Test()
         {
             var ray = new Ray(new Vector(0, 0, 0), new Vector(9, 0, 0));
-            ray.Direction.Equals(new Vector(1, 0, 0), Tol).Should().BeTrue();
+            Assert.IsTrue(ray.Direction.Equals(new Vector(1, 0, 0), Tol));
         }
 
         [TestMethod, TestCategory("Points")]
         public void PointAt_ShouldClampBehindOrigin_Test()
         {
             var ray = new Ray(new Vector(0, 0, 0), new Vector(1, 0, 0));
-            ray.PointAt(5).Equals(new Vector(5, 0, 0), Tol).Should().BeTrue();
-            ray.PointAt(-3).Equals(new Vector(0, 0, 0), Tol).Should().BeTrue(); // clamped to the origin
+            Assert.IsTrue(ray.PointAt(5).Equals(new Vector(5, 0, 0), Tol));
+            Assert.IsTrue(ray.PointAt(-3).Equals(new Vector(0, 0, 0), Tol)); // clamped to the origin
         }
 
         [TestMethod, TestCategory("Query")]
         public void ClosestPointTo_BehindOrigin_ShouldReturnOrigin_Test()
         {
             var ray = new Ray(new Vector(0, 0, 0), new Vector(1, 0, 0));
-            ray.ClosestPointTo(new Vector(-5, 2, 0)).Equals(new Vector(0, 0, 0), Tol).Should().BeTrue();
+            Assert.IsTrue(ray.ClosestPointTo(new Vector(-5, 2, 0)).Equals(new Vector(0, 0, 0), Tol));
         }
 
         [TestMethod, TestCategory("Query")]
         public void ClosestPointTo_AheadOfOrigin_ShouldProject_Test()
         {
             var ray = new Ray(new Vector(0, 0, 0), new Vector(1, 0, 0));
-            ray.ClosestPointTo(new Vector(3, 4, 0)).Equals(new Vector(3, 0, 0), Tol).Should().BeTrue();
-            ray.DistanceTo(new Vector(3, 4, 0)).Should().BeApproximately(4, Tol);
+            Assert.IsTrue(ray.ClosestPointTo(new Vector(3, 4, 0)).Equals(new Vector(3, 0, 0), Tol));
+            Assert.AreEqual(4, ray.DistanceTo(new Vector(3, 4, 0)), Tol);
         }
 
         [TestMethod, TestCategory("Conversion")]
@@ -45,7 +43,7 @@ namespace RP.Math.Tests
         {
             var ray = new Ray(new Vector(0, 0, 0), new Vector(1, 0, 0));
             var line = ray.ToLine();
-            line.PointAt(-5).Equals(new Vector(-5, 0, 0), Tol).Should().BeTrue();
+            Assert.IsTrue(line.PointAt(-5).Equals(new Vector(-5, 0, 0), Tol));
         }
     }
 }

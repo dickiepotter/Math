@@ -2,7 +2,6 @@ namespace RP.Math.Tests
 {
     using System;
 
-    using FluentAssertions;
 
     using Microsoft.VisualStudio.TestTools.UnitTesting;
 
@@ -26,9 +25,9 @@ namespace RP.Math.Tests
             var target = new Vector(0, 0, 0);
             Matrix view = Matrix.LookAt(eye, target, new Vector(0, 1, 0));
 
-            view.Transform(eye).Equals(Vector.Origin, LooseTol).Should().BeTrue();
+            Assert.IsTrue(view.Transform(eye).Equals(Vector.Origin, LooseTol));
             // Target sits 5 in front of the camera, i.e. down its local -Z (right-handed).
-            view.Transform(target).Equals(new Vector(0, 0, -5), LooseTol).Should().BeTrue();
+            Assert.IsTrue(view.Transform(target).Equals(new Vector(0, 0, -5), LooseTol));
         }
 
         [TestMethod, TestCategory("LookAt")]
@@ -38,15 +37,15 @@ namespace RP.Math.Tests
             Matrix view = Matrix.LookAt(eye, new Vector(0, 0, 0), new Vector(0, 1, 0));
 
             // A world point one unit to the +X of the eye stays on camera +X (and up stays up).
-            view.Transform(new Vector(1, 0, 5)).Equals(new Vector(1, 0, 0), LooseTol).Should().BeTrue();
-            view.Transform(new Vector(0, 1, 5)).Equals(new Vector(0, 1, 0), LooseTol).Should().BeTrue();
+            Assert.IsTrue(view.Transform(new Vector(1, 0, 5)).Equals(new Vector(1, 0, 0), LooseTol));
+            Assert.IsTrue(view.Transform(new Vector(0, 1, 5)).Equals(new Vector(0, 1, 0), LooseTol));
         }
 
         [TestMethod, TestCategory("LookAt")]
         public void LookAt_WithEyeAtTarget_Throws_Test()
         {
             Action act = () => Matrix.LookAt(new Vector(1, 1, 1), new Vector(1, 1, 1), new Vector(0, 1, 0));
-            act.Should().Throw<ArgumentException>();
+            Assert.ThrowsException<ArgumentException>(act);
         }
 
         [TestMethod, TestCategory("LookAt")]
@@ -54,7 +53,7 @@ namespace RP.Math.Tests
         {
             // Looking straight down +Y with up also +Y: no way to resolve "right".
             Action act = () => Matrix.LookAt(new Vector(0, 5, 0), new Vector(0, 0, 0), new Vector(0, 1, 0));
-            act.Should().Throw<ArgumentException>();
+            Assert.ThrowsException<ArgumentException>(act);
         }
 
         #endregion
@@ -67,8 +66,8 @@ namespace RP.Math.Tests
             Matrix ortho = Matrix.Orthographic(2, 2, 1, 3); // width 2, height 2, near 1, far 3
 
             // The camera looks down -Z, so the near plane is at z = -near and the far plane at z = -far.
-            ortho.Transform(new Vector(0, 0, -1)).Equals(new Vector(0, 0, -1), Tol).Should().BeTrue(); // near -> -1
-            ortho.Transform(new Vector(0, 0, -3)).Equals(new Vector(0, 0, 1), Tol).Should().BeTrue();  // far  -> +1
+            Assert.IsTrue(ortho.Transform(new Vector(0, 0, -1)).Equals(new Vector(0, 0, -1), Tol)); // near -> -1
+            Assert.IsTrue(ortho.Transform(new Vector(0, 0, -3)).Equals(new Vector(0, 0, 1), Tol));  // far  -> +1
         }
 
         [TestMethod, TestCategory("Orthographic")]
@@ -76,22 +75,22 @@ namespace RP.Math.Tests
         {
             Matrix ortho = Matrix.Orthographic(2, 2, 1, 3); // half-width 1, half-height 1
 
-            ortho.Transform(new Vector(1, 1, -1)).Equals(new Vector(1, 1, -1), Tol).Should().BeTrue();
-            ortho.Transform(new Vector(-1, -1, -3)).Equals(new Vector(-1, -1, 1), Tol).Should().BeTrue();
+            Assert.IsTrue(ortho.Transform(new Vector(1, 1, -1)).Equals(new Vector(1, 1, -1), Tol));
+            Assert.IsTrue(ortho.Transform(new Vector(-1, -1, -3)).Equals(new Vector(-1, -1, 1), Tol));
         }
 
         [TestMethod, TestCategory("Orthographic")]
         public void Orthographic_IsAffine_SoTheStarOperatorAlsoApplies_Test()
         {
             Matrix ortho = Matrix.Orthographic(2, 2, 1, 3);
-            (ortho * new Vector(0, 0, -3)).Equals(ortho.Transform(new Vector(0, 0, -3)), Tol).Should().BeTrue();
+            Assert.IsTrue((ortho * new Vector(0, 0, -3)).Equals(ortho.Transform(new Vector(0, 0, -3)), Tol));
         }
 
         [TestMethod, TestCategory("Orthographic")]
         public void Orthographic_DegenerateVolume_Throws_Test()
         {
             Action act = () => Matrix.OrthographicOffCenter(-1, 1, -1, 1, 2, 2); // near == far
-            act.Should().Throw<ArgumentOutOfRangeException>();
+            Assert.ThrowsException<ArgumentOutOfRangeException>(act);
         }
 
         #endregion
@@ -103,8 +102,8 @@ namespace RP.Math.Tests
         {
             Matrix p = Matrix.PerspectiveFieldOfView(new Angle(90, AngleUnits.DEG), 1.0, 1, 3);
 
-            p.Transform(new Vector(0, 0, -1)).Equals(new Vector(0, 0, -1), LooseTol).Should().BeTrue(); // near -> -1
-            p.Transform(new Vector(0, 0, -3)).Equals(new Vector(0, 0, 1), LooseTol).Should().BeTrue();  // far  -> +1
+            Assert.IsTrue(p.Transform(new Vector(0, 0, -1)).Equals(new Vector(0, 0, -1), LooseTol)); // near -> -1
+            Assert.IsTrue(p.Transform(new Vector(0, 0, -3)).Equals(new Vector(0, 0, 1), LooseTol));  // far  -> +1
         }
 
         [TestMethod, TestCategory("Perspective")]
@@ -113,7 +112,7 @@ namespace RP.Math.Tests
             // 90° vertical FOV, aspect 1: the near plane half-extent equals the near distance, so a point
             // at (near, 0, -near) sits on the right clip edge (+1).
             Matrix p = Matrix.PerspectiveFieldOfView(new Angle(90, AngleUnits.DEG), 1.0, 1, 3);
-            p.Transform(new Vector(1, 0, -1)).X.Should().BeApproximately(1, LooseTol);
+            Assert.AreEqual(1, p.Transform(new Vector(1, 0, -1)).X, LooseTol);
         }
 
         [TestMethod, TestCategory("Perspective")]
@@ -123,8 +122,8 @@ namespace RP.Math.Tests
             Matrix p = Matrix.PerspectiveFieldOfView(new Angle(90, AngleUnits.DEG), 1.0, 1, 3);
             double nearX = p.Transform(new Vector(1, 0, -1)).X; // at the near plane
             double farX = p.Transform(new Vector(1, 0, -3)).X;  // three times further
-            farX.Should().BeApproximately(1.0 / 3.0, LooseTol);
-            farX.Should().BeLessThan(nearX);
+            Assert.AreEqual(1.0 / 3.0, farX, LooseTol);
+            Assert.IsTrue((farX) < (nearX));
         }
 
         [TestMethod, TestCategory("Perspective")]
@@ -134,9 +133,9 @@ namespace RP.Math.Tests
             Action badAspect = () => Matrix.PerspectiveFieldOfView(new Angle(90, AngleUnits.DEG), 0, 1, 3);
             Action badFov = () => Matrix.PerspectiveFieldOfView(new Angle(180, AngleUnits.DEG), 1.0, 1, 3);
 
-            badNear.Should().Throw<ArgumentOutOfRangeException>();
-            badAspect.Should().Throw<ArgumentOutOfRangeException>();
-            badFov.Should().Throw<ArgumentOutOfRangeException>();
+            Assert.ThrowsException<ArgumentOutOfRangeException>(badNear);
+            Assert.ThrowsException<ArgumentOutOfRangeException>(badAspect);
+            Assert.ThrowsException<ArgumentOutOfRangeException>(badFov);
         }
 
         #endregion
@@ -153,7 +152,7 @@ namespace RP.Math.Tests
             // (proj * view) applied to a world point equals proj applied to the view-space point.
             Matrix viewProj = proj * view;
             var world = new Vector(0, 0, 0); // the target, 5 in front of the eye
-            viewProj.Transform(world).Equals(proj.Transform(view.Transform(world)), LooseTol).Should().BeTrue();
+            Assert.IsTrue(viewProj.Transform(world).Equals(proj.Transform(view.Transform(world)), LooseTol));
         }
 
         #endregion

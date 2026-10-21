@@ -1,7 +1,6 @@
 namespace RP.Math.Tests.Numerics
 {
     using System;
-    using FluentAssertions;
     using Microsoft.VisualStudio.TestTools.UnitTesting;
     using RP.Math;
 
@@ -19,8 +18,8 @@ namespace RP.Math.Tests.Numerics
             var (pos, vel) = Integrators.ExplicitEuler(
                 new Vector(0, 0, 0), new Vector(2, 0, 0), Vector.Zero, 0.5);
 
-            pos.Should().Be(new Vector(1, 0, 0)); // x += v*dt
-            vel.Should().Be(new Vector(2, 0, 0)); // unchanged
+            Assert.AreEqual(new Vector(1, 0, 0), pos); // x += v*dt
+            Assert.AreEqual(new Vector(2, 0, 0), vel); // unchanged
         }
 
         [TestMethod]
@@ -30,17 +29,17 @@ namespace RP.Math.Tests.Numerics
             var (pos, vel) = Integrators.SemiImplicitEuler(
                 Vector.Zero, new Vector(1, 0, 0), new Vector(2, 0, 0), 1.0);
 
-            vel.Should().Be(new Vector(3, 0, 0));   // 1 + 2*1
-            pos.Should().Be(new Vector(3, 0, 0));   // 0 + 3*1
+            Assert.AreEqual(new Vector(3, 0, 0), vel);   // 1 + 2*1
+            Assert.AreEqual(new Vector(3, 0, 0), pos);   // 0 + 3*1
         }
 
         [TestMethod]
         public void AllMethods_ZeroForce_ConserveMomentum()
         {
             var v = new Vector(3, -2, 1);
-            Integrators.ExplicitEuler(Vector.Zero, v, Vector.Zero, 0.123).Velocity.Should().Be(v);
-            Integrators.SemiImplicitEuler(Vector.Zero, v, Vector.Zero, 0.123).Velocity.Should().Be(v);
-            Integrators.RungeKutta4(Vector.Zero, v, (p, vv, t) => Vector.Zero, 0.123).Velocity.Should().Be(v);
+            Assert.AreEqual(v, Integrators.ExplicitEuler(Vector.Zero, v, Vector.Zero, 0.123).Velocity);
+            Assert.AreEqual(v, Integrators.SemiImplicitEuler(Vector.Zero, v, Vector.Zero, 0.123).Velocity);
+            Assert.AreEqual(v, Integrators.RungeKutta4(Vector.Zero, v, (p, vv, t) => Vector.Zero, 0.123).Velocity);
         }
 
         [TestMethod]
@@ -56,8 +55,8 @@ namespace RP.Math.Tests.Numerics
 
             var expectedPos = x0 + v0 * dt + a * (0.5 * dt * dt);
             var expectedVel = v0 + a * dt;
-            pos.Distance(expectedPos).Should().BeLessThan(1e-9);
-            vel.Distance(expectedVel).Should().BeLessThan(1e-9);
+            Assert.IsTrue((pos.Distance(expectedPos)) < (1e-9));
+            Assert.IsTrue((vel.Distance(expectedVel)) < (1e-9));
         }
 
         [TestMethod]
@@ -77,7 +76,7 @@ namespace RP.Math.Tests.Numerics
             }
 
             var expectedPos = x0 + v0 * total + a * (0.5 * total * total);
-            pos.Distance(expectedPos).Should().BeLessThan(1e-6);
+            Assert.IsTrue((pos.Distance(expectedPos)) < (1e-6));
         }
 
         [TestMethod]
@@ -103,7 +102,7 @@ namespace RP.Math.Tests.Numerics
 
             double coarse = ErrorFor(10);
             double fine = ErrorFor(1000);
-            fine.Should().BeLessThan(coarse);
+            Assert.IsTrue((fine) < (coarse));
         }
 
         [TestMethod]
@@ -124,7 +123,7 @@ namespace RP.Math.Tests.Numerics
             }
 
             // Started at amplitude 1; should stay close to it, never diverge.
-            maxDisplacement.Should().BeLessThan(1.1);
+            Assert.IsTrue((maxDisplacement) < (1.1));
         }
     }
 }

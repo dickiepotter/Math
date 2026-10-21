@@ -1,7 +1,5 @@
 namespace RP.Math.Tests
 {
-    using FluentAssertions;
-
     using Microsoft.VisualStudio.TestTools.UnitTesting;
 
     /// <summary>
@@ -28,9 +26,9 @@ namespace RP.Math.Tests
             var q = SampleRotation();
             var v = new Vector(1, 2, 3);
 
-            ((AxisAngle)q).Equals(AxisAngle.FromQuaternion(q), Tol).Should().BeTrue();
-            ((Rotation)q).Equals(Rotation.FromQuaternion(q), Tol).Should().BeTrue();
-            (((Matrix)q) * v).Equals(q.ToMatrix() * v, Tol).Should().BeTrue();
+            Assert.IsTrue(((AxisAngle)q).Equals(AxisAngle.FromQuaternion(q), Tol));
+            Assert.IsTrue(((Rotation)q).Equals(Rotation.FromQuaternion(q), Tol));
+            Assert.IsTrue((((Matrix)q) * v).Equals(q.ToMatrix() * v, Tol));
         }
 
         [TestMethod, TestCategory("Casting")]
@@ -41,9 +39,9 @@ namespace RP.Math.Tests
             var expected = q.Rotate(v);
 
             // Round-trip out to each representation and back to a quaternion; the action must be identical.
-            ((Quaternion)(AxisAngle)q).Rotate(v).Equals(expected, Tol).Should().BeTrue();
-            ((Quaternion)(Rotation)q).Rotate(v).Equals(expected, Tol).Should().BeTrue();
-            ((Quaternion)(Matrix)q).Rotate(v).Equals(expected, Tol).Should().BeTrue();
+            Assert.IsTrue(((Quaternion)(AxisAngle)q).Rotate(v).Equals(expected, Tol));
+            Assert.IsTrue(((Quaternion)(Rotation)q).Rotate(v).Equals(expected, Tol));
+            Assert.IsTrue(((Quaternion)(Matrix)q).Rotate(v).Equals(expected, Tol));
         }
 
         [TestMethod, TestCategory("Casting")]
@@ -59,7 +57,7 @@ namespace RP.Math.Tests
             var mat = (Matrix)rot;
             var back = (Quaternion)mat;
 
-            back.Rotate(v).Equals(expected, Tol).Should().BeTrue();
+            Assert.IsTrue(back.Rotate(v).Equals(expected, Tol));
         }
 
         // ---- Aggregate tuple casts -------------------------------------------------------------
@@ -72,8 +70,8 @@ namespace RP.Math.Tests
 
             var a = (AxisAngle)(rawAxis, angle); // explicit in (normalises the axis)
 
-            a.Axis.Equals(rawAxis.NormalizeOrDefault(), Tol).Should().BeTrue("the axis is normalised on construction");
-            a.Angle.Rad.Should().BeApproximately(1.1, Tol);
+            Assert.IsTrue(a.Axis.Equals(rawAxis.NormalizeOrDefault(), Tol), "the axis is normalised on construction");
+            Assert.AreEqual(1.1, a.Angle.Rad, Tol);
         }
 
         [TestMethod, TestCategory("Casting")]
@@ -83,8 +81,8 @@ namespace RP.Math.Tests
 
             (Vector Axis, Angle Angle) t = a; // implicit out
 
-            t.Axis.Equals(a.Axis, Tol).Should().BeTrue();
-            t.Angle.Rad.Should().BeApproximately(a.Angle.Rad, Tol);
+            Assert.IsTrue(t.Axis.Equals(a.Axis, Tol));
+            Assert.AreEqual(a.Angle.Rad, t.Angle.Rad, Tol);
         }
 
         [TestMethod, TestCategory("Casting")]
@@ -95,12 +93,12 @@ namespace RP.Math.Tests
             var probe = new Vector(0.5, -2, 1);
 
             var p = (Pose)(pos, q); // explicit in (normalises the orientation)
-            p.Position.Should().Be(pos);
-            p.Rotation.Rotate(probe).Equals(q.Rotate(probe), Tol).Should().BeTrue();
+            Assert.AreEqual(pos, p.Position);
+            Assert.IsTrue(p.Rotation.Rotate(probe).Equals(q.Rotate(probe), Tol));
 
             (Vector Position, Quaternion Orientation) t = p; // implicit out
-            t.Position.Should().Be(pos);
-            t.Orientation.Rotate(probe).Equals(q.Rotate(probe), Tol).Should().BeTrue();
+            Assert.AreEqual(pos, t.Position);
+            Assert.IsTrue(t.Orientation.Rotate(probe).Equals(q.Rotate(probe), Tol));
         }
 
         // ---- Line-family explicit casts --------------------------------------------------------
@@ -111,12 +109,12 @@ namespace RP.Math.Tests
             var seg = new LineSegment(new Vector(1, 1, 1), new Vector(4, 1, 1));
 
             var line = (Line)seg;
-            line.Point.Should().Be(seg.ToLine().Point);
-            line.Direction.Should().Be(seg.ToLine().Direction);
+            Assert.AreEqual(seg.ToLine().Point, line.Point);
+            Assert.AreEqual(seg.ToLine().Direction, line.Direction);
 
             var ray = (Ray)seg;
-            ray.Origin.Should().Be(seg.ToRay().Origin);
-            ray.Direction.Should().Be(seg.ToRay().Direction);
+            Assert.AreEqual(seg.ToRay().Origin, ray.Origin);
+            Assert.AreEqual(seg.ToRay().Direction, ray.Direction);
         }
 
         [TestMethod, TestCategory("Casting")]
@@ -126,12 +124,12 @@ namespace RP.Math.Tests
             var ray = new Ray(new Vector(2, 0, 0), new Vector(1, 0, 0));
 
             var asRay = (Ray)line;
-            asRay.Origin.Should().Be(line.Point);
-            asRay.Direction.Should().Be(line.Direction);
+            Assert.AreEqual(line.Point, asRay.Origin);
+            Assert.AreEqual(line.Direction, asRay.Direction);
 
             var asLine = (Line)ray;
-            asLine.Point.Should().Be(ray.Origin);
-            asLine.Direction.Should().Be(ray.Direction);
+            Assert.AreEqual(ray.Origin, asLine.Point);
+            Assert.AreEqual(ray.Direction, asLine.Direction);
         }
     }
 }

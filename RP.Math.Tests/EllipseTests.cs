@@ -2,7 +2,6 @@ namespace RP.Math.Tests
 {
     using System;
 
-    using FluentAssertions;
 
     using Microsoft.VisualStudio.TestTools.UnitTesting;
 
@@ -19,50 +18,50 @@ namespace RP.Math.Tests
         public void Measurements_Test()
         {
             var e = new Ellipse(3, 2);
-            e.Area.Should().BeApproximately(Math.PI * 6, Tol);
-            e.SemiMajor.Should().Be(3);
-            e.SemiMinor.Should().Be(2);
-            e.FocalDistance.Should().BeApproximately(Math.Sqrt(5), Tol);
-            e.Eccentricity.Should().BeApproximately(Math.Sqrt(5) / 3.0, Tol);
+            Assert.AreEqual(Math.PI * 6, e.Area, Tol);
+            Assert.AreEqual(3, e.SemiMajor);
+            Assert.AreEqual(2, e.SemiMinor);
+            Assert.AreEqual(Math.Sqrt(5), e.FocalDistance, Tol);
+            Assert.AreEqual(Math.Sqrt(5) / 3.0, e.Eccentricity, Tol);
         }
 
         [TestMethod, TestCategory("Conceptual")]
         public void Circle_Case_Test()
         {
             var e = new Ellipse(2, 2);
-            e.IsCircle(Tol).Should().BeTrue();
-            e.Eccentricity.Should().BeApproximately(0, Tol);
+            Assert.IsTrue(e.IsCircle(Tol));
+            Assert.AreEqual(0, e.Eccentricity, Tol);
         }
 
         [TestMethod, TestCategory("Conceptual")]
         public void NegativeAxis_ShouldThrow_Test()
         {
             Action act = () => new Ellipse(-1, 2);
-            act.Should().Throw<ArgumentOutOfRangeException>();
+            Assert.ThrowsException<ArgumentOutOfRangeException>(act);
         }
 
         [TestMethod, TestCategory("Conceptual")]
         public void Comparison_ByArea_Test()
         {
-            (new Ellipse(3, 2) > new Ellipse(1, 1)).Should().BeTrue();
+            Assert.IsTrue((new Ellipse(3, 2) > new Ellipse(1, 1)));
         }
 
         [TestMethod, TestCategory("Placed")]
         public void Contains_OnAndBeyondBoundary_Test()
         {
             var e = PlacedEllipse.InXYPlane(new Ellipse(3, 2), new Vector(0, 0, 0));
-            e.Contains(new Vector(3, 0, 0), LooseTol).Should().BeTrue();
-            e.Contains(new Vector(0, 2, 0), LooseTol).Should().BeTrue();
-            e.Contains(new Vector(3.1, 0, 0), Tol).Should().BeFalse();
-            e.Contains(new Vector(0, 0, 0.5), Tol).Should().BeFalse(); // off the plane
+            Assert.IsTrue(e.Contains(new Vector(3, 0, 0), LooseTol));
+            Assert.IsTrue(e.Contains(new Vector(0, 2, 0), LooseTol));
+            Assert.IsFalse(e.Contains(new Vector(3.1, 0, 0), Tol));
+            Assert.IsFalse(e.Contains(new Vector(0, 0, 0.5), Tol)); // off the plane
         }
 
         [TestMethod, TestCategory("Placed")]
         public void ClosestPoint_OnAxes_Test()
         {
             var e = PlacedEllipse.InXYPlane(new Ellipse(3, 2), new Vector(0, 0, 0));
-            e.ClosestPoint(new Vector(10, 0, 0)).Equals(new Vector(3, 0, 0), LooseTol).Should().BeTrue();
-            e.ClosestPoint(new Vector(0, 10, 0)).Equals(new Vector(0, 2, 0), LooseTol).Should().BeTrue();
+            Assert.IsTrue(e.ClosestPoint(new Vector(10, 0, 0)).Equals(new Vector(3, 0, 0), LooseTol));
+            Assert.IsTrue(e.ClosestPoint(new Vector(0, 10, 0)).Equals(new Vector(0, 2, 0), LooseTol));
         }
 
         [TestMethod, TestCategory("Placed")]
@@ -72,7 +71,7 @@ namespace RP.Math.Tests
             Vector p = e.ClosestPoint(new Vector(10, 10, 0));
             // The returned point must satisfy the ellipse equation (x/3)^2 + (y/2)^2 = 1.
             double onBoundary = ((p.X * p.X) / 9.0) + ((p.Y * p.Y) / 4.0);
-            onBoundary.Should().BeApproximately(1, LooseTol);
+            Assert.AreEqual(1, onBoundary, LooseTol);
         }
 
         [TestMethod, TestCategory("Placed")]
@@ -80,8 +79,8 @@ namespace RP.Math.Tests
         {
             var e = PlacedEllipse.InXYPlane(new Ellipse(3, 2), new Vector(0, 0, 0));
             var ray = new Ray(new Vector(1, 0.5, 5), new Vector(0, 0, -1));
-            e.TryIntersect(ray, out Vector p).Should().BeTrue();
-            p.Equals(new Vector(1, 0.5, 0), LooseTol).Should().BeTrue();
+            Assert.IsTrue(e.TryIntersect(ray, out Vector p));
+            Assert.IsTrue(p.Equals(new Vector(1, 0.5, 0), LooseTol));
         }
     }
 }

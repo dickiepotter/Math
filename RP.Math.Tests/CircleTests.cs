@@ -2,7 +2,6 @@ namespace RP.Math.Tests
 {
     using System;
 
-    using FluentAssertions;
 
     using Microsoft.VisualStudio.TestTools.UnitTesting;
 
@@ -19,59 +18,59 @@ namespace RP.Math.Tests
         public void Measurements_Test()
         {
             var c = new Circle(3);
-            c.Area.Should().BeApproximately(Math.PI * 9, Tol);
-            c.Circumference.Should().BeApproximately(2 * Math.PI * 3, Tol);
-            c.Perimeter.Should().BeApproximately(2 * Math.PI * 3, Tol);
-            c.Diameter.Should().Be(6);
+            Assert.AreEqual(Math.PI * 9, c.Area, Tol);
+            Assert.AreEqual(2 * Math.PI * 3, c.Circumference, Tol);
+            Assert.AreEqual(2 * Math.PI * 3, c.Perimeter, Tol);
+            Assert.AreEqual(6, c.Diameter);
         }
 
         [TestMethod, TestCategory("Conceptual")]
         public void NegativeRadius_ShouldThrow_Test()
         {
             Action act = () => new Circle(-1);
-            act.Should().Throw<ArgumentOutOfRangeException>();
+            Assert.ThrowsException<ArgumentOutOfRangeException>(act);
         }
 
         [TestMethod, TestCategory("Conceptual")]
         public void Comparison_ByArea_Test()
         {
-            (new Circle(3) > new Circle(2)).Should().BeTrue();
-            new Circle(3).CompareTo(new Circle(2)).Should().BeGreaterThan(0);
+            Assert.IsTrue((new Circle(3) > new Circle(2)));
+            Assert.IsTrue((new Circle(3).CompareTo(new Circle(2))) > (0));
         }
 
         [TestMethod, TestCategory("Placed")]
         public void Placement_ExposesCentreAndNormal_Test()
         {
             var c = PlacedCircle.InXYPlane(new Circle(3), new Vector(1, 2, 0));
-            c.Center.Should().Be(new Vector(1, 2, 0));
-            c.Centroid.Should().Be(new Vector(1, 2, 0));
-            c.Normal.Equals(new Vector(0, 0, 1), Tol).Should().BeTrue();
-            c.Area.Should().BeApproximately(Math.PI * 9, Tol);
+            Assert.AreEqual(new Vector(1, 2, 0), c.Center);
+            Assert.AreEqual(new Vector(1, 2, 0), c.Centroid);
+            Assert.IsTrue(c.Normal.Equals(new Vector(0, 0, 1), Tol));
+            Assert.AreEqual(Math.PI * 9, c.Area, Tol);
         }
 
         [TestMethod, TestCategory("Placed")]
         public void FromCenterNormal_ShouldOrientPlane_Test()
         {
             var c = PlacedCircle.FromCenterNormal(new Circle(4), new Vector(1, 2, 3), new Vector(0, 1, 0));
-            c.Normal.Equals(new Vector(0, 1, 0), LooseTol).Should().BeTrue();
-            c.Plane.Contains(c.Center, LooseTol).Should().BeTrue();
+            Assert.IsTrue(c.Normal.Equals(new Vector(0, 1, 0), LooseTol));
+            Assert.IsTrue(c.Plane.Contains(c.Center, LooseTol));
         }
 
         [TestMethod, TestCategory("Placed")]
         public void Contains_OnDisc_Test()
         {
             var c = PlacedCircle.InXYPlane(new Circle(5), new Vector(0, 0, 0));
-            c.Contains(new Vector(3, 4, 0), Tol).Should().BeTrue();  // on the rim
-            c.Contains(new Vector(1, 1, 0), Tol).Should().BeTrue();
-            c.Contains(new Vector(6, 0, 0), Tol).Should().BeFalse(); // beyond the radius
-            c.Contains(new Vector(1, 1, 2), Tol).Should().BeFalse(); // off the plane
+            Assert.IsTrue(c.Contains(new Vector(3, 4, 0), Tol));  // on the rim
+            Assert.IsTrue(c.Contains(new Vector(1, 1, 0), Tol));
+            Assert.IsFalse(c.Contains(new Vector(6, 0, 0), Tol)); // beyond the radius
+            Assert.IsFalse(c.Contains(new Vector(1, 1, 2), Tol)); // off the plane
         }
 
         [TestMethod, TestCategory("Placed")]
         public void ClosestPoint_OutsidePoint_ShouldClampToRim_Test()
         {
             var c = PlacedCircle.InXYPlane(new Circle(5), new Vector(0, 0, 0));
-            c.ClosestPoint(new Vector(20, 0, 7)).Equals(new Vector(5, 0, 0), LooseTol).Should().BeTrue();
+            Assert.IsTrue(c.ClosestPoint(new Vector(20, 0, 7)).Equals(new Vector(5, 0, 0), LooseTol));
         }
 
         [TestMethod, TestCategory("Placed")]
@@ -79,9 +78,9 @@ namespace RP.Math.Tests
         {
             var c = PlacedCircle.InXYPlane(new Circle(5), new Vector(0, 0, 0));
             var line = new Line(new Vector(1, 1, 5), new Vector(0, 0, -1));
-            c.TryIntersect(line, out Vector near, out Vector far).Should().BeTrue();
-            near.Equals(new Vector(1, 1, 0), LooseTol).Should().BeTrue();
-            far.Equals(near, LooseTol).Should().BeTrue(); // a flat disc has a single crossing
+            Assert.IsTrue(c.TryIntersect(line, out Vector near, out Vector far));
+            Assert.IsTrue(near.Equals(new Vector(1, 1, 0), LooseTol));
+            Assert.IsTrue(far.Equals(near, LooseTol)); // a flat disc has a single crossing
 
         }
     }

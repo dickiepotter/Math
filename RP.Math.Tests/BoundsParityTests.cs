@@ -1,7 +1,5 @@
 namespace RP.Math.Tests
 {
-    using FluentAssertions;
-
     using Microsoft.VisualStudio.TestTools.UnitTesting;
 
     using RP.Math;
@@ -22,8 +20,8 @@ namespace RP.Math.Tests
         {
             var box = new BoundingBox(new Vector(0, 0, 0), new Vector(2, 2, 2));
             var moved = box.Translate(new Vector(10, 0, -5));
-            moved.Min.Equals(new Vector(10, 0, -5), Tol).Should().BeTrue();
-            moved.Max.Equals(new Vector(12, 2, -3), Tol).Should().BeTrue();
+            Assert.IsTrue(moved.Min.Equals(new Vector(10, 0, -5), Tol));
+            Assert.IsTrue(moved.Max.Equals(new Vector(12, 2, -3), Tol));
         }
 
         [TestMethod]
@@ -32,7 +30,7 @@ namespace RP.Math.Tests
             var box = new BoundingBox(new Vector(-1, -1, -1), new Vector(1, 1, 1));
             var m = Matrix.TranslationMatrix(new Vector(5, 6, 7));
             var t = box.Transform(m);
-            t.Center.Equals(new Vector(5, 6, 7), 1e-9).Should().BeTrue();
+            Assert.IsTrue(t.Center.Equals(new Vector(5, 6, 7), 1e-9));
         }
 
         [TestMethod]
@@ -42,8 +40,8 @@ namespace RP.Math.Tests
             var box = new BoundingBox(new Vector(-1, -1, -1), new Vector(1, 1, 1));
             var rot = Matrix.RotationMatrixAboutZAxis(new Angle(System.Math.PI / 4));
             var t = box.Transform(rot);
-            t.Size.X.Should().BeGreaterThan(2.0 - 1e-9); // grew from 2 toward 2√2
-            t.Center.Equals(Vector.Origin, 1e-9).Should().BeTrue();
+            Assert.IsTrue((t.Size.X) > (2.0 - 1e-9)); // grew from 2 toward 2√2
+            Assert.IsTrue(t.Center.Equals(Vector.Origin, 1e-9));
         }
 
         [TestMethod]
@@ -52,18 +50,18 @@ namespace RP.Math.Tests
             var a = new BoundingBox(Vector.Origin, new Vector(2, 2, 2));
             var b = new BoundingBox(new Vector(10, 10, 10), new Vector(20, 20, 20));
             var mid = BoundingBox.Lerp(a, b, 0.5);
-            mid.Min.Equals(new Vector(5, 5, 5), Tol).Should().BeTrue();
-            mid.Max.Equals(new Vector(11, 11, 11), Tol).Should().BeTrue();
+            Assert.IsTrue(mid.Min.Equals(new Vector(5, 5, 5), Tol));
+            Assert.IsTrue(mid.Max.Equals(new Vector(11, 11, 11), Tol));
         }
 
         [TestMethod]
         public void Box_SphereIntersectAndContain()
         {
             var box = new BoundingBox(Vector.Origin, new Vector(10, 10, 10));
-            box.Intersects(new BoundingSphere(new Vector(5, 5, 5), 1)).Should().BeTrue();
-            box.Intersects(new BoundingSphere(new Vector(20, 20, 20), 1)).Should().BeFalse();
-            box.Contains(new BoundingSphere(new Vector(5, 5, 5), 2)).Should().BeTrue();
-            box.Contains(new BoundingSphere(new Vector(5, 5, 5), 6)).Should().BeFalse(); // pokes out
+            Assert.IsTrue(box.Intersects(new BoundingSphere(new Vector(5, 5, 5), 1)));
+            Assert.IsFalse(box.Intersects(new BoundingSphere(new Vector(20, 20, 20), 1)));
+            Assert.IsTrue(box.Contains(new BoundingSphere(new Vector(5, 5, 5), 2)));
+            Assert.IsFalse(box.Contains(new BoundingSphere(new Vector(5, 5, 5), 6))); // pokes out
         }
 
         [TestMethod]
@@ -72,25 +70,25 @@ namespace RP.Math.Tests
             var a = new BoundingBox(Vector.Origin, new Vector(4, 4, 4));
             var b = new BoundingBox(new Vector(2, 2, 2), new Vector(8, 8, 8));
             var overlap = a.Intersection(b);
-            overlap.IsEmpty.Should().BeFalse();
-            overlap.Min.Equals(new Vector(2, 2, 2), Tol).Should().BeTrue();
-            overlap.Max.Equals(new Vector(4, 4, 4), Tol).Should().BeTrue();
+            Assert.IsFalse(overlap.IsEmpty);
+            Assert.IsTrue(overlap.Min.Equals(new Vector(2, 2, 2), Tol));
+            Assert.IsTrue(overlap.Max.Equals(new Vector(4, 4, 4), Tol));
 
             var disjoint = a.Intersection(new BoundingBox(new Vector(100, 100, 100), new Vector(101, 101, 101)));
-            disjoint.IsEmpty.Should().BeTrue();
+            Assert.IsTrue(disjoint.IsEmpty);
         }
 
         [TestMethod]
         public void Box_Empty_IsTheIdentityForMerge()
         {
-            BoundingBox.Empty.IsEmpty.Should().BeTrue();
+            Assert.IsTrue(BoundingBox.Empty.IsEmpty);
 
             // Accumulating from Empty yields exactly the merged geometry.
             var acc = BoundingBox.Empty
                 .Merge(new Vector(1, 2, 3))
                 .Merge(new Vector(-1, 5, 0));
-            acc.Min.Equals(new Vector(-1, 2, 0), Tol).Should().BeTrue();
-            acc.Max.Equals(new Vector(1, 5, 3), Tol).Should().BeTrue();
+            Assert.IsTrue(acc.Min.Equals(new Vector(-1, 2, 0), Tol));
+            Assert.IsTrue(acc.Max.Equals(new Vector(1, 5, 3), Tol));
         }
 
         #endregion
@@ -102,11 +100,11 @@ namespace RP.Math.Tests
         {
             var box = new BoundingBox(new Vector(-1, -1, -1), new Vector(1, 1, 1));
             var s = BoundingSphere.FromBox(box);
-            s.Center.Equals(Vector.Origin, Tol).Should().BeTrue();
-            s.Radius.Should().BeApproximately(System.Math.Sqrt(3), 1e-9); // half-diagonal
+            Assert.IsTrue(s.Center.Equals(Vector.Origin, Tol));
+            Assert.AreEqual(System.Math.Sqrt(3), s.Radius, 1e-9); // half-diagonal
             // The corners sit exactly on the sphere (a knife-edge that double rounding can push either side),
             // so containment is asserted with a rounding margin.
-            s.Expand(1e-9).Contains(box).Should().BeTrue();
+            Assert.IsTrue(s.Expand(1e-9).Contains(box));
         }
 
         [TestMethod]
@@ -115,11 +113,11 @@ namespace RP.Math.Tests
             var s = new BoundingSphere(new Vector(1, 0, 0), 2);
 
             var posed = s.Transform(Pose.At(new Vector(10, 0, 0)));
-            posed.Center.Equals(new Vector(11, 0, 0), 1e-9).Should().BeTrue();
-            posed.Radius.Should().BeApproximately(2, Tol); // rigid: radius unchanged
+            Assert.IsTrue(posed.Center.Equals(new Vector(11, 0, 0), 1e-9));
+            Assert.AreEqual(2, posed.Radius, Tol); // rigid: radius unchanged
 
             var scaled = s.Transform(Matrix.ScalingMatrix(3, 3, 3));
-            scaled.Radius.Should().BeApproximately(6, 1e-9); // uniform scale ×3
+            Assert.AreEqual(6, scaled.Radius, 1e-9); // uniform scale ×3
         }
 
         [TestMethod]
@@ -127,7 +125,7 @@ namespace RP.Math.Tests
         {
             var s = new BoundingSphere(Vector.Origin, 1);
             var scaled = s.Transform(Matrix.ScalingMatrix(2, 5, 3));
-            scaled.Radius.Should().BeApproximately(5, 1e-9); // enclosing: largest factor
+            Assert.AreEqual(5, scaled.Radius, 1e-9); // enclosing: largest factor
         }
 
         [TestMethod]
@@ -136,8 +134,8 @@ namespace RP.Math.Tests
             var a = new BoundingSphere(Vector.Origin, 1);
             var b = new BoundingSphere(new Vector(10, 0, 0), 3);
             var mid = BoundingSphere.Lerp(a, b, 0.5);
-            mid.Center.Equals(new Vector(5, 0, 0), Tol).Should().BeTrue();
-            mid.Radius.Should().BeApproximately(2, Tol);
+            Assert.IsTrue(mid.Center.Equals(new Vector(5, 0, 0), Tol));
+            Assert.AreEqual(2, mid.Radius, Tol);
         }
 
         #endregion
@@ -153,19 +151,19 @@ namespace RP.Math.Tests
             var frustum = Frustum.FromViewProjection(proj * view);
 
             var inside = new BoundingSphere(new Vector(0, 0, -10), 1);
-            frustum.Contains(inside).Should().BeTrue();
-            frustum.Intersects(inside).Should().BeTrue();
+            Assert.IsTrue(frustum.Contains(inside));
+            Assert.IsTrue(frustum.Intersects(inside));
 
             // A sphere straddling the near plane intersects but is not fully contained.
             var straddling = new BoundingSphere(new Vector(0, 0, -1), 2);
-            frustum.Intersects(straddling).Should().BeTrue();
-            frustum.Contains(straddling).Should().BeFalse();
+            Assert.IsTrue(frustum.Intersects(straddling));
+            Assert.IsFalse(frustum.Contains(straddling));
 
             // Well behind the camera: neither.
             var behind = new BoundingSphere(new Vector(0, 0, 50), 1);
-            frustum.Intersects(behind).Should().BeFalse();
+            Assert.IsFalse(frustum.Intersects(behind));
 
-            frustum.AllPlanes.Count.Should().Be(6);
+            Assert.AreEqual(6, frustum.AllPlanes.Count);
         }
 
         #endregion

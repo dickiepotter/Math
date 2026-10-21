@@ -1,7 +1,5 @@
 namespace RP.Math.Tests
 {
-    using FluentAssertions;
-
     using Microsoft.VisualStudio.TestTools.UnitTesting;
 
     /// <summary>
@@ -20,8 +18,8 @@ namespace RP.Math.Tests
         {
             var s = PlacedSphere.At(new Sphere(2), new Vector(0, 0, 0));
             var ray = new Ray(new Vector(10, 0, 0), new Vector(-1, 0, 0));
-            s.TryIntersect(ray, out Vector p).Should().BeTrue();
-            p.Equals(new Vector(2, 0, 0), LooseTol).Should().BeTrue();
+            Assert.IsTrue(s.TryIntersect(ray, out Vector p));
+            Assert.IsTrue(p.Equals(new Vector(2, 0, 0), LooseTol));
         }
 
         [TestMethod, TestCategory("SphereIntersect")]
@@ -29,7 +27,7 @@ namespace RP.Math.Tests
         {
             var s = PlacedSphere.At(new Sphere(2), new Vector(0, 0, 0));
             var ray = new Ray(new Vector(10, 0, 0), new Vector(1, 0, 0));
-            s.TryIntersect(ray, out _).Should().BeFalse();
+            Assert.IsFalse(s.TryIntersect(ray, out _));
         }
 
         [TestMethod, TestCategory("SphereIntersect")]
@@ -37,8 +35,8 @@ namespace RP.Math.Tests
         {
             var s = PlacedSphere.At(new Sphere(2), new Vector(0, 0, 0));
             var ray = new Ray(new Vector(0, 0, 0), new Vector(1, 0, 0));
-            s.TryIntersect(ray, out Vector p).Should().BeTrue();
-            p.Equals(new Vector(2, 0, 0), LooseTol).Should().BeTrue();
+            Assert.IsTrue(s.TryIntersect(ray, out Vector p));
+            Assert.IsTrue(p.Equals(new Vector(2, 0, 0), LooseTol));
         }
 
         [TestMethod, TestCategory("SphereIntersect")]
@@ -46,9 +44,9 @@ namespace RP.Math.Tests
         {
             var s = PlacedSphere.At(new Sphere(2), new Vector(0, 0, 0));
             var line = new Line(new Vector(0, 0, 0), new Vector(1, 0, 0));
-            s.TryIntersect(line, out Vector near, out Vector far).Should().BeTrue();
-            near.Equals(new Vector(-2, 0, 0), LooseTol).Should().BeTrue();
-            far.Equals(new Vector(2, 0, 0), LooseTol).Should().BeTrue();
+            Assert.IsTrue(s.TryIntersect(line, out Vector near, out Vector far));
+            Assert.IsTrue(near.Equals(new Vector(-2, 0, 0), LooseTol));
+            Assert.IsTrue(far.Equals(new Vector(2, 0, 0), LooseTol));
         }
 
         [TestMethod, TestCategory("SphereIntersect")]
@@ -56,7 +54,7 @@ namespace RP.Math.Tests
         {
             var s = PlacedSphere.At(new Sphere(2), new Vector(0, 0, 0));
             var line = new Line(new Vector(0, 5, 0), new Vector(1, 0, 0)); // passes 5 above, misses r = 2
-            s.TryIntersect(line, out _, out _).Should().BeFalse();
+            Assert.IsFalse(s.TryIntersect(line, out _, out _));
         }
 
         #endregion
@@ -68,9 +66,9 @@ namespace RP.Math.Tests
         {
             var c = PlacedCircle.InXYPlane(new Circle(5), new Vector(0, 0, 0));
             var line = new Line(new Vector(1, 1, 5), new Vector(0, 0, -1)); // straight down through the disc
-            c.TryIntersect(line, out Vector near, out Vector far).Should().BeTrue();
-            near.Equals(new Vector(1, 1, 0), LooseTol).Should().BeTrue();
-            far.Equals(near, LooseTol).Should().BeTrue(); // a flat disc has a single crossing
+            Assert.IsTrue(c.TryIntersect(line, out Vector near, out Vector far));
+            Assert.IsTrue(near.Equals(new Vector(1, 1, 0), LooseTol));
+            Assert.IsTrue(far.Equals(near, LooseTol)); // a flat disc has a single crossing
 
         }
 
@@ -79,7 +77,7 @@ namespace RP.Math.Tests
         {
             var c = PlacedCircle.InXYPlane(new Circle(5), new Vector(0, 0, 0));
             var line = new Line(new Vector(20, 0, 5), new Vector(0, 0, -1)); // hits the plane at x = 20, outside r = 5
-            c.TryIntersect(line, out _, out _).Should().BeFalse();
+            Assert.IsFalse(c.TryIntersect(line, out _, out _));
         }
 
         [TestMethod, TestCategory("CircleIntersect")]
@@ -87,7 +85,7 @@ namespace RP.Math.Tests
         {
             var c = PlacedCircle.InXYPlane(new Circle(5), new Vector(0, 0, 0));
             var ray = new Ray(new Vector(0, 0, 5), new Vector(0, 0, 1)); // away from the plane
-            c.TryIntersect(ray, out _).Should().BeFalse();
+            Assert.IsFalse(c.TryIntersect(ray, out _));
         }
 
         #endregion

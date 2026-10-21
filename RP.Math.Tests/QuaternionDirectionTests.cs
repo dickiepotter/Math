@@ -1,7 +1,5 @@
 namespace RP.Math.Tests
 {
-    using FluentAssertions;
-
     using Microsoft.VisualStudio.TestTools.UnitTesting;
 
     /// <summary>
@@ -19,21 +17,21 @@ namespace RP.Math.Tests
         public void FromToRotation_TurnsFromOntoTo_Test()
         {
             Quaternion q = Quaternion.FromToRotation(Vector.XAxis, Vector.YAxis);
-            q.Rotate(Vector.XAxis).Equals(Vector.YAxis, LooseTolerance).Should().BeTrue();
+            Assert.IsTrue(q.Rotate(Vector.XAxis).Equals(Vector.YAxis, LooseTolerance));
         }
 
         [TestMethod, TestCategory("FromToRotation")]
         public void FromToRotation_OfAlignedVectors_IsIdentity_Test()
         {
             Quaternion q = Quaternion.FromToRotation(new Vector(2, 0, 0), new Vector(5, 0, 0));
-            q.IsIdentity(Tolerance).Should().BeTrue();
+            Assert.IsTrue(q.IsIdentity(Tolerance));
         }
 
         [TestMethod, TestCategory("FromToRotation")]
         public void FromToRotation_OfOppositeVectors_IsAHalfTurn_Test()
         {
             Quaternion q = Quaternion.FromToRotation(Vector.XAxis, new Vector(-1, 0, 0));
-            q.Rotate(Vector.XAxis).Equals(new Vector(-1, 0, 0), LooseTolerance).Should().BeTrue();
+            Assert.IsTrue(q.Rotate(Vector.XAxis).Equals(new Vector(-1, 0, 0), LooseTolerance));
         }
 
         [TestMethod, TestCategory("FromToRotation")]
@@ -41,13 +39,13 @@ namespace RP.Math.Tests
         {
             // Non-unit inputs should behave like their directions.
             Quaternion q = Quaternion.FromToRotation(new Vector(0, 3, 0), new Vector(0, 0, 7));
-            q.Rotate(Vector.YAxis).Equals(Vector.ZAxis, LooseTolerance).Should().BeTrue();
+            Assert.IsTrue(q.Rotate(Vector.YAxis).Equals(Vector.ZAxis, LooseTolerance));
         }
 
         [TestMethod, TestCategory("FromToRotation")]
         public void FromToRotation_OfZeroVector_IsIdentity_Test()
         {
-            Quaternion.FromToRotation(Vector.Zero, Vector.XAxis).IsIdentity(Tolerance).Should().BeTrue();
+            Assert.IsTrue(Quaternion.FromToRotation(Vector.Zero, Vector.XAxis).IsIdentity(Tolerance));
         }
 
         #endregion
@@ -59,7 +57,7 @@ namespace RP.Math.Tests
         {
             OrthogonalAxes axes = OrthogonalAxes.OpenGL;
             Quaternion q = Quaternion.LookRotation(axes.Forward, axes.Up, axes);
-            q.IsIdentity(LooseTolerance).Should().BeTrue();
+            Assert.IsTrue(q.IsIdentity(LooseTolerance));
         }
 
         [TestMethod, TestCategory("LookRotation")]
@@ -70,7 +68,7 @@ namespace RP.Math.Tests
 
             Quaternion q = Quaternion.LookRotation(target, axes.Up, axes);
 
-            q.Rotate(axes.Forward).Equals(target, LooseTolerance).Should().BeTrue();
+            Assert.IsTrue(q.Rotate(axes.Forward).Equals(target, LooseTolerance));
         }
 
         [TestMethod, TestCategory("LookRotation")]
@@ -84,9 +82,9 @@ namespace RP.Math.Tests
             Vector resultUp = q.Rotate(axes.Up);
 
             // The resulting up is perpendicular to the forward direction...
-            resultUp.DotProduct(forward.NormalizeOrDefault()).Should().BeApproximately(0, LooseTolerance);
+            Assert.AreEqual(0, resultUp.DotProduct(forward.NormalizeOrDefault()), LooseTolerance);
             // ...and points to the same side as the requested up (positive component along it).
-            resultUp.DotProduct(up).Should().BeGreaterThan(0);
+            Assert.IsTrue((resultUp.DotProduct(up)) > (0));
         }
 
         [TestMethod, TestCategory("LookRotation")]
@@ -98,7 +96,7 @@ namespace RP.Math.Tests
             // up parallel to forward: the roll is unspecified, but it must still look along forward.
             Quaternion q = Quaternion.LookRotation(forward, new Vector(0, 2, 0), axes);
 
-            q.Rotate(axes.Forward).Equals(forward.NormalizeOrDefault(), LooseTolerance).Should().BeTrue();
+            Assert.IsTrue(q.Rotate(axes.Forward).Equals(forward.NormalizeOrDefault(), LooseTolerance));
         }
 
         [TestMethod, TestCategory("LookRotation")]
@@ -110,7 +108,7 @@ namespace RP.Math.Tests
             Quaternion two = Quaternion.LookRotation(forward, axes.Up, axes);
             Quaternion one = Quaternion.LookRotation(forward, axes);
 
-            one.Equals(two, LooseTolerance).Should().BeTrue();
+            Assert.IsTrue(one.Equals(two, LooseTolerance));
         }
 
         #endregion

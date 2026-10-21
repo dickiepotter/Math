@@ -1,6 +1,5 @@
 namespace RP.Math.Tests.Bounds
 {
-    using FluentAssertions;
     using Microsoft.VisualStudio.TestTools.UnitTesting;
     using RP.Math;
 
@@ -22,39 +21,39 @@ namespace RP.Math.Tests.Bounds
         [TestMethod]
         public void Contains_PointAtOrigin_IsInside()
         {
-            MakeFrustum().Contains(Vector.Origin).Should().BeTrue();
+            Assert.IsTrue(MakeFrustum().Contains(Vector.Origin));
         }
 
         [TestMethod]
         public void Contains_PointBehindCamera_IsOutside()
         {
             // The camera sits at z = 5 looking toward −z; z = 20 is well behind it.
-            MakeFrustum().Contains(new Vector(0, 0, 20)).Should().BeFalse();
+            Assert.IsFalse(MakeFrustum().Contains(new Vector(0, 0, 20)));
         }
 
         [TestMethod]
         public void Contains_PointBeyondFarPlane_IsOutside()
         {
             // Far plane is 100 units ahead of the camera (z = 5), i.e. around z = −95.
-            MakeFrustum().Contains(new Vector(0, 0, -200)).Should().BeFalse();
+            Assert.IsFalse(MakeFrustum().Contains(new Vector(0, 0, -200)));
         }
 
         [TestMethod]
         public void Contains_PointFarToTheSide_IsOutside()
         {
-            MakeFrustum().Contains(new Vector(100, 0, 0)).Should().BeFalse();
+            Assert.IsFalse(MakeFrustum().Contains(new Vector(100, 0, 0)));
         }
 
         [TestMethod]
         public void Intersects_SphereAtOrigin_IsVisible()
         {
-            MakeFrustum().Intersects(new BoundingSphere(Vector.Origin, 1.0)).Should().BeTrue();
+            Assert.IsTrue(MakeFrustum().Intersects(new BoundingSphere(Vector.Origin, 1.0)));
         }
 
         [TestMethod]
         public void Intersects_SphereFarToTheSide_IsCulled()
         {
-            MakeFrustum().Intersects(new BoundingSphere(new Vector(100, 0, 0), 1.0)).Should().BeFalse();
+            Assert.IsFalse(MakeFrustum().Intersects(new BoundingSphere(new Vector(100, 0, 0), 1.0)));
         }
 
         [TestMethod]
@@ -63,21 +62,21 @@ namespace RP.Math.Tests.Bounds
             // A sphere whose centre is a little outside the side, but whose radius reaches back in.
             var frustum = MakeFrustum();
             var bigSphere = new BoundingSphere(new Vector(3, 0, 0), 5.0);
-            frustum.Intersects(bigSphere).Should().BeTrue();
+            Assert.IsTrue(frustum.Intersects(bigSphere));
         }
 
         [TestMethod]
         public void Intersects_BoxAtOrigin_IsVisible()
         {
             var box = BoundingBox.FromMinMax(new Vector(-1, -1, -1), new Vector(1, 1, 1));
-            MakeFrustum().Intersects(box).Should().BeTrue();
+            Assert.IsTrue(MakeFrustum().Intersects(box));
         }
 
         [TestMethod]
         public void Intersects_BoxFarToTheSide_IsCulled()
         {
             var box = BoundingBox.FromMinMax(new Vector(90, -1, -1), new Vector(92, 1, 1));
-            MakeFrustum().Intersects(box).Should().BeFalse();
+            Assert.IsFalse(MakeFrustum().Intersects(box));
         }
     }
 }

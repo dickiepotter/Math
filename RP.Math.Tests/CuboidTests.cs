@@ -2,7 +2,6 @@ namespace RP.Math.Tests
 {
     using System;
 
-    using FluentAssertions;
 
     using Microsoft.VisualStudio.TestTools.UnitTesting;
 
@@ -16,33 +15,33 @@ namespace RP.Math.Tests
         public void Constructor_StoresSizes_Test()
         {
             var c = new Cuboid(2, 3, 4);
-            c.Width.Should().Be(2);
-            c.Height.Should().Be(3);
-            c.Depth.Should().Be(4);
+            Assert.AreEqual(2, c.Width);
+            Assert.AreEqual(3, c.Height);
+            Assert.AreEqual(4, c.Depth);
         }
 
         [TestMethod, TestCategory("Construction")]
         public void Constructor_NegativeSize_ShouldThrow_Test()
         {
             Action act = () => new Cuboid(2, -3, 4);
-            act.Should().Throw<ArgumentOutOfRangeException>();
+            Assert.ThrowsException<ArgumentOutOfRangeException>(act);
         }
 
         [TestMethod, TestCategory("Measurement")]
         public void Measurements_ShouldMatchFormulae_Test()
         {
             var c = new Cuboid(2, 3, 4);
-            c.Volume.Should().Be(24);
-            c.SurfaceArea.Should().Be(52);                       // 2(6 + 12 + 8)
-            c.SpaceDiagonal.Should().BeApproximately(System.Math.Sqrt(29), Tol);
-            c.Size.Should().Be(new Vector(2, 3, 4));
+            Assert.AreEqual(24, c.Volume);
+            Assert.AreEqual(52, c.SurfaceArea);                       // 2(6 + 12 + 8)
+            Assert.AreEqual(System.Math.Sqrt(29), c.SpaceDiagonal, Tol);
+            Assert.AreEqual(new Vector(2, 3, 4), c.Size);
         }
 
         [TestMethod, TestCategory("Classification")]
         public void IsCube_ShouldDetectEqualEdges_Test()
         {
-            Cuboid.Cube(3).IsCube(Tol).Should().BeTrue();
-            new Cuboid(2, 3, 4).IsCube(Tol).Should().BeFalse();
+            Assert.IsTrue(Cuboid.Cube(3).IsCube(Tol));
+            Assert.IsFalse(new Cuboid(2, 3, 4).IsCube(Tol));
         }
 
         [TestMethod, TestCategory("Comparison")]
@@ -50,24 +49,24 @@ namespace RP.Math.Tests
         {
             var small = Cuboid.Cube(2); // 8
             var large = new Cuboid(2, 3, 4); // 24
-            (large > small).Should().BeTrue();
-            large.CompareTo(small).Should().BeGreaterThan(0);
+            Assert.IsTrue((large > small));
+            Assert.IsTrue((large.CompareTo(small)) > (0));
         }
 
         [TestMethod, TestCategory("Equality")]
         public void Equality_ShouldCompareSizes_Test()
         {
-            (new Cuboid(2, 3, 4) == new Cuboid(2, 3, 4)).Should().BeTrue();
-            (new Cuboid(2, 3, 4) != new Cuboid(2, 3, 5)).Should().BeTrue();
+            Assert.IsTrue((new Cuboid(2, 3, 4) == new Cuboid(2, 3, 4)));
+            Assert.IsTrue((new Cuboid(2, 3, 4) != new Cuboid(2, 3, 5)));
         }
 
         [TestMethod, TestCategory("Deconstruction")]
         public void Deconstruct_ShouldYieldSizes_Test()
         {
             var (w, h, d) = new Cuboid(2, 3, 4);
-            w.Should().Be(2);
-            h.Should().Be(3);
-            d.Should().Be(4);
+            Assert.AreEqual(2, w);
+            Assert.AreEqual(3, h);
+            Assert.AreEqual(4, d);
         }
     }
 }

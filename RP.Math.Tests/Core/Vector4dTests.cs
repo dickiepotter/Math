@@ -2,7 +2,6 @@ namespace RP.Math.Tests.Core
 {
     using System;
 
-    using FluentAssertions;
 
     using Microsoft.VisualStudio.TestTools.UnitTesting;
 
@@ -24,19 +23,19 @@ namespace RP.Math.Tests.Core
         public void Constructor_And_Accessors()
         {
             var v = new Vector4d(1, 2, 2, 4); // magnitude = sqrt(1+4+4+16) = 5
-            v.X.Should().Be(1);
-            v.W.Should().Be(4);
-            v.Magnitude.Should().BeApproximately(5, Tol);
-            v[2].Should().Be(2);
-            v[3].Should().Be(4);
-            v.Array.Should().Equal(1.0, 2.0, 2.0, 4.0);
-            v.XYZ.Should().Be(new Vector3d(1, 2, 2));
+            Assert.AreEqual(1, v.X);
+            Assert.AreEqual(4, v.W);
+            Assert.AreEqual(5, v.Magnitude, Tol);
+            Assert.AreEqual(2, v[2]);
+            Assert.AreEqual(4, v[3]);
+            CollectionAssert.AreEqual(new[] { 1.0, 2.0, 2.0, 4.0 }, v.Array);
+            Assert.AreEqual(new Vector3d(1, 2, 2), v.XYZ);
         }
 
         [TestMethod]
         public void Constructor_FromVector3dAndW()
         {
-            new Vector4d(new Vector3d(1, 2, 3), 4).Should().Be(new Vector4d(1, 2, 3, 4));
+            Assert.AreEqual(new Vector4d(1, 2, 3, 4), new Vector4d(new Vector3d(1, 2, 3), 4));
         }
 
         [TestMethod]
@@ -44,14 +43,14 @@ namespace RP.Math.Tests.Core
         {
             var v = new Vector4d(1, 2, 3, 4);
             Action act = () => { var _ = v[4]; };
-            act.Should().Throw<ArgumentException>();
+            Assert.ThrowsException<ArgumentException>(act);
         }
 
         [TestMethod]
         public void Array_Constructor_WrongLength_Throws()
         {
             Action act = () => new Vector4d(new[] { 1.0, 2.0, 3.0 });
-            act.Should().Throw<ArgumentException>();
+            Assert.ThrowsException<ArgumentException>(act);
         }
 
         #endregion
@@ -64,26 +63,26 @@ namespace RP.Math.Tests.Core
             var a = new Vector4d(1, 2, 3, 4);
             var b = new Vector4d(4, 3, 2, 1);
 
-            (a + b).Should().Be(new Vector4d(5, 5, 5, 5));
-            (b - a).Should().Be(new Vector4d(3, 1, -1, -3));
-            (a * 2).Should().Be(new Vector4d(2, 4, 6, 8));
-            (a * b).Should().Be(new Vector4d(4, 6, 6, 4)); // component-wise
-            Vector4d.DotProduct(a, b).Should().Be(4 + 6 + 6 + 4);
-            a.Dot(b).Should().Be(20); // alias
+            Assert.AreEqual(new Vector4d(5, 5, 5, 5), (a + b));
+            Assert.AreEqual(new Vector4d(3, 1, -1, -3), (b - a));
+            Assert.AreEqual(new Vector4d(2, 4, 6, 8), (a * 2));
+            Assert.AreEqual(new Vector4d(4, 6, 6, 4), (a * b)); // component-wise
+            Assert.AreEqual(4 + 6 + 6 + 4, Vector4d.DotProduct(a, b));
+            Assert.AreEqual(20, a.Dot(b)); // alias
         }
 
         [TestMethod]
         public void Comparison_Operators_AreByMagnitude()
         {
-            (new Vector4d(1, 0, 0, 0) < new Vector4d(0, 0, 0, 2)).Should().BeTrue();
-            (new Vector4d(3, 0, 0, 0) >= new Vector4d(0, 0, 0, 3)).Should().BeTrue();
+            Assert.IsTrue((new Vector4d(1, 0, 0, 0) < new Vector4d(0, 0, 0, 2)));
+            Assert.IsTrue((new Vector4d(3, 0, 0, 0) >= new Vector4d(0, 0, 0, 3)));
         }
 
         [TestMethod]
         public void EqualityOperator_IsExact_And_NaNIsNotEqualToItself()
         {
-            (new Vector4d(1, 2, 3, 4) == new Vector4d(1, 2, 3, 4)).Should().BeTrue();
-            (Vector4d.NaN == Vector4d.NaN).Should().BeFalse();
+            Assert.IsTrue((new Vector4d(1, 2, 3, 4) == new Vector4d(1, 2, 3, 4)));
+            Assert.IsFalse((Vector4d.NaN == Vector4d.NaN));
         }
 
         #endregion
@@ -94,36 +93,36 @@ namespace RP.Math.Tests.Core
         public void Normalize_ProducesUnitVector()
         {
             var n = new Vector4d(1, 2, 2, 4).Normalize();
-            n.Magnitude.Should().BeApproximately(1, Tol);
-            n.Equals(new Vector4d(0.2, 0.4, 0.4, 0.8), Tol).Should().BeTrue();
+            Assert.AreEqual(1, n.Magnitude, Tol);
+            Assert.IsTrue(n.Equals(new Vector4d(0.2, 0.4, 0.4, 0.8), Tol));
         }
 
         [TestMethod]
         public void Normalize_Zero_Throws()
         {
             Action act = () => Vector4d.Origin.Normalize();
-            act.Should().Throw<NormalizeVectorException>();
+            Assert.ThrowsException<NormalizeVectorException>(act);
         }
 
         [TestMethod]
         public void NormalizeOrDefault_Zero_ReturnsOrigin_NaN_ReturnsNaN()
         {
-            Vector4d.Origin.NormalizeOrDefault().Should().Be(Vector4d.Origin);
-            Vector4d.NaN.NormalizeOrDefault().IsNaN().Should().BeTrue();
+            Assert.AreEqual(Vector4d.Origin, Vector4d.Origin.NormalizeOrDefault());
+            Assert.IsTrue(Vector4d.NaN.NormalizeOrDefault().IsNaN());
         }
 
         [TestMethod]
         public void Normalize_AxisAlignedInfinity_IsASpecialCase()
         {
             var n = new Vector4d(0, double.PositiveInfinity, 0, 0).NormalizeOrDefault();
-            n.Equals(Vector4d.YAxis, Tol).Should().BeTrue();
+            Assert.IsTrue(n.Equals(Vector4d.YAxis, Tol));
         }
 
         [TestMethod]
         public void Normalize_HalfInfiniteVector_Throws()
         {
             Action act = () => new Vector4d(double.PositiveInfinity, 5, 0, 0).Normalize();
-            act.Should().Throw<NormalizeVectorException>();
+            Assert.ThrowsException<NormalizeVectorException>(act);
         }
 
         #endregion
@@ -133,27 +132,25 @@ namespace RP.Math.Tests.Core
         [TestMethod]
         public void Interpolate_Midpoint_And_RangeCheck()
         {
-            Vector4d.Interpolate(Vector4d.Origin, new Vector4d(2, 4, 6, 8), 0.5)
-                .Should().Be(new Vector4d(1, 2, 3, 4));
+            Assert.AreEqual(new Vector4d(1, 2, 3, 4), Vector4d.Interpolate(Vector4d.Origin, new Vector4d(2, 4, 6, 8), 0.5));
 
             Action act = () => Vector4d.Interpolate(Vector4d.Origin, Vector4d.One, -0.5);
-            act.Should().Throw<ArgumentOutOfRangeException>();
+            Assert.ThrowsException<ArgumentOutOfRangeException>(act);
 
-            Vector4d.Lerp(Vector4d.Origin, new Vector4d(2, 2, 2, 2), 2)
-                .Should().Be(new Vector4d(4, 4, 4, 4)); // extrapolation
+            Assert.AreEqual(new Vector4d(4, 4, 4, 4), Vector4d.Lerp(Vector4d.Origin, new Vector4d(2, 2, 2, 2), 2)); // extrapolation
         }
 
         [TestMethod]
         public void Slerp_QuarterTurn_StaysUnit()
         {
             var mid = Vector4d.Slerp(Vector4d.XAxis, Vector4d.YAxis, 0.5);
-            mid.Magnitude.Should().BeApproximately(1, Tol);
+            Assert.AreEqual(1, mid.Magnitude, Tol);
         }
 
         [TestMethod]
         public void Slerp_Antiparallel_FallsBackToLerp_NoNaN()
         {
-            Vector4d.Slerp(Vector4d.XAxis, -Vector4d.XAxis, 0.5).IsNaN().Should().BeFalse();
+            Assert.IsFalse(Vector4d.Slerp(Vector4d.XAxis, -Vector4d.XAxis, 0.5).IsNaN());
         }
 
         #endregion
@@ -163,10 +160,10 @@ namespace RP.Math.Tests.Core
         [TestMethod]
         public void Angle_KnownCases_IncludingAntiparallel()
         {
-            Vector4d.Angle(Vector4d.XAxis, Vector4d.YAxis).Should().BeApproximately(Math.PI / 2, Tol);
-            Vector4d.Angle(Vector4d.XAxis, Vector4d.XAxis).Should().Be(0);
+            Assert.AreEqual(Math.PI / 2, Vector4d.Angle(Vector4d.XAxis, Vector4d.YAxis), Tol);
+            Assert.AreEqual(0, Vector4d.Angle(Vector4d.XAxis, Vector4d.XAxis));
             // The Kahan form must return exactly π (no NaN) for opposite vectors.
-            Vector4d.Angle(Vector4d.XAxis, -Vector4d.XAxis).Should().BeApproximately(Math.PI, Tol);
+            Assert.AreEqual(Math.PI, Vector4d.Angle(Vector4d.XAxis, -Vector4d.XAxis), Tol);
         }
 
         [TestMethod]
@@ -175,7 +172,7 @@ namespace RP.Math.Tests.Core
             // A tiny angle where the acos(dot) form would lose all precision; Kahan keeps it.
             var a = new Vector4d(1, 0, 0, 0);
             var b = new Vector4d(1, 1e-7, 0, 0);
-            Vector4d.Angle(a, b).Should().BeApproximately(1e-7, 1e-12);
+            Assert.AreEqual(1e-7, Vector4d.Angle(a, b), 1e-12);
         }
 
         #endregion
@@ -187,15 +184,15 @@ namespace RP.Math.Tests.Core
         {
             var v = new Vector4d(1, 2, 3, 4);
             var dir = new Vector4d(0, 1, 0, 0);
-            v.Projection(dir).Should().Be(new Vector4d(0, 2, 0, 0));
-            (v.Projection(dir) + v.Rejection(dir)).Equals(v, Tol).Should().BeTrue();
+            Assert.AreEqual(new Vector4d(0, 2, 0, 0), v.Projection(dir));
+            Assert.IsTrue((v.Projection(dir) + v.Rejection(dir)).Equals(v, Tol));
         }
 
         [TestMethod]
         public void Reflect_AboutNormal_FlipsTheNormalComponent()
         {
-            new Vector4d(1, -1, 0, 0).Reflect(Vector4d.YAxis)
-                .Equals(new Vector4d(1, 1, 0, 0), Tol).Should().BeTrue();
+            Assert.IsTrue(new Vector4d(1, -1, 0, 0).Reflect(Vector4d.YAxis)
+                .Equals(new Vector4d(1, 1, 0, 0), Tol));
         }
 
         #endregion
@@ -207,20 +204,19 @@ namespace RP.Math.Tests.Core
         {
             var a = new Vector4d(1, 5, 1, 5);
             var b = new Vector4d(4, 2, 4, 2);
-            Vector4d.ComponentMin(a, b).Should().Be(new Vector4d(1, 2, 1, 2));
-            Vector4d.ComponentMax(a, b).Should().Be(new Vector4d(4, 5, 4, 5));
+            Assert.AreEqual(new Vector4d(1, 2, 1, 2), Vector4d.ComponentMin(a, b));
+            Assert.AreEqual(new Vector4d(4, 5, 4, 5), Vector4d.ComponentMax(a, b));
 
-            new Vector4d(2, 0, 0, 0).ClampMagnitude(1).Magnitude.Should().BeApproximately(1, Tol);
-            Vector4d.MoveTowards(Vector4d.Origin, new Vector4d(10, 0, 0, 0), 4)
-                .Should().Be(new Vector4d(4, 0, 0, 0));
+            Assert.AreEqual(1, new Vector4d(2, 0, 0, 0).ClampMagnitude(1).Magnitude, Tol);
+            Assert.AreEqual(new Vector4d(4, 0, 0, 0), Vector4d.MoveTowards(Vector4d.Origin, new Vector4d(10, 0, 0, 0), 4));
         }
 
         [TestMethod]
         public void Round_MidpointModes()
         {
             var v = new Vector4d(0.5, 1.5, 2.5, 3.5);
-            Vector4d.Round(v, MidpointRounding.ToEven).Should().Be(new Vector4d(0, 2, 2, 4));
-            Vector4d.Round(v, MidpointRounding.AwayFromZero).Should().Be(new Vector4d(1, 2, 3, 4));
+            Assert.AreEqual(new Vector4d(0, 2, 2, 4), Vector4d.Round(v, MidpointRounding.ToEven));
+            Assert.AreEqual(new Vector4d(1, 2, 3, 4), Vector4d.Round(v, MidpointRounding.AwayFromZero));
         }
 
         #endregion
@@ -230,7 +226,7 @@ namespace RP.Math.Tests.Core
         [TestMethod]
         public void Dehomogenize_DoesThePerspectiveDivide()
         {
-            new Vector4d(2, 4, 6, 2).Dehomogenize().Should().Be(new Vector3d(1, 2, 3));
+            Assert.AreEqual(new Vector3d(1, 2, 3), new Vector4d(2, 4, 6, 2).Dehomogenize());
         }
 
         [TestMethod]
@@ -238,7 +234,7 @@ namespace RP.Math.Tests.Core
         {
             // w == 0 is a point at infinity (a pure direction).
             var d = new Vector4d(1, 0, 0, 0).Dehomogenize();
-            double.IsInfinity(d.X).Should().BeTrue();
+            Assert.IsTrue(double.IsInfinity(d.X));
         }
 
         #endregion
@@ -249,21 +245,21 @@ namespace RP.Math.Tests.Core
         public void Conversions_WithFloatSibling()
         {
             Vector4d widened = new Vector4(1.5f, 2.5f, 3.5f, 4.5f); // implicit
-            widened.Should().Be(new Vector4d(1.5, 2.5, 3.5, 4.5));
+            Assert.AreEqual(new Vector4d(1.5, 2.5, 3.5, 4.5), widened);
 
             var narrowed = (Vector4)new Vector4d(1.5, 2.5, 3.5, 4.5); // explicit
-            narrowed.Should().Be(new Vector4(1.5f, 2.5f, 3.5f, 4.5f));
+            Assert.AreEqual(new Vector4(1.5f, 2.5f, 3.5f, 4.5f), narrowed);
 
             var (x, y, z, w) = new Vector4d(5, 6, 7, 8);
-            (x, y, z, w).Should().Be((5.0, 6.0, 7.0, 8.0));
+            Assert.AreEqual((5.0, 6.0, 7.0, 8.0), (x, y, z, w));
         }
 
         [TestMethod]
         public void Equals_NaN_And_Tolerance_And_Hash()
         {
-            Vector4d.NaN.Equals(Vector4d.NaN).Should().BeTrue();
-            new Vector4d(1, 2, 3, 4).Equals(new Vector4d(1, 2, 3, 4.0000001), 1e-3).Should().BeTrue();
-            new Vector4d(1, 2, 3, 4).GetHashCode().Should().Be(new Vector4d(1, 2, 3, 4).GetHashCode());
+            Assert.IsTrue(Vector4d.NaN.Equals(Vector4d.NaN));
+            Assert.IsTrue(new Vector4d(1, 2, 3, 4).Equals(new Vector4d(1, 2, 3, 4.0000001), 1e-3));
+            Assert.AreEqual(new Vector4d(1, 2, 3, 4).GetHashCode(), new Vector4d(1, 2, 3, 4).GetHashCode());
         }
 
         [TestMethod]
@@ -271,7 +267,7 @@ namespace RP.Math.Tests.Core
         {
             var infA = new Vector4d(double.PositiveInfinity, 0, 0, 0);
             var infB = new Vector4d(0, 0, 0, double.PositiveInfinity);
-            infA.CompareTo(infB, 1e-6).Should().Be(0);
+            Assert.AreEqual(0, infA.CompareTo(infB, 1e-6));
         }
 
         #endregion
@@ -281,14 +277,14 @@ namespace RP.Math.Tests.Core
         [TestMethod]
         public void Decisions_And_Constants()
         {
-            Vector4d.WAxis.IsUnitVector().Should().BeTrue();
-            Vector4d.XAxis.IsPerpendicular(Vector4d.YAxis).Should().BeTrue();
-            Vector4d.NaN.IsNaN().Should().BeTrue();
-            Vector4d.Origin.IsZero().Should().BeTrue();
+            Assert.IsTrue(Vector4d.WAxis.IsUnitVector());
+            Assert.IsTrue(Vector4d.XAxis.IsPerpendicular(Vector4d.YAxis));
+            Assert.IsTrue(Vector4d.NaN.IsNaN());
+            Assert.IsTrue(Vector4d.Origin.IsZero());
 
-            Vector4d.Zero.Should().Be(Vector4d.Origin);
-            Vector4d.One.Should().Be(new Vector4d(1, 1, 1, 1));
-            Vector4d.UnitW.Should().Be(Vector4d.WAxis);
+            Assert.AreEqual(Vector4d.Origin, Vector4d.Zero);
+            Assert.AreEqual(new Vector4d(1, 1, 1, 1), Vector4d.One);
+            Assert.AreEqual(Vector4d.WAxis, Vector4d.UnitW);
         }
 
         #endregion

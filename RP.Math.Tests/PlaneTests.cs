@@ -2,7 +2,6 @@ namespace RP.Math.Tests
 {
     using System;
 
-    using FluentAssertions;
 
     using Microsoft.VisualStudio.TestTools.UnitTesting;
 
@@ -20,11 +19,11 @@ namespace RP.Math.Tests
         public void Construction_FromCoefficients_ShouldExposeThem_Test()
         {
             var p = new Plane(1, 2, 3, 4);
-            p.A.Should().Be(1);
-            p.B.Should().Be(2);
-            p.C.Should().Be(3);
-            p.D.Should().Be(4);
-            p.Normal.Should().Be(new Vector(1, 2, 3));
+            Assert.AreEqual(1, p.A);
+            Assert.AreEqual(2, p.B);
+            Assert.AreEqual(3, p.C);
+            Assert.AreEqual(4, p.D);
+            Assert.AreEqual(new Vector(1, 2, 3), p.Normal);
         }
 
         [TestMethod, TestCategory("Construction")]
@@ -33,8 +32,8 @@ namespace RP.Math.Tests
             var point = new Vector(0, 0, 5);
             var p = Plane.FromPointNormal(point, new Vector(0, 0, 10));
 
-            p.Normal.Magnitude.Should().BeApproximately(1, Tol);
-            p.Contains(point, Tol).Should().BeTrue();
+            Assert.AreEqual(1, p.Normal.Magnitude, Tol);
+            Assert.IsTrue(p.Contains(point, Tol));
         }
 
         [TestMethod, TestCategory("Construction")]
@@ -45,18 +44,18 @@ namespace RP.Math.Tests
             var c = new Vector(0, 1, 0);
             var p = Plane.FromThreePoints(a, b, c);
 
-            p.Contains(a, Tol).Should().BeTrue();
-            p.Contains(b, Tol).Should().BeTrue();
-            p.Contains(c, Tol).Should().BeTrue();
+            Assert.IsTrue(p.Contains(a, Tol));
+            Assert.IsTrue(p.Contains(b, Tol));
+            Assert.IsTrue(p.Contains(c, Tol));
             // XY plane: normal should be ±Z.
-            p.UnitNormal.Equals(new Vector(0, 0, 1), Tol).Should().BeTrue();
+            Assert.IsTrue(p.UnitNormal.Equals(new Vector(0, 0, 1), Tol));
         }
 
         [TestMethod, TestCategory("Construction")]
         public void FromThreePoints_Collinear_ShouldThrow_Test()
         {
             Action act = () => Plane.FromThreePoints(new Vector(0, 0, 0), new Vector(1, 0, 0), new Vector(2, 0, 0));
-            act.Should().Throw<ArgumentException>();
+            Assert.ThrowsException<ArgumentException>(act);
         }
 
         #endregion
@@ -67,15 +66,15 @@ namespace RP.Math.Tests
         public void SignedDistanceTo_ShouldBePositiveOnTheNormalSide_Test()
         {
             var p = Plane.FromPointNormal(new Vector(0, 0, 0), new Vector(0, 0, 1));
-            p.SignedDistanceTo(new Vector(0, 0, 5)).Should().BeApproximately(5, Tol);
-            p.SignedDistanceTo(new Vector(0, 0, -5)).Should().BeApproximately(-5, Tol);
+            Assert.AreEqual(5, p.SignedDistanceTo(new Vector(0, 0, 5)), Tol);
+            Assert.AreEqual(-5, p.SignedDistanceTo(new Vector(0, 0, -5)), Tol);
         }
 
         [TestMethod, TestCategory("Distance")]
         public void DistanceTo_ShouldBeUnsigned_Test()
         {
             var p = Plane.FromPointNormal(new Vector(0, 0, 0), new Vector(0, 0, 1));
-            p.DistanceTo(new Vector(3, 4, -7)).Should().BeApproximately(7, Tol);
+            Assert.AreEqual(7, p.DistanceTo(new Vector(3, 4, -7)), Tol);
         }
 
         [TestMethod, TestCategory("Distance")]
@@ -83,16 +82,16 @@ namespace RP.Math.Tests
         {
             // Same geometric plane z = 0 but with a non-unit normal.
             var p = new Plane(0, 0, 10, 0);
-            p.DistanceTo(new Vector(0, 0, 4)).Should().BeApproximately(4, Tol);
+            Assert.AreEqual(4, p.DistanceTo(new Vector(0, 0, 4)), Tol);
         }
 
         [TestMethod, TestCategory("Side")]
         public void SideOf_ShouldClassifyPoints_Test()
         {
             var p = Plane.FromPointNormal(new Vector(0, 0, 0), new Vector(0, 0, 1));
-            p.SideOf(new Vector(0, 0, 1), Tol).Should().Be(1);
-            p.SideOf(new Vector(0, 0, -1), Tol).Should().Be(-1);
-            p.SideOf(new Vector(5, 5, 0), Tol).Should().Be(0);
+            Assert.AreEqual(1, p.SideOf(new Vector(0, 0, 1), Tol));
+            Assert.AreEqual(-1, p.SideOf(new Vector(0, 0, -1), Tol));
+            Assert.AreEqual(0, p.SideOf(new Vector(5, 5, 0), Tol));
         }
 
         [TestMethod, TestCategory("ClosestPoint")]
@@ -100,15 +99,15 @@ namespace RP.Math.Tests
         {
             var p = Plane.FromPointNormal(new Vector(0, 0, 0), new Vector(0, 0, 1));
             var closest = p.ClosestPoint(new Vector(3, 4, 9));
-            closest.Equals(new Vector(3, 4, 0), Tol).Should().BeTrue();
-            p.Contains(closest, Tol).Should().BeTrue();
+            Assert.IsTrue(closest.Equals(new Vector(3, 4, 0), Tol));
+            Assert.IsTrue(p.Contains(closest, Tol));
         }
 
         [TestMethod, TestCategory("Reflect")]
         public void Reflect_ShouldMirrorThroughThePlane_Test()
         {
             var p = Plane.FromPointNormal(new Vector(0, 0, 0), new Vector(0, 0, 1));
-            p.Reflect(new Vector(2, 3, 5)).Equals(new Vector(2, 3, -5), Tol).Should().BeTrue();
+            Assert.IsTrue(p.Reflect(new Vector(2, 3, 5)).Equals(new Vector(2, 3, -5), Tol));
         }
 
         #endregion
@@ -120,8 +119,8 @@ namespace RP.Math.Tests
         {
             var p = Plane.FromPointNormal(new Vector(0, 0, 0), new Vector(0, 0, 1));
             var ok = p.TryIntersectLine(new Vector(1, 2, 5), new Vector(0, 0, -1), out var hit);
-            ok.Should().BeTrue();
-            hit.Equals(new Vector(1, 2, 0), Tol).Should().BeTrue();
+            Assert.IsTrue(ok);
+            Assert.IsTrue(hit.Equals(new Vector(1, 2, 0), Tol));
         }
 
         [TestMethod, TestCategory("Intersection")]
@@ -129,7 +128,7 @@ namespace RP.Math.Tests
         {
             var p = Plane.FromPointNormal(new Vector(0, 0, 0), new Vector(0, 0, 1));
             var ok = p.TryIntersectLine(new Vector(0, 0, 5), new Vector(1, 0, 0), out _);
-            ok.Should().BeFalse();
+            Assert.IsFalse(ok);
         }
 
         [TestMethod, TestCategory("Intersection")]
@@ -137,7 +136,7 @@ namespace RP.Math.Tests
         {
             var p = Plane.FromPointNormal(new Vector(0, 0, 0), new Vector(0, 0, 1));
             // From z=5 heading -z, the plane is reached at t = 5.
-            p.IntersectLineParameter(new Vector(0, 0, 5), new Vector(0, 0, -1)).Should().BeApproximately(5, Tol);
+            Assert.AreEqual(5, p.IntersectLineParameter(new Vector(0, 0, 5), new Vector(0, 0, -1)), Tol);
         }
 
         #endregion
@@ -149,14 +148,14 @@ namespace RP.Math.Tests
         {
             var p = new Plane(0, 0, 1, 0);
             var q = new Plane(0, 0, 1, -5);    // z = 5, parallel
-            p.IsParallelTo(q, Tol).Should().BeTrue();
+            Assert.IsTrue(p.IsParallelTo(q, Tol));
         }
 
         [TestMethod, TestCategory("Predicate")]
         public void IsDegenerate_ShouldDetectZeroNormal_Test()
         {
-            new Plane(0, 0, 0, 1).IsDegenerate().Should().BeTrue();
-            new Plane(0, 0, 1, 0).IsDegenerate().Should().BeFalse();
+            Assert.IsTrue(new Plane(0, 0, 0, 1).IsDegenerate());
+            Assert.IsFalse(new Plane(0, 0, 1, 0).IsDegenerate());
         }
 
         [TestMethod, TestCategory("Equality")]
@@ -166,8 +165,8 @@ namespace RP.Math.Tests
             var scaled = new Plane(0, 0, 5, 0);   // same plane, scaled normal
             var flipped = new Plane(0, 0, -1, 0); // same plane, opposite normal
 
-            p.Equals(scaled, Tol).Should().BeTrue();
-            p.Equals(flipped, Tol).Should().BeTrue();
+            Assert.IsTrue(p.Equals(scaled, Tol));
+            Assert.IsTrue(p.Equals(flipped, Tol));
         }
 
         [TestMethod, TestCategory("Equality")]
@@ -175,7 +174,7 @@ namespace RP.Math.Tests
         {
             var p = new Plane(0, 0, 1, 0);    // z = 0
             var q = new Plane(0, 0, 1, -5);   // z = 5
-            p.Equals(q, Tol).Should().BeFalse();
+            Assert.IsFalse(p.Equals(q, Tol));
         }
 
         [TestMethod, TestCategory("Operator")]
@@ -183,8 +182,8 @@ namespace RP.Math.Tests
         {
             var p = new Plane(0, 0, 1, -5);
             var n = -p;
-            n.Should().Be(new Plane(0, 0, -1, 5));
-            p.Equals(n, Tol).Should().BeTrue();
+            Assert.AreEqual(new Plane(0, 0, -1, 5), n);
+            Assert.IsTrue(p.Equals(n, Tol));
         }
 
         #endregion

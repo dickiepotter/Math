@@ -2,7 +2,6 @@ namespace RP.Math.Tests
 {
     using System;
 
-    using FluentAssertions;
 
     using Microsoft.VisualStudio.TestTools.UnitTesting;
 
@@ -23,31 +22,31 @@ namespace RP.Math.Tests
         public void Construction_WithComponents_ShouldExposeThem_Test()
         {
             var q = new Quaternion(1, 2, 3, 4);
-            q.X.Should().Be(1);
-            q.Y.Should().Be(2);
-            q.Z.Should().Be(3);
-            q.W.Should().Be(4);
+            Assert.AreEqual(1, q.X);
+            Assert.AreEqual(2, q.Y);
+            Assert.AreEqual(3, q.Z);
+            Assert.AreEqual(4, q.W);
         }
 
         [TestMethod, TestCategory("Construction")]
         public void Construction_FromVectorAndScalar_ShouldSplitTheParts_Test()
         {
             var q = new Quaternion(new Vector(1, 2, 3), 4);
-            q.Xyz.Should().Be(new Vector(1, 2, 3));
-            q.Scalar.Should().Be(4);
+            Assert.AreEqual(new Vector(1, 2, 3), q.Xyz);
+            Assert.AreEqual(4, q.Scalar);
         }
 
         [TestMethod, TestCategory("Construction")]
         public void Construction_FromArrayOfWrongLength_ShouldThrow_Test()
         {
             Action act = () => new Quaternion(new double[] { 1, 2, 3 });
-            act.Should().Throw<ArgumentException>();
+            Assert.ThrowsException<ArgumentException>(act);
         }
 
         [TestMethod, TestCategory("Construction")]
         public void Identity_ShouldBeZeroVectorWithScalarOne_Test()
         {
-            Quaternion.Identity.Should().Be(new Quaternion(0, 0, 0, 1));
+            Assert.AreEqual(new Quaternion(0, 0, 0, 1), Quaternion.Identity);
         }
 
         #endregion
@@ -57,13 +56,13 @@ namespace RP.Math.Tests
         [TestMethod, TestCategory("Magnitude")]
         public void Magnitude_OfIdentity_ShouldBeOne_Test()
         {
-            Quaternion.Identity.Magnitude.Should().BeApproximately(1, Tolerance);
+            Assert.AreEqual(1, Quaternion.Identity.Magnitude, Tolerance);
         }
 
         [TestMethod, TestCategory("Magnitude")]
         public void MagnitudeSquared_ShouldBeSumOfSquares_Test()
         {
-            new Quaternion(1, 2, 3, 4).MagnitudeSquared.Should().BeApproximately(30, Tolerance);
+            Assert.AreEqual(30, new Quaternion(1, 2, 3, 4).MagnitudeSquared, Tolerance);
         }
 
         #endregion
@@ -74,21 +73,21 @@ namespace RP.Math.Tests
         public void Addition_ShouldBeComponentWise_Test()
         {
             var sum = new Quaternion(1, 2, 3, 4) + new Quaternion(5, 6, 7, 8);
-            sum.Should().Be(new Quaternion(6, 8, 10, 12));
+            Assert.AreEqual(new Quaternion(6, 8, 10, 12), sum);
         }
 
         [TestMethod, TestCategory("Operator")]
         public void ScalarMultiplication_ShouldScaleEachComponent_Test()
         {
-            (new Quaternion(1, 2, 3, 4) * 2).Should().Be(new Quaternion(2, 4, 6, 8));
+            Assert.AreEqual(new Quaternion(2, 4, 6, 8), (new Quaternion(1, 2, 3, 4) * 2));
         }
 
         [TestMethod, TestCategory("Product")]
         public void IdentityProduct_ShouldLeaveQuaternionUnchanged_Test()
         {
             var q = new Quaternion(1, 2, 3, 4);
-            (q * Quaternion.Identity).Equals(q, Tolerance).Should().BeTrue();
-            (Quaternion.Identity * q).Equals(q, Tolerance).Should().BeTrue();
+            Assert.IsTrue((q * Quaternion.Identity).Equals(q, Tolerance));
+            Assert.IsTrue((Quaternion.Identity * q).Equals(q, Tolerance));
         }
 
         [TestMethod, TestCategory("Product")]
@@ -97,14 +96,13 @@ namespace RP.Math.Tests
             // i * j = k : (1,0,0,0) * (0,1,0,0) = (0,0,1,0)
             var i = new Quaternion(1, 0, 0, 0);
             var j = new Quaternion(0, 1, 0, 0);
-            (i * j).Equals(new Quaternion(0, 0, 1, 0), Tolerance).Should().BeTrue();
+            Assert.IsTrue((i * j).Equals(new Quaternion(0, 0, 1, 0), Tolerance));
         }
 
         [TestMethod, TestCategory("Product")]
         public void DotProduct_ShouldBeSumOfComponentProducts_Test()
         {
-            Quaternion.DotProduct(new Quaternion(1, 2, 3, 4), new Quaternion(5, 6, 7, 8))
-                .Should().BeApproximately(70, Tolerance);
+            Assert.AreEqual(70, Quaternion.DotProduct(new Quaternion(1, 2, 3, 4), new Quaternion(5, 6, 7, 8)), Tolerance);
         }
 
         #endregion
@@ -114,33 +112,33 @@ namespace RP.Math.Tests
         [TestMethod, TestCategory("Conjugate")]
         public void Conjugate_ShouldNegateTheVectorPart_Test()
         {
-            new Quaternion(1, 2, 3, 4).Conjugate().Should().Be(new Quaternion(-1, -2, -3, 4));
+            Assert.AreEqual(new Quaternion(-1, -2, -3, 4), new Quaternion(1, 2, 3, 4).Conjugate());
         }
 
         [TestMethod, TestCategory("Inverse")]
         public void Inverse_TimesOriginal_ShouldBeIdentity_Test()
         {
             var q = new Quaternion(1, 2, 3, 4);
-            (q * q.Inverse()).Equals(Quaternion.Identity, LooseTolerance).Should().BeTrue();
+            Assert.IsTrue((q * q.Inverse()).Equals(Quaternion.Identity, LooseTolerance));
         }
 
         [TestMethod, TestCategory("Normalize")]
         public void Normalize_ShouldProduceUnitQuaternion_Test()
         {
-            new Quaternion(1, 2, 3, 4).Normalize().IsUnit(Tolerance).Should().BeTrue();
+            Assert.IsTrue(new Quaternion(1, 2, 3, 4).Normalize().IsUnit(Tolerance));
         }
 
         [TestMethod, TestCategory("Normalize")]
         public void Normalize_OfZero_ShouldThrow_Test()
         {
             Action act = () => Quaternion.Zero.Normalize();
-            act.Should().Throw<NormalizeQuaternionException>();
+            Assert.ThrowsException<NormalizeQuaternionException>(act);
         }
 
         [TestMethod, TestCategory("Normalize")]
         public void NormalizeOrDefault_OfZero_ShouldReturnIdentity_Test()
         {
-            Quaternion.Zero.NormalizeOrDefault().Should().Be(Quaternion.Identity);
+            Assert.AreEqual(Quaternion.Identity, Quaternion.Zero.NormalizeOrDefault());
         }
 
         #endregion
@@ -150,8 +148,8 @@ namespace RP.Math.Tests
         [TestMethod, TestCategory("Rotation")]
         public void FromAxisAngle_ShouldProduceUnitQuaternion_Test()
         {
-            Quaternion.FromAxisAngle(new Vector(0, 0, 1), System.Math.PI / 2)
-                .IsUnit(Tolerance).Should().BeTrue();
+            Assert.IsTrue(Quaternion.FromAxisAngle(new Vector(0, 0, 1), System.Math.PI / 2)
+                .IsUnit(Tolerance));
         }
 
         [TestMethod, TestCategory("Rotation")]
@@ -159,7 +157,7 @@ namespace RP.Math.Tests
         {
             var q = Quaternion.FromAxisAngle(new Vector(0, 0, 1), System.Math.PI / 2);
             var rotated = q.Rotate(new Vector(1, 0, 0));
-            rotated.Equals(new Vector(0, 1, 0), LooseTolerance).Should().BeTrue();
+            Assert.IsTrue(rotated.Equals(new Vector(0, 1, 0), LooseTolerance));
         }
 
         [TestMethod, TestCategory("Rotation")]
@@ -167,7 +165,7 @@ namespace RP.Math.Tests
         {
             var q = Quaternion.FromAxisAngle(new Vector(1, 1, 1), 1.234);
             var v = new Vector(3, -2, 5);
-            q.Rotate(v).Magnitude.Should().BeApproximately(v.Magnitude, LooseTolerance);
+            Assert.AreEqual(v.Magnitude, q.Rotate(v).Magnitude, LooseTolerance);
         }
 
         [TestMethod, TestCategory("Rotation")]
@@ -179,7 +177,7 @@ namespace RP.Math.Tests
             var viaMatrix = q.ToMatrix() * v;
             var viaRotate = q.Rotate(v);
 
-            viaMatrix.Equals(viaRotate, LooseTolerance).Should().BeTrue();
+            Assert.IsTrue(viaMatrix.Equals(viaRotate, LooseTolerance));
         }
 
         [TestMethod, TestCategory("Rotation")]
@@ -190,8 +188,8 @@ namespace RP.Math.Tests
 
             q.ToAxisAngle(out var outAxis, out var outAngle);
 
-            outAngle.Rad.Should().BeApproximately(System.Math.PI / 3, LooseTolerance);
-            outAxis.Equals(axis, LooseTolerance).Should().BeTrue();
+            Assert.AreEqual(System.Math.PI / 3, outAngle.Rad, LooseTolerance);
+            Assert.IsTrue(outAxis.Equals(axis, LooseTolerance));
         }
 
         [TestMethod, TestCategory("Rotation")]
@@ -201,7 +199,7 @@ namespace RP.Math.Tests
             var q45 = Quaternion.FromAxisAngle(z, System.Math.PI / 4);
             var q90 = Quaternion.FromAxisAngle(z, System.Math.PI / 2);
 
-            (q45 * q45).Equals(q90, LooseTolerance).Should().BeTrue();
+            Assert.IsTrue((q45 * q45).Equals(q90, LooseTolerance));
         }
 
         #endregion
@@ -213,7 +211,7 @@ namespace RP.Math.Tests
         {
             var a = Quaternion.FromAxisAngle(new Vector(0, 0, 1), 0.2);
             var b = Quaternion.FromAxisAngle(new Vector(0, 0, 1), 1.5);
-            Quaternion.Slerp(a, b, 0).Equals(a, LooseTolerance).Should().BeTrue();
+            Assert.IsTrue(Quaternion.Slerp(a, b, 0).Equals(a, LooseTolerance));
         }
 
         [TestMethod, TestCategory("Interpolation")]
@@ -221,7 +219,7 @@ namespace RP.Math.Tests
         {
             var a = Quaternion.FromAxisAngle(new Vector(0, 0, 1), 0.2);
             var b = Quaternion.FromAxisAngle(new Vector(0, 0, 1), 1.5);
-            Quaternion.Slerp(a, b, 1).Equals(b, LooseTolerance).Should().BeTrue();
+            Assert.IsTrue(Quaternion.Slerp(a, b, 1).Equals(b, LooseTolerance));
         }
 
         [TestMethod, TestCategory("Interpolation")]
@@ -234,7 +232,7 @@ namespace RP.Math.Tests
             var mid = Quaternion.Slerp(a, b, 0.5);
             var expected = Quaternion.FromAxisAngle(z, System.Math.PI / 4);
 
-            mid.Equals(expected, LooseTolerance).Should().BeTrue();
+            Assert.IsTrue(mid.Equals(expected, LooseTolerance));
         }
 
         #endregion
@@ -244,34 +242,32 @@ namespace RP.Math.Tests
         [TestMethod, TestCategory("Equality")]
         public void Equality_WithTolerance_ShouldIgnoreTinyDifferences_Test()
         {
-            new Quaternion(1, 2, 3, 4)
-                .Equals(new Quaternion(1 + 1e-12, 2, 3, 4), Tolerance)
-                .Should().BeTrue();
+            Assert.IsTrue(new Quaternion(1, 2, 3, 4)
+                .Equals(new Quaternion(1 + 1e-12, 2, 3, 4), Tolerance));
         }
 
         [TestMethod, TestCategory("Formatting")]
         public void ToString_ShouldListFourComponents_Test()
         {
-            new Quaternion(1, 2, 3, 4)
-                .ToString("0.0", System.Globalization.CultureInfo.InvariantCulture)
-                .Should().Be("(1.0, 2.0, 3.0, 4.0)");
+            Assert.AreEqual("(1.0, 2.0, 3.0, 4.0)", new Quaternion(1, 2, 3, 4)
+                .ToString("0.0", System.Globalization.CultureInfo.InvariantCulture));
         }
 
         [TestMethod, TestCategory("Conversion")]
         public void Deconstruct_ShouldYieldComponents_Test()
         {
             var (x, y, z, w) = new Quaternion(1, 2, 3, 4);
-            x.Should().Be(1);
-            y.Should().Be(2);
-            z.Should().Be(3);
-            w.Should().Be(4);
+            Assert.AreEqual(1, x);
+            Assert.AreEqual(2, y);
+            Assert.AreEqual(3, z);
+            Assert.AreEqual(4, w);
         }
 
         [TestMethod, TestCategory("Conversion")]
         public void ImplicitTupleConversion_ShouldRoundTrip_Test()
         {
             Quaternion q = (1.0, 2.0, 3.0, 4.0);
-            q.Should().Be(new Quaternion(1, 2, 3, 4));
+            Assert.AreEqual(new Quaternion(1, 2, 3, 4), q);
         }
 
         #endregion

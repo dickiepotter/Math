@@ -2,7 +2,6 @@ namespace RP.Math.Tests
 {
     using System;
 
-    using FluentAssertions;
 
     using Microsoft.VisualStudio.TestTools.UnitTesting;
 
@@ -17,51 +16,51 @@ namespace RP.Math.Tests
         public void Constructor_WithNegativeRadius_Throws_Test()
         {
             Action act = () => new BoundingSphere(Vector.Zero, -1);
-            act.Should().Throw<ArgumentOutOfRangeException>();
+            Assert.ThrowsException<ArgumentOutOfRangeException>(act);
         }
 
         [TestMethod, TestCategory("Containment")]
         public void Contains_DistinguishesInsideFromOutside_Test()
         {
             var s = new BoundingSphere(Vector.Zero, 5);
-            s.Contains(new Vector(3, 0, 0)).Should().BeTrue();
-            s.Contains(new Vector(5, 0, 0)).Should().BeTrue(); // on the surface
-            s.Contains(new Vector(6, 0, 0)).Should().BeFalse();
+            Assert.IsTrue(s.Contains(new Vector(3, 0, 0)));
+            Assert.IsTrue(s.Contains(new Vector(5, 0, 0))); // on the surface
+            Assert.IsFalse(s.Contains(new Vector(6, 0, 0)));
         }
 
         [TestMethod, TestCategory("Containment")]
         public void Contains_OtherSphere_Test()
         {
             var outer = new BoundingSphere(Vector.Zero, 10);
-            outer.Contains(new BoundingSphere(new Vector(2, 0, 0), 3)).Should().BeTrue();
-            outer.Contains(new BoundingSphere(new Vector(8, 0, 0), 3)).Should().BeFalse();
+            Assert.IsTrue(outer.Contains(new BoundingSphere(new Vector(2, 0, 0), 3)));
+            Assert.IsFalse(outer.Contains(new BoundingSphere(new Vector(8, 0, 0), 3)));
         }
 
         [TestMethod, TestCategory("Intersection")]
         public void Intersects_OtherSphere_Test()
         {
             var a = new BoundingSphere(Vector.Zero, 2);
-            a.Intersects(new BoundingSphere(new Vector(3, 0, 0), 2)).Should().BeTrue();
-            a.Intersects(new BoundingSphere(new Vector(5, 0, 0), 2)).Should().BeFalse();
-            a.Intersects(new BoundingSphere(new Vector(4, 0, 0), 2)).Should().BeTrue(); // touching
+            Assert.IsTrue(a.Intersects(new BoundingSphere(new Vector(3, 0, 0), 2)));
+            Assert.IsFalse(a.Intersects(new BoundingSphere(new Vector(5, 0, 0), 2)));
+            Assert.IsTrue(a.Intersects(new BoundingSphere(new Vector(4, 0, 0), 2))); // touching
         }
 
         [TestMethod, TestCategory("Intersection")]
         public void Intersects_BoundingBox_Test()
         {
             var s = new BoundingSphere(new Vector(0, 0, 0), 2);
-            s.Intersects(new BoundingBox(new Vector(1, 1, 1), new Vector(5, 5, 5))).Should().BeTrue();
-            s.Intersects(new BoundingBox(new Vector(3, 3, 3), new Vector(5, 5, 5))).Should().BeFalse();
+            Assert.IsTrue(s.Intersects(new BoundingBox(new Vector(1, 1, 1), new Vector(5, 5, 5))));
+            Assert.IsFalse(s.Intersects(new BoundingBox(new Vector(3, 3, 3), new Vector(5, 5, 5))));
         }
 
         [TestMethod, TestCategory("Queries")]
         public void ClosestPoint_AndSignedDistance_Test()
         {
             var s = new BoundingSphere(Vector.Zero, 5);
-            s.ClosestPoint(new Vector(10, 0, 0)).Equals(new Vector(5, 0, 0), LooseTolerance).Should().BeTrue();
-            s.ClosestPoint(new Vector(1, 0, 0)).Equals(new Vector(1, 0, 0), Tolerance).Should().BeTrue(); // inside
-            s.SignedDistanceTo(new Vector(8, 0, 0)).Should().BeApproximately(3, LooseTolerance);
-            s.SignedDistanceTo(new Vector(1, 0, 0)).Should().BeApproximately(-4, LooseTolerance);
+            Assert.IsTrue(s.ClosestPoint(new Vector(10, 0, 0)).Equals(new Vector(5, 0, 0), LooseTolerance));
+            Assert.IsTrue(s.ClosestPoint(new Vector(1, 0, 0)).Equals(new Vector(1, 0, 0), Tolerance)); // inside
+            Assert.AreEqual(3, s.SignedDistanceTo(new Vector(8, 0, 0)), LooseTolerance);
+            Assert.AreEqual(-4, s.SignedDistanceTo(new Vector(1, 0, 0)), LooseTolerance);
         }
 
         [TestMethod, TestCategory("Combination")]
@@ -70,8 +69,8 @@ namespace RP.Math.Tests
             var s = new BoundingSphere(Vector.Zero, 1);
             BoundingSphere grown = s.Merge(new Vector(5, 0, 0));
 
-            grown.Contains(new Vector(5, 0, 0), LooseTolerance).Should().BeTrue();
-            grown.Contains(new Vector(-1, 0, 0), LooseTolerance).Should().BeTrue(); // original far side still inside
+            Assert.IsTrue(grown.Contains(new Vector(5, 0, 0), LooseTolerance));
+            Assert.IsTrue(grown.Contains(new Vector(-1, 0, 0), LooseTolerance)); // original far side still inside
         }
 
         [TestMethod, TestCategory("Factories")]
@@ -90,7 +89,7 @@ namespace RP.Math.Tests
 
             foreach (Vector p in points)
             {
-                s.Contains(p, LooseTolerance).Should().BeTrue();
+                Assert.IsTrue(s.Contains(p, LooseTolerance));
             }
         }
 
@@ -98,7 +97,7 @@ namespace RP.Math.Tests
         public void FromPoints_WithNoPoints_Throws_Test()
         {
             Action act = () => BoundingSphere.FromPoints();
-            act.Should().Throw<ArgumentException>();
+            Assert.ThrowsException<ArgumentException>(act);
         }
     }
 }

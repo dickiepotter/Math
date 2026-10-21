@@ -1,4 +1,3 @@
-using FluentAssertions;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 
 namespace RP.Math.Tests
@@ -16,21 +15,21 @@ namespace RP.Math.Tests
         public void Constructor_RejectsTwoAxesFromTheSamePair()
         {
             System.Action act = () => new OrthogonalAxes(AxisAlignment.UP, AxisAlignment.DOWN, AxisAlignment.RIGHT);
-            act.Should().Throw<System.ArgumentException>();
+            Assert.ThrowsException<System.ArgumentException>(act);
         }
 
         [TestMethod]
         public void Constructor_RejectsRepeatedRole()
         {
             System.Action act = () => new OrthogonalAxes(AxisAlignment.RIGHT, AxisAlignment.RIGHT, AxisAlignment.UP);
-            act.Should().Throw<System.ArgumentException>();
+            Assert.ThrowsException<System.ArgumentException>(act);
         }
 
         [TestMethod]
         public void Constructor_AcceptsAGenuineConvention()
         {
             System.Action act = () => new OrthogonalAxes(AxisAlignment.FAR, AxisAlignment.RIGHT, AxisAlignment.UP);
-            act.Should().NotThrow();
+            act();
         }
 
         // ---- Derived basis vectors --------------------------------------------------
@@ -41,9 +40,9 @@ namespace RP.Math.Tests
             // Unreal: +x forward (far), +y right, +z up.
             var a = new OrthogonalAxes(AxisAlignment.FAR, AxisAlignment.RIGHT, AxisAlignment.UP);
 
-            a.Forward.Should().Be(new Vector(1, 0, 0));
-            a.Right.Should().Be(new Vector(0, 1, 0));
-            a.Up.Should().Be(new Vector(0, 0, 1));
+            Assert.AreEqual(new Vector(1, 0, 0), a.Forward);
+            Assert.AreEqual(new Vector(0, 1, 0), a.Right);
+            Assert.AreEqual(new Vector(0, 0, 1), a.Up);
         }
 
         [TestMethod]
@@ -52,7 +51,7 @@ namespace RP.Math.Tests
             // z carries NEAR, so the forward/far direction is -z.
             var a = new OrthogonalAxes(AxisAlignment.RIGHT, AxisAlignment.UP, AxisAlignment.NEAR);
 
-            a.Forward.Should().Be(new Vector(0, 0, -1));
+            Assert.AreEqual(new Vector(0, 0, -1), a.Forward);
         }
 
         // ---- Derived handedness -----------------------------------------------------
@@ -60,15 +59,15 @@ namespace RP.Math.Tests
         [TestMethod]
         public void Handedness_IsRightHandedForOpenGlStyleFrames()
         {
-            OrthogonalAxes.OpenGL.Handedness.Should().Be(Handedness.Right);
-            OrthogonalAxes.Blender.Handedness.Should().Be(Handedness.Right);
+            Assert.AreEqual(Handedness.Right, OrthogonalAxes.OpenGL.Handedness);
+            Assert.AreEqual(Handedness.Right, OrthogonalAxes.Blender.Handedness);
         }
 
         [TestMethod]
         public void Handedness_IsLeftHandedForDirectXStyleFrames()
         {
-            OrthogonalAxes.DirectX.Handedness.Should().Be(Handedness.Left);
-            OrthogonalAxes.Unreal.Handedness.Should().Be(Handedness.Left);
+            Assert.AreEqual(Handedness.Left, OrthogonalAxes.DirectX.Handedness);
+            Assert.AreEqual(Handedness.Left, OrthogonalAxes.Unreal.Handedness);
         }
 
         // ---- Predefined conventions -------------------------------------------------
@@ -77,21 +76,21 @@ namespace RP.Math.Tests
         public void OpenGlAndDirectX_DifferOnlyInTheDepthAxis()
         {
             // The whole right- vs left-handed distinction is exactly NEAR vs FAR on z.
-            OrthogonalAxes.OpenGL.Z.Should().Be(AxisAlignment.NEAR);
-            OrthogonalAxes.DirectX.Z.Should().Be(AxisAlignment.FAR);
-            OrthogonalAxes.OpenGL.X.Should().Be(OrthogonalAxes.DirectX.X);
-            OrthogonalAxes.OpenGL.Y.Should().Be(OrthogonalAxes.DirectX.Y);
+            Assert.AreEqual(AxisAlignment.NEAR, OrthogonalAxes.OpenGL.Z);
+            Assert.AreEqual(AxisAlignment.FAR, OrthogonalAxes.DirectX.Z);
+            Assert.AreEqual(OrthogonalAxes.DirectX.X, OrthogonalAxes.OpenGL.X);
+            Assert.AreEqual(OrthogonalAxes.DirectX.Y, OrthogonalAxes.OpenGL.Y);
         }
 
         [TestMethod]
         public void AliasedConventions_AreEqual()
         {
-            OrthogonalAxes.Maya.Should().Be(OrthogonalAxes.OpenGL);
-            OrthogonalAxes.Godot.Should().Be(OrthogonalAxes.OpenGL);
-            OrthogonalAxes.MathsYUp.Should().Be(OrthogonalAxes.OpenGL);
-            OrthogonalAxes.Unity.Should().Be(OrthogonalAxes.DirectX);
-            OrthogonalAxes.Max3ds.Should().Be(OrthogonalAxes.Blender);
-            OrthogonalAxes.MathsZUp.Should().Be(OrthogonalAxes.Blender);
+            Assert.AreEqual(OrthogonalAxes.OpenGL, OrthogonalAxes.Maya);
+            Assert.AreEqual(OrthogonalAxes.OpenGL, OrthogonalAxes.Godot);
+            Assert.AreEqual(OrthogonalAxes.OpenGL, OrthogonalAxes.MathsYUp);
+            Assert.AreEqual(OrthogonalAxes.DirectX, OrthogonalAxes.Unity);
+            Assert.AreEqual(OrthogonalAxes.Blender, OrthogonalAxes.Max3ds);
+            Assert.AreEqual(OrthogonalAxes.Blender, OrthogonalAxes.MathsZUp);
         }
 
         // ---- Formatting (was BUG 6) -------------------------------------------------
@@ -101,8 +100,8 @@ namespace RP.Math.Tests
         {
             var a = OrthogonalAxes.OpenGL;
 
-            a.ToString().Should().Be("(RIGHT, UP, NEAR)");
-            a.ToString("v", null).Should().Contain("Right-handed");
+            Assert.AreEqual("(RIGHT, UP, NEAR)", a.ToString());
+            StringAssert.Contains(a.ToString("v", null), "Right-handed");
         }
     }
 }

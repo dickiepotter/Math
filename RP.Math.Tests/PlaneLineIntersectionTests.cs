@@ -1,7 +1,5 @@
 namespace RP.Math.Tests
 {
-    using FluentAssertions;
-
     using Microsoft.VisualStudio.TestTools.UnitTesting;
 
     /// <summary>
@@ -23,8 +21,8 @@ namespace RP.Math.Tests
             var plane = Plane.XY; // z = 0
             var line = new Line(new Vector(2, 3, 5), new Vector(0, 0, -1)); // straight down onto z = 0
 
-            plane.TryIntersect(line, out Vector hit).Should().BeTrue();
-            hit.Equals(new Vector(2, 3, 0), LooseTol).Should().BeTrue();
+            Assert.IsTrue(plane.TryIntersect(line, out Vector hit));
+            Assert.IsTrue(hit.Equals(new Vector(2, 3, 0), LooseTol));
         }
 
         [TestMethod, TestCategory("Plane")]
@@ -33,7 +31,7 @@ namespace RP.Math.Tests
             var plane = Plane.XY;
             var line = new Line(new Vector(0, 0, 4), new Vector(1, 0, 0)); // runs parallel to z = 0
 
-            plane.TryIntersect(line, out _).Should().BeFalse();
+            Assert.IsFalse(plane.TryIntersect(line, out _));
         }
 
         [TestMethod, TestCategory("Line")]
@@ -42,8 +40,8 @@ namespace RP.Math.Tests
             var plane = Plane.XY;
             var line = new Line(new Vector(2, 3, 5), new Vector(0, 0, -1));
 
-            line.TryIntersect(plane, out Vector hit).Should().BeTrue();
-            hit.Equals(new Vector(2, 3, 0), LooseTol).Should().BeTrue();
+            Assert.IsTrue(line.TryIntersect(plane, out Vector hit));
+            Assert.IsTrue(hit.Equals(new Vector(2, 3, 0), LooseTol));
         }
 
         #endregion
@@ -56,8 +54,8 @@ namespace RP.Math.Tests
             var plane = Plane.XY;
             var ray = new Ray(new Vector(0, 0, 5), new Vector(0, 0, -1)); // aimed at z = 0
 
-            plane.TryIntersect(ray, out Vector hit).Should().BeTrue();
-            hit.Equals(new Vector(0, 0, 0), LooseTol).Should().BeTrue();
+            Assert.IsTrue(plane.TryIntersect(ray, out Vector hit));
+            Assert.IsTrue(hit.Equals(new Vector(0, 0, 0), LooseTol));
         }
 
         [TestMethod, TestCategory("Plane")]
@@ -66,7 +64,7 @@ namespace RP.Math.Tests
             var plane = Plane.XY;
             var ray = new Ray(new Vector(0, 0, 5), new Vector(0, 0, 1)); // crossing is behind the origin
 
-            plane.TryIntersect(ray, out _).Should().BeFalse();
+            Assert.IsFalse(plane.TryIntersect(ray, out _));
         }
 
         #endregion
@@ -79,8 +77,8 @@ namespace RP.Math.Tests
             var plane = Plane.XY;
             var segment = new LineSegment(new Vector(0, 0, 2), new Vector(0, 0, -2)); // crosses z = 0 at the middle
 
-            plane.TryIntersect(segment, out Vector hit).Should().BeTrue();
-            hit.Equals(new Vector(0, 0, 0), LooseTol).Should().BeTrue();
+            Assert.IsTrue(plane.TryIntersect(segment, out Vector hit));
+            Assert.IsTrue(hit.Equals(new Vector(0, 0, 0), LooseTol));
         }
 
         [TestMethod, TestCategory("Plane")]
@@ -89,7 +87,7 @@ namespace RP.Math.Tests
             var plane = Plane.XY;
             var segment = new LineSegment(new Vector(0, 0, 2), new Vector(0, 0, 1)); // both ends above z = 0
 
-            plane.TryIntersect(segment, out _).Should().BeFalse();
+            Assert.IsFalse(plane.TryIntersect(segment, out _));
         }
 
         #endregion
@@ -102,8 +100,8 @@ namespace RP.Math.Tests
             var x = new Line(new Vector(0, 0, 0), new Vector(1, 0, 0)); // the X axis
             var y = new Line(new Vector(0, 0, 0), new Vector(0, 1, 0)); // the Y axis
 
-            x.TryIntersect(y, Tol, out Vector hit).Should().BeTrue();
-            hit.Equals(new Vector(0, 0, 0), LooseTol).Should().BeTrue();
+            Assert.IsTrue(x.TryIntersect(y, Tol, out Vector hit));
+            Assert.IsTrue(hit.Equals(new Vector(0, 0, 0), LooseTol));
         }
 
         [TestMethod, TestCategory("LineLine")]
@@ -112,7 +110,7 @@ namespace RP.Math.Tests
             var x = new Line(new Vector(0, 0, 0), new Vector(1, 0, 0));      // along X at z = 0
             var skew = new Line(new Vector(0, 0, 1), new Vector(0, 1, 0));   // along Y at z = 1 (never meets)
 
-            x.TryIntersect(skew, Tol, out _).Should().BeFalse();
+            Assert.IsFalse(x.TryIntersect(skew, Tol, out _));
         }
 
         [TestMethod, TestCategory("LineLine")]
@@ -121,7 +119,7 @@ namespace RP.Math.Tests
             var x = new Line(new Vector(0, 0, 0), new Vector(1, 0, 0));    // along X at z = 0
             var skew = new Line(new Vector(0, 0, 1), new Vector(0, 1, 0)); // along Y at z = 1
 
-            x.DistanceTo(skew).Should().BeApproximately(1, LooseTol);
+            Assert.AreEqual(1, x.DistanceTo(skew), LooseTol);
         }
 
         [TestMethod, TestCategory("LineLine")]
@@ -130,7 +128,7 @@ namespace RP.Math.Tests
             var a = new Line(new Vector(0, 0, 0), new Vector(1, 0, 0));
             var b = new Line(new Vector(0, 3, 0), new Vector(1, 0, 0)); // parallel, 3 apart in Y
 
-            a.DistanceTo(b).Should().BeApproximately(3, LooseTol);
+            Assert.AreEqual(3, a.DistanceTo(b), LooseTol);
         }
 
         [TestMethod, TestCategory("LineLine")]
@@ -140,7 +138,7 @@ namespace RP.Math.Tests
             var skew = new Line(new Vector(2, 0, 1), new Vector(0, 1, 0));   // along Y through x = 2 at z = 1
 
             // Nearest point on the X axis is directly under the crossing at x = 2.
-            x.ClosestPointTo(skew).Equals(new Vector(2, 0, 0), LooseTol).Should().BeTrue();
+            Assert.IsTrue(x.ClosestPointTo(skew).Equals(new Vector(2, 0, 0), LooseTol));
         }
 
         #endregion

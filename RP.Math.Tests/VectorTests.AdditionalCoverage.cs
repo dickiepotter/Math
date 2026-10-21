@@ -3,7 +3,6 @@ namespace RP.Math.Tests
     using System;
     using System.Globalization;
 
-    using FluentAssertions;
 
     using Microsoft.VisualStudio.TestTools.UnitTesting;
 
@@ -26,7 +25,7 @@ namespace RP.Math.Tests
 
             var result = Vector.Interpolate(a, b, 0);
 
-            result.Should().Be(a);
+            Assert.AreEqual(a, result);
         }
 
         [TestMethod, TestCategory("Interpolate")]
@@ -37,7 +36,7 @@ namespace RP.Math.Tests
 
             var result = Vector.Interpolate(a, b, 1);
 
-            result.Should().Be(b);
+            Assert.AreEqual(b, result);
         }
 
         [TestMethod, TestCategory("Interpolate")]
@@ -48,9 +47,9 @@ namespace RP.Math.Tests
 
             var result = a.Interpolate(b, 0.5);
 
-            result.X.Should().Be(2);
-            result.Y.Should().Be(4);
-            result.Z.Should().Be(6);
+            Assert.AreEqual(2, result.X);
+            Assert.AreEqual(4, result.Y);
+            Assert.AreEqual(6, result.Z);
         }
 
         [TestMethod, TestCategory("Interpolate")]
@@ -61,7 +60,7 @@ namespace RP.Math.Tests
 
             Action act = () => Vector.Interpolate(a, b, 1.5);
 
-            act.Should().Throw<ArgumentOutOfRangeException>();
+            Assert.ThrowsException<ArgumentOutOfRangeException>(act);
         }
 
         [TestMethod, TestCategory("Interpolate")]
@@ -72,9 +71,9 @@ namespace RP.Math.Tests
 
             var result = Vector.Interpolate(a, b, 1.5, true);
 
-            result.X.Should().Be(3, "extrapolating to t = 1.5 along (0,0,0)->(2,2,2) gives (3,3,3)");
-            result.Y.Should().Be(3);
-            result.Z.Should().Be(3);
+            Assert.AreEqual(3, result.X, "extrapolating to t = 1.5 along (0,0,0)->(2,2,2) gives (3,3,3)");
+            Assert.AreEqual(3, result.Y);
+            Assert.AreEqual(3, result.Z);
         }
 
         [TestMethod, TestCategory("Interpolate")]
@@ -86,9 +85,9 @@ namespace RP.Math.Tests
             // The instance overload should honour allowExtrapolation just like the static one.
             var result = a.Interpolate(b, 1.5, true);
 
-            result.X.Should().Be(3);
-            result.Y.Should().Be(3);
-            result.Z.Should().Be(3);
+            Assert.AreEqual(3, result.X);
+            Assert.AreEqual(3, result.Y);
+            Assert.AreEqual(3, result.Z);
         }
 
         #endregion
@@ -101,8 +100,8 @@ namespace RP.Math.Tests
             var shorter = new Vector(1, 0, 0);   // magnitude 1
             var longer = new Vector(3, 4, 0);    // magnitude 5
 
-            Vector.Max(shorter, longer).Should().Be(longer);
-            longer.Max(shorter).Should().Be(longer);
+            Assert.AreEqual(longer, Vector.Max(shorter, longer));
+            Assert.AreEqual(longer, longer.Max(shorter));
         }
 
         [TestMethod, TestCategory("MinMax")]
@@ -111,8 +110,8 @@ namespace RP.Math.Tests
             var shorter = new Vector(1, 0, 0);   // magnitude 1
             var longer = new Vector(3, 4, 0);    // magnitude 5
 
-            Vector.Min(shorter, longer).Should().Be(shorter);
-            longer.Min(shorter).Should().Be(shorter);
+            Assert.AreEqual(shorter, Vector.Min(shorter, longer));
+            Assert.AreEqual(shorter, longer.Min(shorter));
         }
 
         #endregion
@@ -125,8 +124,8 @@ namespace RP.Math.Tests
             var a = new Vector(0, 0, 0);
             var b = new Vector(3, 4, 0);
 
-            Vector.Distance(a, b).Should().Be(5);
-            a.Distance(b).Should().Be(5);
+            Assert.AreEqual(5, Vector.Distance(a, b));
+            Assert.AreEqual(5, a.Distance(b));
         }
 
         [TestMethod, TestCategory("Distance")]
@@ -134,7 +133,7 @@ namespace RP.Math.Tests
         {
             var a = new Vector(7, -2, 5);
 
-            a.Distance(a).Should().Be(0);
+            Assert.AreEqual(0, a.Distance(a));
         }
 
         #endregion
@@ -145,8 +144,8 @@ namespace RP.Math.Tests
         public void MixedProduct_OfTheUnitAxes_ShouldBeOne_Test()
         {
             // X . (Y x Z) == 1 : the signed unit volume of the standard basis.
-            Vector.MixedProduct(Vector.XAxis, Vector.YAxis, Vector.ZAxis).Should().Be(1);
-            Vector.XAxis.MixedProduct(Vector.YAxis, Vector.ZAxis).Should().Be(1);
+            Assert.AreEqual(1, Vector.MixedProduct(Vector.XAxis, Vector.YAxis, Vector.ZAxis));
+            Assert.AreEqual(1, Vector.XAxis.MixedProduct(Vector.YAxis, Vector.ZAxis));
         }
 
         [TestMethod, TestCategory("Product")]
@@ -156,7 +155,7 @@ namespace RP.Math.Tests
             var b = new Vector(0, 1, 0);
             var c = new Vector(1, 1, 0); // lies in the XY plane with a and b
 
-            Vector.MixedProduct(a, b, c).Should().Be(0, "coplanar vectors span no volume");
+            Assert.AreEqual(0, Vector.MixedProduct(a, b, c), "coplanar vectors span no volume");
         }
 
         #endregion
@@ -169,8 +168,8 @@ namespace RP.Math.Tests
             var normal = new Vector(0, 0, 1);
             var lineOfSight = new Vector(0, 0, -1); // normal . sight = -1 < 0
 
-            Vector.IsBackFace(normal, lineOfSight).Should().BeTrue();
-            normal.IsBackFace(lineOfSight).Should().BeTrue();
+            Assert.IsTrue(Vector.IsBackFace(normal, lineOfSight));
+            Assert.IsTrue(normal.IsBackFace(lineOfSight));
         }
 
         [TestMethod, TestCategory("BackFace")]
@@ -179,7 +178,7 @@ namespace RP.Math.Tests
             var normal = new Vector(0, 0, 1);
             var lineOfSight = new Vector(0, 0, 1); // normal . sight = 1, not < 0
 
-            normal.IsBackFace(lineOfSight).Should().BeFalse();
+            Assert.IsFalse(normal.IsBackFace(lineOfSight));
         }
 
         #endregion
@@ -189,13 +188,13 @@ namespace RP.Math.Tests
         [TestMethod, TestCategory("Components")]
         public void SumComponents_ShouldAddTheThreeComponents_Test()
         {
-            new Vector(2, 3, 4).SumComponents().Should().Be(9);
+            Assert.AreEqual(9, new Vector(2, 3, 4).SumComponents());
         }
 
         [TestMethod, TestCategory("Components")]
         public void SumComponentSqrs_ShouldAddTheSquaresOfTheComponents_Test()
         {
-            new Vector(2, 3, 4).SumComponentSqrs().Should().Be(29); // 4 + 9 + 16
+            Assert.AreEqual(29, new Vector(2, 3, 4).SumComponentSqrs()); // 4 + 9 + 16
         }
 
         #endregion
@@ -207,9 +206,9 @@ namespace RP.Math.Tests
         {
             var vector = new Vector(10, 20, 30);
 
-            vector[0].Should().Be(10);
-            vector[1].Should().Be(20);
-            vector[2].Should().Be(30);
+            Assert.AreEqual(10, vector[0]);
+            Assert.AreEqual(20, vector[1]);
+            Assert.AreEqual(30, vector[2]);
         }
 
         [TestMethod, TestCategory("Accessors")]
@@ -219,7 +218,7 @@ namespace RP.Math.Tests
 
             Action act = () => { var unused = vector[3]; };
 
-            act.Should().Throw<ArgumentException>();
+            Assert.ThrowsException<ArgumentException>(act);
         }
 
         [TestMethod, TestCategory("Accessors")]
@@ -227,7 +226,7 @@ namespace RP.Math.Tests
         {
             var vector = new Vector(10, 20, 30);
 
-            vector.Array.Should().Equal(10d, 20d, 30d);
+            CollectionAssert.AreEqual(new[] { 10d, 20d, 30d }, vector.Array);
         }
 
         #endregion
@@ -239,8 +238,8 @@ namespace RP.Math.Tests
         {
             var vector = new Vector(1, 2, 3);
 
-            (vector * 2).Should().Be(new Vector(2, 4, 6));
-            (2 * vector).Should().Be(new Vector(2, 4, 6), "scalar multiplication is commutative");
+            Assert.AreEqual(new Vector(2, 4, 6), (vector * 2));
+            Assert.AreEqual(new Vector(2, 4, 6), (2 * vector), "scalar multiplication is commutative");
         }
 
         [TestMethod, TestCategory("Operator")]
@@ -250,9 +249,9 @@ namespace RP.Math.Tests
 
             var result = vector / 2;
 
-            result.X.Should().Be(1);
-            result.Y.Should().Be(2);
-            result.Z.Should().Be(3);
+            Assert.AreEqual(1, result.X);
+            Assert.AreEqual(2, result.Y);
+            Assert.AreEqual(3, result.Z);
         }
 
         #endregion
@@ -262,7 +261,7 @@ namespace RP.Math.Tests
         [TestMethod, TestCategory("Formatting")]
         public void ToString_WithNoFormat_ShouldListTheComponents_Test()
         {
-            new Vector(1, 2, 3).ToString().Should().Be("(1, 2, 3)");
+            Assert.AreEqual("(1, 2, 3)", new Vector(1, 2, 3).ToString());
         }
 
         [TestMethod, TestCategory("Formatting")]
@@ -270,9 +269,9 @@ namespace RP.Math.Tests
         {
             var vector = new Vector(1, 2, 3);
 
-            vector.ToString("x", CultureInfo.InvariantCulture).Should().Be("1");
-            vector.ToString("y", CultureInfo.InvariantCulture).Should().Be("2");
-            vector.ToString("z", CultureInfo.InvariantCulture).Should().Be("3");
+            Assert.AreEqual("1", vector.ToString("x", CultureInfo.InvariantCulture));
+            Assert.AreEqual("2", vector.ToString("y", CultureInfo.InvariantCulture));
+            Assert.AreEqual("3", vector.ToString("z", CultureInfo.InvariantCulture));
         }
 
         [TestMethod, TestCategory("Formatting")]
@@ -280,7 +279,9 @@ namespace RP.Math.Tests
         {
             var description = new Vector(1, 2, 3).ToVerbString();
 
-            description.Should().Contain("x=1").And.Contain("y=2").And.Contain("z=3");
+            StringAssert.Contains(description, "x=1");
+            StringAssert.Contains(description, "y=2");
+            StringAssert.Contains(description, "z=3");
         }
 
         #endregion
@@ -297,9 +298,9 @@ namespace RP.Math.Tests
             // Origin rotated 90° about the line parallel to X through (y=1, z=0).
             var result = Vector.RotateX(new Vector(0, 0, 0), 1, 0, Deg90AsRad);
 
-            Math.Round(result.X, 6).Should().Be(0);
-            Math.Round(result.Y, 6).Should().Be(1);
-            Math.Round(result.Z, 6).Should().Be(-1);
+            Assert.AreEqual(0, Math.Round(result.X, 6));
+            Assert.AreEqual(1, Math.Round(result.Y, 6));
+            Assert.AreEqual(-1, Math.Round(result.Z, 6));
         }
 
         [TestMethod, TestCategory("Rotation")]
@@ -308,9 +309,9 @@ namespace RP.Math.Tests
             // Origin rotated 90° about the line parallel to Y through (x=1, z=0).
             var result = Vector.RotateY(new Vector(0, 0, 0), 1, 0, Deg90AsRad);
 
-            Math.Round(result.X, 6).Should().Be(1);
-            Math.Round(result.Y, 6).Should().Be(0);
-            Math.Round(result.Z, 6).Should().Be(1);
+            Assert.AreEqual(1, Math.Round(result.X, 6));
+            Assert.AreEqual(0, Math.Round(result.Y, 6));
+            Assert.AreEqual(1, Math.Round(result.Z, 6));
         }
 
         [TestMethod, TestCategory("Rotation")]
@@ -319,9 +320,9 @@ namespace RP.Math.Tests
             // Origin rotated 90° about the line parallel to Z through (x=1, y=0).
             var result = Vector.RotateZ(new Vector(0, 0, 0), 1, 0, Deg90AsRad);
 
-            Math.Round(result.X, 6).Should().Be(1);
-            Math.Round(result.Y, 6).Should().Be(-1);
-            Math.Round(result.Z, 6).Should().Be(0);
+            Assert.AreEqual(1, Math.Round(result.X, 6));
+            Assert.AreEqual(-1, Math.Round(result.Y, 6));
+            Assert.AreEqual(0, Math.Round(result.Z, 6));
         }
 
         [TestMethod, TestCategory("Rotation")]
@@ -330,9 +331,9 @@ namespace RP.Math.Tests
             // (·, 2, 3) lies on the line parallel to X through (y=2, z=3), so it is unchanged.
             var result = new Vector(5, 2, 3).RotateX(2, 3, Deg90AsRad);
 
-            Math.Round(result.X, 6).Should().Be(5);
-            Math.Round(result.Y, 6).Should().Be(2);
-            Math.Round(result.Z, 6).Should().Be(3);
+            Assert.AreEqual(5, Math.Round(result.X, 6));
+            Assert.AreEqual(2, Math.Round(result.Y, 6));
+            Assert.AreEqual(3, Math.Round(result.Z, 6));
         }
 
         [TestMethod, TestCategory("Rotation")]
@@ -341,9 +342,9 @@ namespace RP.Math.Tests
             // (5, ·, 3) lies on the line parallel to Y through (x=5, z=3), so it is unchanged.
             var result = new Vector(5, 2, 3).RotateY(5, 3, Deg90AsRad);
 
-            Math.Round(result.X, 6).Should().Be(5);
-            Math.Round(result.Y, 6).Should().Be(2);
-            Math.Round(result.Z, 6).Should().Be(3);
+            Assert.AreEqual(5, Math.Round(result.X, 6));
+            Assert.AreEqual(2, Math.Round(result.Y, 6));
+            Assert.AreEqual(3, Math.Round(result.Z, 6));
         }
 
         [TestMethod, TestCategory("Rotation")]
@@ -352,9 +353,9 @@ namespace RP.Math.Tests
             // (3, 4, ·) lies on the line parallel to Z through (x=3, y=4), so it is unchanged.
             var result = new Vector(3, 4, 7).RotateZ(3, 4, Deg90AsRad);
 
-            Math.Round(result.X, 6).Should().Be(3);
-            Math.Round(result.Y, 6).Should().Be(4);
-            Math.Round(result.Z, 6).Should().Be(7);
+            Assert.AreEqual(3, Math.Round(result.X, 6));
+            Assert.AreEqual(4, Math.Round(result.Y, 6));
+            Assert.AreEqual(7, Math.Round(result.Z, 6));
         }
 
         #endregion
@@ -370,11 +371,11 @@ namespace RP.Math.Tests
 
             var result = Vector.Reflect(velocity, up);
 
-            result.X.Should().Be(1);
-            result.Y.Should().Be(1, "the component along the normal is reversed");
-            result.Z.Should().Be(0);
+            Assert.AreEqual(1, result.X);
+            Assert.AreEqual(1, result.Y, "the component along the normal is reversed");
+            Assert.AreEqual(0, result.Z);
 
-            velocity.Reflect(up).Should().Be(result);
+            Assert.AreEqual(result, velocity.Reflect(up));
         }
 
         [TestMethod, TestCategory("Reflect")]
@@ -385,9 +386,9 @@ namespace RP.Math.Tests
 
             var result = Vector.Reflect(velocity, up);
 
-            result.X.Should().Be(1);
-            result.Y.Should().Be(1);
-            result.Z.Should().Be(0);
+            Assert.AreEqual(1, result.X);
+            Assert.AreEqual(1, result.Y);
+            Assert.AreEqual(0, result.Z);
         }
 
         #endregion
@@ -399,7 +400,7 @@ namespace RP.Math.Tests
         {
             var result = new Vector(1, 5, 3).ComponentMin(new Vector(4, 2, 6));
 
-            result.Should().Be(new Vector(1, 2, 3));
+            Assert.AreEqual(new Vector(1, 2, 3), result);
         }
 
         [TestMethod, TestCategory("Componentwise")]
@@ -407,7 +408,7 @@ namespace RP.Math.Tests
         {
             var result = new Vector(1, 5, 3).ComponentMax(new Vector(4, 2, 6));
 
-            result.Should().Be(new Vector(4, 5, 6));
+            Assert.AreEqual(new Vector(4, 5, 6), result);
         }
 
         [TestMethod, TestCategory("Componentwise")]
@@ -415,7 +416,7 @@ namespace RP.Math.Tests
         {
             var result = new Vector(5, -5, 2).Clamp(new Vector(0, 0, 0), new Vector(3, 3, 3));
 
-            result.Should().Be(new Vector(3, 0, 2));
+            Assert.AreEqual(new Vector(3, 0, 2), result);
         }
 
         #endregion
@@ -425,7 +426,7 @@ namespace RP.Math.Tests
         [TestMethod, TestCategory("Distance")]
         public void DistanceSquared_ShouldBeTheSquareOfTheDistance_Test()
         {
-            Vector.DistanceSquared(new Vector(0, 0, 0), new Vector(3, 4, 0)).Should().Be(25);
+            Assert.AreEqual(25, Vector.DistanceSquared(new Vector(0, 0, 0), new Vector(3, 4, 0)));
         }
 
         [TestMethod, TestCategory("ClampMagnitude")]
@@ -433,10 +434,10 @@ namespace RP.Math.Tests
         {
             var result = new Vector(3, 4, 0).ClampMagnitude(2.5); // magnitude 5 -> 2.5
 
-            result.X.Should().Be(1.5);
-            result.Y.Should().Be(2);
-            result.Z.Should().Be(0);
-            result.Magnitude.Should().Be(2.5);
+            Assert.AreEqual(1.5, result.X);
+            Assert.AreEqual(2, result.Y);
+            Assert.AreEqual(0, result.Z);
+            Assert.AreEqual(2.5, result.Magnitude);
         }
 
         [TestMethod, TestCategory("ClampMagnitude")]
@@ -444,7 +445,7 @@ namespace RP.Math.Tests
         {
             var vector = new Vector(3, 4, 0); // magnitude 5
 
-            vector.ClampMagnitude(10).Should().Be(vector);
+            Assert.AreEqual(vector, vector.ClampMagnitude(10));
         }
 
         [TestMethod, TestCategory("MoveTowards")]
@@ -452,7 +453,7 @@ namespace RP.Math.Tests
         {
             var result = new Vector(0, 0, 0).MoveTowards(new Vector(10, 0, 0), 3);
 
-            result.Should().Be(new Vector(3, 0, 0));
+            Assert.AreEqual(new Vector(3, 0, 0), result);
         }
 
         [TestMethod, TestCategory("MoveTowards")]
@@ -460,7 +461,7 @@ namespace RP.Math.Tests
         {
             var target = new Vector(10, 0, 0);
 
-            new Vector(0, 0, 0).MoveTowards(target, 100).Should().Be(target);
+            Assert.AreEqual(target, new Vector(0, 0, 0).MoveTowards(target, 100));
         }
 
         #endregion
@@ -473,17 +474,17 @@ namespace RP.Math.Tests
             var result = Vector.XAxis.Slerp(Vector.YAxis, 0.5);
 
             var expected = Math.Sqrt(0.5); // ~0.70710678
-            Math.Round(result.X, 6).Should().Be(Math.Round(expected, 6));
-            Math.Round(result.Y, 6).Should().Be(Math.Round(expected, 6));
-            Math.Round(result.Z, 6).Should().Be(0);
-            Math.Round(result.Magnitude, 6).Should().Be(1, "slerp between unit vectors stays on the unit sphere");
+            Assert.AreEqual(Math.Round(expected, 6), Math.Round(result.X, 6));
+            Assert.AreEqual(Math.Round(expected, 6), Math.Round(result.Y, 6));
+            Assert.AreEqual(0, Math.Round(result.Z, 6));
+            Assert.AreEqual(1, Math.Round(result.Magnitude, 6), "slerp between unit vectors stays on the unit sphere");
         }
 
         [TestMethod, TestCategory("Slerp")]
         public void Slerp_AtTheEndpoints_ShouldReturnTheEndpoints_Test()
         {
-            Vector.XAxis.Slerp(Vector.YAxis, 0).Should().Be(Vector.XAxis);
-            Vector.XAxis.Slerp(Vector.YAxis, 1).Should().Be(Vector.YAxis);
+            Assert.AreEqual(Vector.XAxis, Vector.XAxis.Slerp(Vector.YAxis, 0));
+            Assert.AreEqual(Vector.YAxis, Vector.XAxis.Slerp(Vector.YAxis, 1));
         }
 
         [TestMethod, TestCategory("Slerp")]
@@ -491,9 +492,9 @@ namespace RP.Math.Tests
         {
             var result = new Vector(1, 0, 0).Slerp(new Vector(3, 0, 0), 0.5);
 
-            result.X.Should().Be(2);
-            result.Y.Should().Be(0);
-            result.Z.Should().Be(0);
+            Assert.AreEqual(2, result.X);
+            Assert.AreEqual(0, result.Y);
+            Assert.AreEqual(0, result.Z);
         }
 
         #endregion
@@ -503,21 +504,21 @@ namespace RP.Math.Tests
         [TestMethod, TestCategory("Components")]
         public void MagnitudeSquared_ShouldEqualTheSumOfTheSquares_Test()
         {
-            new Vector(3, 4, 0).MagnitudeSquared.Should().Be(25);
+            Assert.AreEqual(25, new Vector(3, 4, 0).MagnitudeSquared);
         }
 
         [TestMethod, TestCategory("Predicate")]
         public void IsZero_ForTheZeroVector_ShouldBeTrue_Test()
         {
-            new Vector(0, 0, 0).IsZero().Should().BeTrue();
-            new Vector(0, 1, 0).IsZero().Should().BeFalse();
+            Assert.IsTrue(new Vector(0, 0, 0).IsZero());
+            Assert.IsFalse(new Vector(0, 1, 0).IsZero());
         }
 
         [TestMethod, TestCategory("Predicate")]
         public void IsZero_WithinTolerance_ShouldTreatTinyVectorsAsZero_Test()
         {
-            new Vector(0.05, 0, 0).IsZero(0.1).Should().BeTrue();
-            new Vector(0.5, 0, 0).IsZero(0.1).Should().BeFalse();
+            Assert.IsTrue(new Vector(0.05, 0, 0).IsZero(0.1));
+            Assert.IsFalse(new Vector(0.5, 0, 0).IsZero(0.1));
         }
 
         [TestMethod, TestCategory("Conversion")]
@@ -525,19 +526,19 @@ namespace RP.Math.Tests
         {
             var (x, y, z) = new Vector(1, 2, 3);
 
-            x.Should().Be(1);
-            y.Should().Be(2);
-            z.Should().Be(3);
+            Assert.AreEqual(1, x);
+            Assert.AreEqual(2, y);
+            Assert.AreEqual(3, z);
         }
 
         [TestMethod, TestCategory("Conversion")]
         public void ImplicitTupleConversions_ShouldRoundTrip_Test()
         {
             Vector fromTuple = (1d, 2d, 3d);
-            fromTuple.Should().Be(new Vector(1, 2, 3));
+            Assert.AreEqual(new Vector(1, 2, 3), fromTuple);
 
             (double x, double y, double z) toTuple = new Vector(4, 5, 6);
-            toTuple.Should().Be((4d, 5d, 6d));
+            Assert.AreEqual((4d, 5d, 6d), toTuple);
         }
 
         #endregion

@@ -2,7 +2,6 @@ namespace RP.Math.Tests
 {
     using System;
 
-    using FluentAssertions;
 
     using Microsoft.VisualStudio.TestTools.UnitTesting;
 
@@ -24,23 +23,23 @@ namespace RP.Math.Tests
         public void Constructor_NegativeRadius_ShouldThrow_Test()
         {
             Action act = () => new Chord(new Vector(0, 0, 0), new Vector(1, 0, 0), -1);
-            act.Should().Throw<ArgumentOutOfRangeException>();
+            Assert.ThrowsException<ArgumentOutOfRangeException>(act);
         }
 
         [TestMethod, TestCategory("Measurement")]
         public void Length_And_Diameter_Test()
         {
             var c = SixAcrossFive();
-            c.Length.Should().BeApproximately(6, Tol);
-            c.Diameter.Should().Be(10);
+            Assert.AreEqual(6, c.Length, Tol);
+            Assert.AreEqual(10, c.Diameter);
         }
 
         [TestMethod, TestCategory("Geometry")]
         public void DistanceFromCentre_And_Sagitta_Test()
         {
             var c = SixAcrossFive();
-            c.DistanceFromCentre.Should().BeApproximately(4, Tol); // sqrt(25 - 9)
-            c.Sagitta.Should().BeApproximately(1, Tol);            // 5 - 4
+            Assert.AreEqual(4, c.DistanceFromCentre, Tol); // sqrt(25 - 9)
+            Assert.AreEqual(1, c.Sagitta, Tol);            // 5 - 4
         }
 
         [TestMethod, TestCategory("Geometry")]
@@ -48,16 +47,16 @@ namespace RP.Math.Tests
         {
             var c = SixAcrossFive();
             double expectedAngle = 2 * Math.Asin(3.0 / 5.0); // 2·asin((c/2)/r)
-            c.CentralAngle.Rad.Should().BeApproximately(expectedAngle, Tol);
-            c.ArcLength.Should().BeApproximately(5 * expectedAngle, Tol);
+            Assert.AreEqual(expectedAngle, c.CentralAngle.Rad, Tol);
+            Assert.AreEqual(5 * expectedAngle, c.ArcLength, Tol);
         }
 
         [TestMethod, TestCategory("Geometry")]
         public void Diameter_Chord_ShouldSubtendStraightAngle_Test()
         {
             var c = new Chord(new Vector(-5, 0, 0), new Vector(5, 0, 0), 5); // a full diameter
-            c.CentralAngle.Rad.Should().BeApproximately(Math.PI, Tol);
-            c.Sagitta.Should().BeApproximately(5, Tol); // the arc bulges a full radius
+            Assert.AreEqual(Math.PI, c.CentralAngle.Rad, Tol);
+            Assert.AreEqual(5, c.Sagitta, Tol); // the arc bulges a full radius
         }
     }
 }

@@ -1,7 +1,5 @@
 namespace RP.Math.Tests
 {
-    using FluentAssertions;
-
     using Microsoft.VisualStudio.TestTools.UnitTesting;
 
     /// <summary>
@@ -18,24 +16,24 @@ namespace RP.Math.Tests
         public void Abs_ReturnsTheMagnitude_NotComponentwise_Test()
         {
             var v = new Vector(3, -4, 0);
-            v.Abs().Should().BeApproximately(5, Tolerance);           // |v|, not a vector
-            v.Abs().Should().Be(v.Magnitude);                          // alias for the property
-            Vector.Abs(v).Should().BeApproximately(5, Tolerance);      // static form agrees
+            Assert.AreEqual(5, v.Abs(), Tolerance);           // |v|, not a vector
+            Assert.AreEqual(v.Magnitude, v.Abs());                          // alias for the property
+            Assert.AreEqual(5, Vector.Abs(v), Tolerance);      // static form agrees
         }
 
         [TestMethod, TestCategory("AbsComponents")]
         public void AbsComponents_TakesTheAbsoluteValuePerAxis_Test()
         {
             var v = new Vector(-3, 4, -5);
-            v.AbsComponents().Equals(new Vector(3, 4, 5), Tolerance).Should().BeTrue();
-            Vector.AbsComponents(v).Equals(new Vector(3, 4, 5), Tolerance).Should().BeTrue();
+            Assert.IsTrue(v.AbsComponents().Equals(new Vector(3, 4, 5), Tolerance));
+            Assert.IsTrue(Vector.AbsComponents(v).Equals(new Vector(3, 4, 5), Tolerance));
         }
 
         [TestMethod, TestCategory("AbsComponents")]
         public void AbsComponents_OfAnAlreadyPositiveVector_IsUnchanged_Test()
         {
             var v = new Vector(1, 2, 3);
-            v.AbsComponents().Equals(v, Tolerance).Should().BeTrue();
+            Assert.IsTrue(v.AbsComponents().Equals(v, Tolerance));
         }
     }
 }

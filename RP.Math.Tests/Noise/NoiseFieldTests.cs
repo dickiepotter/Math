@@ -1,7 +1,6 @@
 namespace RP.Math.Tests.Noise
 {
     using System;
-    using FluentAssertions;
     using Microsoft.VisualStudio.TestTools.UnitTesting;
     using RP.Math.Noise;
 
@@ -68,10 +67,10 @@ namespace RP.Math.Tests.Noise
             ForEachSample2(
                 (x, y) =>
                 {
-                    a.Sample(x, y).Should().Be(b.Sample(x, y));
-                    sa.Sample(x, y).Should().Be(sb.Sample(x, y));
-                    va.Sample(x, y).Should().Be(vb.Sample(x, y));
-                    wa.Sample(x, y).Should().Be(wb.Sample(x, y));
+                    Assert.AreEqual(b.Sample(x, y), a.Sample(x, y));
+                    Assert.AreEqual(sb.Sample(x, y), sa.Sample(x, y));
+                    Assert.AreEqual(vb.Sample(x, y), va.Sample(x, y));
+                    Assert.AreEqual(wb.Sample(x, y), wa.Sample(x, y));
                 },
                 count: 500);
         }
@@ -86,7 +85,7 @@ namespace RP.Math.Tests.Noise
             ForEachSample2((x, y) => { if (a.Sample(x, y) != b.Sample(x, y)) differences++; }, count: 500);
 
             // Not "every sample differs" — two independent fields will coincide occasionally by chance.
-            differences.Should().BeGreaterThan(450);
+            Assert.IsTrue((differences) > (450));
         }
 
         [TestMethod]
@@ -95,9 +94,9 @@ namespace RP.Math.Tests.Noise
             int a = NoiseHash.Derive(Seed, 1);
             int b = NoiseHash.Derive(Seed, 2);
 
-            a.Should().NotBe(b);
-            a.Should().NotBe(Seed);
-            NoiseHash.Derive(Seed, 1).Should().Be(a, "derivation must itself be deterministic");
+            Assert.AreNotEqual(b, a);
+            Assert.AreNotEqual(Seed, a);
+            Assert.AreEqual(a, NoiseHash.Derive(Seed, 1), "derivation must itself be deterministic");
         }
 
         // ---- Range ---------------------------------------------------------------------------------
@@ -106,21 +105,21 @@ namespace RP.Math.Tests.Noise
         public void Perlin2D_StaysWithinTheDocumentedRange()
         {
             var n = new PerlinNoise(Seed);
-            ForEachSample2((x, y) => n.Sample(x, y).Should().BeInRange(-1.0, 1.0));
+            ForEachSample2((x, y) => Assert.IsTrue((n.Sample(x, y)) >= (-1.0) && (n.Sample(x, y)) <= (1.0)));
         }
 
         [TestMethod]
         public void Perlin3D_StaysWithinTheDocumentedRange()
         {
             var n = new PerlinNoise(Seed);
-            ForEachSample3((x, y, z) => n.Sample(x, y, z).Should().BeInRange(-1.0, 1.0));
+            ForEachSample3((x, y, z) => Assert.IsTrue((n.Sample(x, y, z)) >= (-1.0) && (n.Sample(x, y, z)) <= (1.0)));
         }
 
         [TestMethod]
         public void Perlin4D_StaysWithinTheDocumentedRange()
         {
             var n = new PerlinNoise(Seed);
-            ForEachSample3((x, y, z) => n.Sample(x, y, z, x - y).Should().BeInRange(-1.0, 1.0));
+            ForEachSample3((x, y, z) => Assert.IsTrue((n.Sample(x, y, z, x - y)) >= (-1.0) && (n.Sample(x, y, z, x - y)) <= (1.0)));
         }
 
         [TestMethod]
@@ -130,29 +129,29 @@ namespace RP.Math.Tests.Noise
             // out of step with the gradient table in NoiseHash, this fails rather than quietly rescaling
             // every threshold in every consuming world.
             var n = new SimplexNoise(Seed);
-            ForEachSample2((x, y) => n.Sample(x, y).Should().BeInRange(-1.0, 1.0));
+            ForEachSample2((x, y) => Assert.IsTrue((n.Sample(x, y)) >= (-1.0) && (n.Sample(x, y)) <= (1.0)));
         }
 
         [TestMethod]
         public void Simplex3D_StaysWithinTheDocumentedRange()
         {
             var n = new SimplexNoise(Seed);
-            ForEachSample3((x, y, z) => n.Sample(x, y, z).Should().BeInRange(-1.0, 1.0));
+            ForEachSample3((x, y, z) => Assert.IsTrue((n.Sample(x, y, z)) >= (-1.0) && (n.Sample(x, y, z)) <= (1.0)));
         }
 
         [TestMethod]
         public void Simplex4D_StaysWithinTheDocumentedRange()
         {
             var n = new SimplexNoise(Seed);
-            ForEachSample3((x, y, z) => n.Sample(x, y, z, (x * 0.5) - z).Should().BeInRange(-1.0, 1.0));
+            ForEachSample3((x, y, z) => Assert.IsTrue((n.Sample(x, y, z, (x * 0.5) - z)) >= (-1.0) && (n.Sample(x, y, z, (x * 0.5) - z)) <= (1.0)));
         }
 
         [TestMethod]
         public void ValueNoise_StaysWithinTheDocumentedRange()
         {
             var n = new ValueNoise(Seed);
-            ForEachSample2((x, y) => n.Sample(x, y).Should().BeInRange(-1.0, 1.0));
-            ForEachSample3((x, y, z) => n.Sample(x, y, z).Should().BeInRange(-1.0, 1.0));
+            ForEachSample2((x, y) => Assert.IsTrue((n.Sample(x, y)) >= (-1.0) && (n.Sample(x, y)) <= (1.0)));
+            ForEachSample3((x, y, z) => Assert.IsTrue((n.Sample(x, y, z)) >= (-1.0) && (n.Sample(x, y, z)) <= (1.0)));
         }
 
         [TestMethod]
@@ -170,8 +169,8 @@ namespace RP.Math.Tests.Noise
                     if (v > max) max = v;
                 });
 
-            min.Should().BeLessThan(-0.7);
-            max.Should().BeGreaterThan(0.7);
+            Assert.IsTrue((min) < (-0.7));
+            Assert.IsTrue((max) > (0.7));
         }
 
         [TestMethod]
@@ -184,7 +183,7 @@ namespace RP.Math.Tests.Noise
             int count = 0;
             ForEachSample2((x, y) => { sum += n.Sample(x, y); count++; });
 
-            (sum / count).Should().BeApproximately(0.0, 0.05);
+            Assert.AreEqual(0.0, (sum / count), 0.05);
         }
 
         // ---- Continuity and the negative-coordinate trap -------------------------------------------
@@ -201,8 +200,8 @@ namespace RP.Math.Tests.Noise
                 (x, y) =>
                 {
                     double here = n.Sample(x, y);
-                    System.Math.Abs(n.Sample(x + Step, y) - here).Should().BeLessThan(0.01);
-                    System.Math.Abs(n.Sample(x, y + Step) - here).Should().BeLessThan(0.01);
+                    Assert.IsTrue((System.Math.Abs(n.Sample(x + Step, y) - here)) < (0.01));
+                    Assert.IsTrue((System.Math.Abs(n.Sample(x, y + Step) - here)) < (0.01));
                 },
                 count: 2000);
         }
@@ -218,7 +217,7 @@ namespace RP.Math.Tests.Noise
             {
                 double a = n.Sample(t, 0.3);
                 double b = n.Sample(t + 0.0005, 0.3);
-                System.Math.Abs(b - a).Should().BeLessThan(0.05);
+                Assert.IsTrue((System.Math.Abs(b - a)) < (0.05));
             }
         }
 
@@ -242,7 +241,7 @@ namespace RP.Math.Tests.Noise
             // four thousand cells, and every sample inside that one cell then matches. Truncation instead
             // of flooring would mirror *everything*, so a small tolerance separates the two cases cleanly
             // while leaving the test insensitive to which seed it runs under.
-            mirrored.Should().BeLessThan(Samples / 20);
+            Assert.IsTrue((mirrored) < (Samples / 20));
         }
 
         // ---- Perlin-specific structure --------------------------------------------------------------
@@ -258,8 +257,8 @@ namespace RP.Math.Tests.Noise
             {
                 for (int y = -8; y <= 8; y++)
                 {
-                    n.Sample(x, y).Should().BeApproximately(0.0, 1e-12);
-                    n.Sample(x, y, 3).Should().BeApproximately(0.0, 1e-12);
+                    Assert.AreEqual(0.0, n.Sample(x, y), 1e-12);
+                    Assert.AreEqual(0.0, n.Sample(x, y, 3), 1e-12);
                 }
             }
         }
@@ -275,9 +274,9 @@ namespace RP.Math.Tests.Noise
                 for (double y = 0.0; y < Period; y += 0.29)
                 {
                     double here = n.SampleTiled(x, y, Period, Period);
-                    n.SampleTiled(x + Period, y, Period, Period).Should().BeApproximately(here, 1e-12);
-                    n.SampleTiled(x, y + Period, Period, Period).Should().BeApproximately(here, 1e-12);
-                    n.SampleTiled(x + (3 * Period), y - (2 * Period), Period, Period).Should().BeApproximately(here, 1e-12);
+                    Assert.AreEqual(here, n.SampleTiled(x + Period, y, Period, Period), 1e-12);
+                    Assert.AreEqual(here, n.SampleTiled(x, y + Period, Period, Period), 1e-12);
+                    Assert.AreEqual(here, n.SampleTiled(x + (3 * Period), y - (2 * Period), Period, Period), 1e-12);
                 }
             }
         }
@@ -287,7 +286,7 @@ namespace RP.Math.Tests.Noise
         {
             var n = new PerlinNoise(Seed);
             Action act = () => n.SampleTiled(1, 1, 0, 4);
-            act.Should().Throw<ArgumentOutOfRangeException>();
+            Assert.ThrowsException<ArgumentOutOfRangeException>(act);
         }
 
         [TestMethod]
@@ -302,24 +301,24 @@ namespace RP.Math.Tests.Noise
                 double y = (i * 0.277) - 25.0;
 
                 double value = n.SampleWithDerivative(x, y, out double dx, out double dy);
-                value.Should().BeApproximately(n.Sample(x, y), 1e-12);
+                Assert.AreEqual(n.Sample(x, y), value, 1e-12);
 
                 double fdX = (n.Sample(x + H, y) - n.Sample(x - H, y)) / (2 * H);
                 double fdY = (n.Sample(x, y + H) - n.Sample(x, y - H)) / (2 * H);
 
-                dx.Should().BeApproximately(fdX, 1e-4);
-                dy.Should().BeApproximately(fdY, 1e-4);
+                Assert.AreEqual(fdX, dx, 1e-4);
+                Assert.AreEqual(fdY, dy, 1e-4);
             }
         }
 
         [TestMethod]
         public void Fade_HasZeroSlopeAtBothEnds()
         {
-            PerlinNoise.Fade(0.0).Should().Be(0.0);
-            PerlinNoise.Fade(1.0).Should().Be(1.0);
-            PerlinNoise.Fade(0.5).Should().BeApproximately(0.5, 1e-12);
-            PerlinNoise.FadeDerivative(0.0).Should().BeApproximately(0.0, 1e-12);
-            PerlinNoise.FadeDerivative(1.0).Should().BeApproximately(0.0, 1e-12);
+            Assert.AreEqual(0.0, PerlinNoise.Fade(0.0));
+            Assert.AreEqual(1.0, PerlinNoise.Fade(1.0));
+            Assert.AreEqual(0.5, PerlinNoise.Fade(0.5), 1e-12);
+            Assert.AreEqual(0.0, PerlinNoise.FadeDerivative(0.0), 1e-12);
+            Assert.AreEqual(0.0, PerlinNoise.FadeDerivative(1.0), 1e-12);
         }
 
         // ---- Simplex-specific -----------------------------------------------------------------------
@@ -334,8 +333,8 @@ namespace RP.Math.Tests.Noise
                 for (double v = 0.0; v < 1.0; v += 0.11)
                 {
                     double here = n.SampleSeamless(u, v, detail: 4.0);
-                    n.SampleSeamless(u + 1.0, v, detail: 4.0).Should().BeApproximately(here, 1e-9);
-                    n.SampleSeamless(u, v + 1.0, detail: 4.0).Should().BeApproximately(here, 1e-9);
+                    Assert.AreEqual(here, n.SampleSeamless(u + 1.0, v, detail: 4.0), 1e-9);
+                    Assert.AreEqual(here, n.SampleSeamless(u, v + 1.0, detail: 4.0), 1e-9);
                 }
             }
         }
@@ -349,8 +348,8 @@ namespace RP.Math.Tests.Noise
             ForEachSample2((x, y) =>
             {
                 CellularSample s = w.SampleCellular(x, y);
-                s.F1.Should().BeLessThanOrEqualTo(s.F2);
-                s.Edge.Should().BeGreaterThanOrEqualTo(0.0);
+                Assert.IsTrue((s.F1) <= (s.F2));
+                Assert.IsTrue((s.Edge) >= (0.0));
             });
         }
 
@@ -363,9 +362,9 @@ namespace RP.Math.Tests.Noise
             CellularSample a = w.SampleCellular(4.2, 7.3);
             CellularSample b = w.SampleCellular(4.8, 7.6);
 
-            b.CellHash.Should().Be(a.CellHash);
-            b.CellX.Should().Be(a.CellX);
-            b.CellY.Should().Be(a.CellY);
+            Assert.AreEqual(a.CellHash, b.CellHash);
+            Assert.AreEqual(a.CellX, b.CellX);
+            Assert.AreEqual(a.CellY, b.CellY);
         }
 
         [TestMethod]
@@ -386,7 +385,7 @@ namespace RP.Math.Tests.Noise
                 },
                 count: 2000);
 
-            distinct.Should().Be(samples, "the runner-up is by definition a different cell from the winner");
+            Assert.AreEqual(samples, distinct, "the runner-up is by definition a different cell from the winner");
         }
 
         [TestMethod]
@@ -395,18 +394,18 @@ namespace RP.Math.Tests.Noise
             var w = new WorleyNoise(Seed, jitter: 0.0); // no jitter: cells are exactly the unit grid
 
             // The centre of a cell is as far from the border as it gets.
-            w.SampleCellular(4.5, 7.5).Certainty(0.3).Should().BeApproximately(1.0, 1e-9);
+            Assert.AreEqual(1.0, w.SampleCellular(4.5, 7.5).Certainty(0.3), 1e-9);
 
             // Exactly halfway between two feature points, F1 and F2 are equal, so certainty is zero.
-            w.SampleCellular(5.0, 7.5).Certainty(0.3).Should().BeApproximately(0.0, 1e-9);
+            Assert.AreEqual(0.0, w.SampleCellular(5.0, 7.5).Certainty(0.3), 1e-9);
 
             // And it is monotone in between, which is what makes it usable as a blend weight.
             double previous = -1;
             for (double t = 0.0; t <= 0.5; t += 0.01)
             {
                 double certainty = w.SampleCellular(4.5 + t, 7.5).Certainty(0.3);
-                certainty.Should().BeInRange(0.0, 1.0);
-                if (previous >= 0) certainty.Should().BeLessThanOrEqualTo(previous + 1e-12);
+                Assert.IsTrue((certainty) >= (0.0) && (certainty) <= (1.0));
+                if (previous >= 0) Assert.IsTrue((certainty) <= (previous + 1e-12));
                 previous = certainty;
             }
         }
@@ -415,8 +414,8 @@ namespace RP.Math.Tests.Noise
         public void Worley_ZeroJitter_PutsFeaturePointsAtCellCentres()
         {
             var w = new WorleyNoise(Seed, jitter: 0.0);
-            w.SampleCellular(0.5, 0.5).F1.Should().BeApproximately(0.0, 1e-12);
-            w.SampleCellular(7.5, -3.5).F1.Should().BeApproximately(0.0, 1e-12);
+            Assert.AreEqual(0.0, w.SampleCellular(0.5, 0.5).F1, 1e-12);
+            Assert.AreEqual(0.0, w.SampleCellular(7.5, -3.5).F1, 1e-12);
         }
 
         [TestMethod]
@@ -429,8 +428,8 @@ namespace RP.Math.Tests.Noise
                     (x, y) =>
                     {
                         CellularSample s = w.SampleCellular(x, y);
-                        s.F1.Should().BeGreaterThanOrEqualTo(0.0);
-                        s.F1.Should().BeLessThanOrEqualTo(s.F2);
+                        Assert.IsTrue((s.F1) >= (0.0));
+                        Assert.IsTrue((s.F1) <= (s.F2));
                     },
                     count: 1000);
             }
@@ -444,9 +443,9 @@ namespace RP.Math.Tests.Noise
                 (x, y, z) =>
                 {
                     CellularSample s = w.SampleCellular(x, y, z);
-                    s.F1.Should().BeLessThanOrEqualTo(s.F2);
+                    Assert.IsTrue((s.F1) <= (s.F2));
                     // With one point per unit cell, the nearest is never further than the cell diagonal.
-                    s.F1.Should().BeLessThan(2.0);
+                    Assert.IsTrue((s.F1) < (2.0));
                 },
                 count: 2000);
         }
@@ -459,7 +458,7 @@ namespace RP.Math.Tests.Noise
             var source = new SimplexNoise(Seed);
             var stack = new FractalNoise2(source, octaves: 1, frequency: 1.0);
 
-            ForEachSample2((x, y) => stack.Sample(x, y).Should().BeApproximately(source.Sample(x, y), 1e-12), count: 500);
+            ForEachSample2((x, y) => Assert.AreEqual(source.Sample(x, y), stack.Sample(x, y), 1e-12), count: 500);
         }
 
         [TestMethod]
@@ -473,7 +472,7 @@ namespace RP.Math.Tests.Noise
                 {
                     var stack = new FractalNoise2(source, octaves, frequency: 0.05, mode: mode);
                     ForEachSample2(
-                        (x, y) => stack.Sample(x, y).Should().BeInRange(-1.0, 1.0, "mode {0}, {1} octaves", mode, octaves),
+                        (x, y) => Assert.IsTrue((stack.Sample(x, y)) >= (-1.0) && (stack.Sample(x, y)) <= (1.0), "mode {0}, {1} octaves", mode, octaves),
                         count: 800);
                 }
             }
@@ -500,28 +499,28 @@ namespace RP.Math.Tests.Noise
                 count: 3000);
 
             // Mean magnitudes should be in the same ballpark, not a factor apart.
-            (sum8 / n).Should().BeApproximately(sum4 / n, 0.12);
+            Assert.AreEqual(sum4 / n, (sum8 / n), 0.12);
         }
 
         [TestMethod]
         public void Fractal_RejectsZeroOctaves()
         {
             Action act = () => new FractalNoise2(new SimplexNoise(Seed), octaves: 0);
-            act.Should().Throw<ArgumentOutOfRangeException>();
+            Assert.ThrowsException<ArgumentOutOfRangeException>(act);
         }
 
         [TestMethod]
         public void Fractal_RejectsANullSource()
         {
             Action act = () => new FractalNoise3(null!, octaves: 2);
-            act.Should().Throw<ArgumentNullException>();
+            Assert.ThrowsException<ArgumentNullException>(act);
         }
 
         [TestMethod]
         public void RidgedMultifractal_IsNonNegativeAndBounded()
         {
             var stack = new FractalNoise2(new SimplexNoise(Seed), octaves: 5, frequency: 0.03, mode: FractalMode.Ridged);
-            ForEachSample2((x, y) => stack.SampleRidgedMultifractal(x, y).Should().BeInRange(0.0, 1.5), count: 3000);
+            ForEachSample2((x, y) => Assert.IsTrue((stack.SampleRidgedMultifractal(x, y)) >= (0.0) && (stack.SampleRidgedMultifractal(x, y)) <= (1.5)), count: 3000);
         }
 
         [TestMethod]
@@ -539,7 +538,7 @@ namespace RP.Math.Tests.Noise
                 roundVariation += System.Math.Abs(stack.SampleSquashed(10, y, 20, 1.0) - stack.SampleSquashed(10, y - 0.5, 20, 1.0));
             }
 
-            flatVariation.Should().BeGreaterThan(roundVariation);
+            Assert.IsTrue((flatVariation) > (roundVariation));
         }
 
         // ---- Domain warping -------------------------------------------------------------------------
@@ -550,7 +549,7 @@ namespace RP.Math.Tests.Noise
             var source = new SimplexNoise(Seed);
             var warp = DomainWarp2.Simplex(source, Seed, amplitude: 0.0, frequency: 0.1);
 
-            ForEachSample2((x, y) => warp.Sample(x, y).Should().BeApproximately(source.Sample(x, y), 1e-12), count: 500);
+            ForEachSample2((x, y) => Assert.AreEqual(source.Sample(x, y), warp.Sample(x, y), 1e-12), count: 500);
         }
 
         [TestMethod]
@@ -564,8 +563,8 @@ namespace RP.Math.Tests.Noise
                 (x, y) =>
                 {
                     warp.Displace(x, y, out double wx, out double wy);
-                    System.Math.Abs(wx - x).Should().BeLessThanOrEqualTo(Amplitude * Iterations);
-                    System.Math.Abs(wy - y).Should().BeLessThanOrEqualTo(Amplitude * Iterations);
+                    Assert.IsTrue((System.Math.Abs(wx - x)) <= (Amplitude * Iterations));
+                    Assert.IsTrue((System.Math.Abs(wy - y)) <= (Amplitude * Iterations));
                 },
                 count: 1000);
         }
@@ -578,8 +577,8 @@ namespace RP.Math.Tests.Noise
                 (x, y, z) =>
                 {
                     double v = warp.Sample(x, y, z);
-                    v.Should().BeInRange(-1.0, 1.0);
-                    v.Should().Be(warp.Sample(x, y, z));
+                    Assert.IsTrue((v) >= (-1.0) && (v) <= (1.0));
+                    Assert.AreEqual(warp.Sample(x, y, z), v);
                 },
                 count: 1000);
         }
@@ -591,9 +590,9 @@ namespace RP.Math.Tests.Noise
         {
             // The symmetric-multiplier bug: with one prime per axis, hash(3,7) would equal hash(7,3) and
             // the whole field would be mirrored about the diagonal.
-            NoiseHash.Hash(3, 7, Seed).Should().NotBe(NoiseHash.Hash(7, 3, Seed));
-            NoiseHash.Hash(1, 0, 0, Seed).Should().NotBe(NoiseHash.Hash(0, 1, 0, Seed));
-            NoiseHash.Hash(0, 0, 1, Seed).Should().NotBe(NoiseHash.Hash(0, 1, 0, Seed));
+            Assert.AreNotEqual(NoiseHash.Hash(7, 3, Seed), NoiseHash.Hash(3, 7, Seed));
+            Assert.AreNotEqual(NoiseHash.Hash(0, 1, 0, Seed), NoiseHash.Hash(1, 0, 0, Seed));
+            Assert.AreNotEqual(NoiseHash.Hash(0, 1, 0, Seed), NoiseHash.Hash(0, 0, 1, Seed));
         }
 
         [TestMethod]
@@ -613,7 +612,7 @@ namespace RP.Math.Tests.Noise
             const int Expected = 256 * 256 / 16;
             foreach (int count in buckets)
             {
-                count.Should().BeInRange((int)(Expected * 0.9), (int)(Expected * 1.1));
+                Assert.IsTrue((count) >= ((int)(Expected * 0.9)) && (count) <= ((int)(Expected * 1.1)));
             }
         }
 
@@ -622,20 +621,22 @@ namespace RP.Math.Tests.Noise
         {
             for (uint h = 0; h < 100000; h += 97)
             {
-                NoiseHash.ToIndex(h, 12).Should().BeInRange(0, 11);
+                Assert.IsTrue((NoiseHash.ToIndex(h, 12)) >= (0) && (NoiseHash.ToIndex(h, 12)) <= (11));
             }
 
-            NoiseHash.ToIndex(uint.MaxValue, 8).Should().Be(7);
-            NoiseHash.ToIndex(0, 8).Should().Be(0);
+            Assert.AreEqual(7, NoiseHash.ToIndex(uint.MaxValue, 8));
+            Assert.AreEqual(0, NoiseHash.ToIndex(0, 8));
         }
 
         [TestMethod]
         public void ToUnitAndToSigned_CoverTheirRanges()
         {
-            NoiseHash.ToUnit(0).Should().Be(0.0);
-            NoiseHash.ToUnit(uint.MaxValue).Should().BeLessThan(1.0).And.BeGreaterThan(0.999);
-            NoiseHash.ToSigned(0).Should().Be(-1.0);
-            NoiseHash.ToSigned(uint.MaxValue).Should().BeLessThan(1.0).And.BeGreaterThan(0.999);
+            Assert.AreEqual(0.0, NoiseHash.ToUnit(0));
+            Assert.IsTrue((NoiseHash.ToUnit(uint.MaxValue)) < (1.0));
+            Assert.IsTrue((NoiseHash.ToUnit(uint.MaxValue)) > (0.999));
+            Assert.AreEqual(-1.0, NoiseHash.ToSigned(0));
+            Assert.IsTrue((NoiseHash.ToSigned(uint.MaxValue)) < (1.0));
+            Assert.IsTrue((NoiseHash.ToSigned(uint.MaxValue)) > (0.999));
         }
     }
 }

@@ -3,7 +3,6 @@ namespace RP.Math.Tests
     using System;
     using System.Linq;
 
-    using FluentAssertions;
 
     using Microsoft.VisualStudio.TestTools.UnitTesting;
 
@@ -17,10 +16,10 @@ namespace RP.Math.Tests
         {
             foreach (double e in expected)
             {
-                actual.Any(r => Math.Abs(r - e) < Tol).Should().BeTrue($"root {e} should be found in [{string.Join(", ", actual)}]");
+                Assert.IsTrue(actual.Any(r => Math.Abs(r - e) < Tol), $"root {e} should be found in [{string.Join(", ", actual)}]");
             }
 
-            actual.Length.Should().Be(expected.Length);
+            Assert.AreEqual(expected.Length, actual.Length);
         }
 
         [TestMethod, TestCategory("Quadratic")]
@@ -32,7 +31,7 @@ namespace RP.Math.Tests
         [TestMethod, TestCategory("Quadratic")]
         public void Quadratic_NoRealRoots_Test()
         {
-            PolynomialRoots.SolveQuadratic(1, 0, 1).Should().BeEmpty();
+            Assert.AreEqual(0, PolynomialRoots.SolveQuadratic(1, 0, 1).Length);
         }
 
         [TestMethod, TestCategory("Cubic")]
@@ -47,8 +46,8 @@ namespace RP.Math.Tests
         {
             // x^3 + x + 1 = 0 has a single real root near -0.6823
             double[] roots = PolynomialRoots.SolveCubic(1, 0, 1, 1);
-            roots.Length.Should().Be(1);
-            roots[0].Should().BeApproximately(-0.6823278, 1e-6);
+            Assert.AreEqual(1, roots.Length);
+            Assert.AreEqual(-0.6823278, roots[0], 1e-6);
         }
 
         [TestMethod, TestCategory("Quartic")]
@@ -69,7 +68,7 @@ namespace RP.Math.Tests
         public void Quartic_NoRealRoots_Test()
         {
             // (x^2+1)(x^2+4) = x^4 + 5x^2 + 4
-            PolynomialRoots.SolveQuartic(1, 0, 5, 0, 4).Should().BeEmpty();
+            Assert.AreEqual(0, PolynomialRoots.SolveQuartic(1, 0, 5, 0, 4).Length);
         }
     }
 }

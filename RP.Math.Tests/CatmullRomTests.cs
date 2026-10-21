@@ -2,7 +2,6 @@ namespace RP.Math.Tests
 {
     using System;
 
-    using FluentAssertions;
 
     using Microsoft.VisualStudio.TestTools.UnitTesting;
 
@@ -25,13 +24,13 @@ namespace RP.Math.Tests
         public void Construction_WithFewerThanTwoPoints_Throws_Test()
         {
             Action act = () => new CatmullRom(new Vector(0, 0, 0));
-            act.Should().Throw<ArgumentException>();
+            Assert.ThrowsException<ArgumentException>(act);
         }
 
         [TestMethod, TestCategory("Accessors")]
         public void SegmentCount_IsOneLessThanWaypointCount_Test()
         {
-            Sample().SegmentCount.Should().Be(3);
+            Assert.AreEqual(3, Sample().SegmentCount);
         }
 
         [TestMethod, TestCategory("Evaluation")]
@@ -43,7 +42,7 @@ namespace RP.Math.Tests
             for (int i = 0; i < spline.Count; i++)
             {
                 double t = (double)i / segments;
-                spline.PointAt(t).Equals(spline[i], Tolerance).Should().BeTrue();
+                Assert.IsTrue(spline.PointAt(t).Equals(spline[i], Tolerance));
             }
         }
 
@@ -51,16 +50,16 @@ namespace RP.Math.Tests
         public void PointAt_AtTheEnds_ReturnsStartAndEnd_Test()
         {
             CatmullRom spline = Sample();
-            spline.PointAt(0).Equals(spline.Start, Tolerance).Should().BeTrue();
-            spline.PointAt(1).Equals(spline.End, Tolerance).Should().BeTrue();
+            Assert.IsTrue(spline.PointAt(0).Equals(spline.Start, Tolerance));
+            Assert.IsTrue(spline.PointAt(1).Equals(spline.End, Tolerance));
         }
 
         [TestMethod, TestCategory("Evaluation")]
         public void PointAt_ClampsBeyondTheEnds_Test()
         {
             CatmullRom spline = Sample();
-            spline.PointAt(-0.5).Equals(spline.Start, Tolerance).Should().BeTrue();
-            spline.PointAt(1.5).Equals(spline.End, Tolerance).Should().BeTrue();
+            Assert.IsTrue(spline.PointAt(-0.5).Equals(spline.Start, Tolerance));
+            Assert.IsTrue(spline.PointAt(1.5).Equals(spline.End, Tolerance));
         }
 
         [TestMethod, TestCategory("Segments")]
@@ -72,14 +71,14 @@ namespace RP.Math.Tests
             // Segment 1 runs from waypoint 1 to waypoint 2; its start tangent is (P2 - P0)/2.
             Hermite middle = spline.Segment(1);
             Vector expectedStartTangent = (spline[2] - spline[0]) * 0.5;
-            middle.StartTangent.Equals(expectedStartTangent, Tolerance).Should().BeTrue();
+            Assert.IsTrue(middle.StartTangent.Equals(expectedStartTangent, Tolerance));
         }
 
         [TestMethod, TestCategory("Segments")]
         public void Segment_OutOfRange_Throws_Test()
         {
             Action act = () => Sample().Segment(3);
-            act.Should().Throw<ArgumentOutOfRangeException>();
+            Assert.ThrowsException<ArgumentOutOfRangeException>(act);
         }
     }
 }

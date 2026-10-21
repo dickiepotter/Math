@@ -1,7 +1,5 @@
 namespace RP.Math.Tests
 {
-    using FluentAssertions;
-
     using Microsoft.VisualStudio.TestTools.UnitTesting;
 
     /// <summary>
@@ -20,15 +18,15 @@ namespace RP.Math.Tests
         public void Construction_ShouldStoreNormalizedRotation_Test()
         {
             var p = new Pose(new Vector(1, 2, 3), new Quaternion(0, 0, 0, 5));
-            p.Rotation.IsUnit(Tol).Should().BeTrue();
-            p.Position.Should().Be(new Vector(1, 2, 3));
+            Assert.IsTrue(p.Rotation.IsUnit(Tol));
+            Assert.AreEqual(new Vector(1, 2, 3), p.Position);
         }
 
         [TestMethod, TestCategory("Construction")]
         public void Identity_ShouldBeOriginWithNoRotation_Test()
         {
-            Pose.Identity.Position.Should().Be(new Vector(0, 0, 0));
-            Pose.Identity.Rotation.Equals(Quaternion.Identity, Tol).Should().BeTrue();
+            Assert.AreEqual(new Vector(0, 0, 0), Pose.Identity.Position);
+            Assert.IsTrue(Pose.Identity.Rotation.Equals(Quaternion.Identity, Tol));
         }
 
         [TestMethod, TestCategory("Construction")]
@@ -37,7 +35,7 @@ namespace RP.Math.Tests
             var rot = Rotation.AboutZ(Deg(90));
             var fromRotation = new Pose(new Vector(1, 0, 0), rot);
             var fromQuaternion = new Pose(new Vector(1, 0, 0), rot.ToQuaternion());
-            fromRotation.Equals(fromQuaternion, Tol).Should().BeTrue();
+            Assert.IsTrue(fromRotation.Equals(fromQuaternion, Tol));
         }
 
         [TestMethod, TestCategory("Construction")]
@@ -46,7 +44,7 @@ namespace RP.Math.Tests
             var att = new Attitude(Deg(30), Deg(20), Deg(10));
             var fromAttitude = new Pose(new Vector(2, 1, 0), att, OrthogonalAxes.DirectX);
             var fromQuaternion = new Pose(new Vector(2, 1, 0), att.ToQuaternion(OrthogonalAxes.DirectX));
-            fromAttitude.Equals(fromQuaternion, Tol).Should().BeTrue();
+            Assert.IsTrue(fromAttitude.Equals(fromQuaternion, Tol));
         }
 
         #endregion
@@ -56,7 +54,7 @@ namespace RP.Math.Tests
         [TestMethod, TestCategory("Apply")]
         public void Apply_WithIdentity_ShouldReturnThePointUnchanged_Test()
         {
-            Pose.Identity.Apply(new Vector(3, 4, 5)).Equals(new Vector(3, 4, 5), Tol).Should().BeTrue();
+            Assert.IsTrue(Pose.Identity.Apply(new Vector(3, 4, 5)).Equals(new Vector(3, 4, 5), Tol));
         }
 
         [TestMethod, TestCategory("Apply")]
@@ -64,14 +62,14 @@ namespace RP.Math.Tests
         {
             // 90 deg about Z takes local X (1,0,0) to (0,1,0), then translate by (10,0,0) -> (10,1,0).
             var pose = new Pose(new Vector(10, 0, 0), Rotation.AboutZ(Deg(90)));
-            pose.Apply(new Vector(1, 0, 0)).Equals(new Vector(10, 1, 0), Tol).Should().BeTrue();
+            Assert.IsTrue(pose.Apply(new Vector(1, 0, 0)).Equals(new Vector(10, 1, 0), Tol));
         }
 
         [TestMethod, TestCategory("Apply")]
         public void ApplyDirection_ShouldRotateButNotTranslate_Test()
         {
             var pose = new Pose(new Vector(10, 20, 30), Rotation.AboutZ(Deg(90)));
-            pose.ApplyDirection(new Vector(1, 0, 0)).Equals(new Vector(0, 1, 0), Tol).Should().BeTrue();
+            Assert.IsTrue(pose.ApplyDirection(new Vector(1, 0, 0)).Equals(new Vector(0, 1, 0), Tol));
         }
 
         [TestMethod, TestCategory("Apply")]
@@ -79,7 +77,7 @@ namespace RP.Math.Tests
         {
             var pose = new Pose(new Vector(10, -5, 2), Rotation.AboutZ(Deg(37)));
             var p = new Vector(1, 2, 3);
-            pose.ApplyInverse(pose.Apply(p)).Equals(p, Tol).Should().BeTrue();
+            Assert.IsTrue(pose.ApplyInverse(pose.Apply(p)).Equals(p, Tol));
         }
 
         [TestMethod, TestCategory("Apply")]
@@ -87,7 +85,7 @@ namespace RP.Math.Tests
         {
             var pose = new Pose(new Vector(4, -3, 7), new Attitude(Deg(25), Deg(15), Deg(40)), OrthogonalAxes.DirectX);
             var p = new Vector(1, 2, 3);
-            (pose.ToMatrix() * p).Equals(pose.Apply(p), Tol).Should().BeTrue();
+            Assert.IsTrue((pose.ToMatrix() * p).Equals(pose.Apply(p), Tol));
         }
 
         #endregion
@@ -101,7 +99,7 @@ namespace RP.Math.Tests
             var inner = new Pose(new Vector(-2, 5, 1), Rotation.AboutX(Deg(50)));
             var p = new Vector(2, -1, 4);
 
-            outer.Compose(inner).Apply(p).Equals(outer.Apply(inner.Apply(p)), Tol).Should().BeTrue();
+            Assert.IsTrue(outer.Compose(inner).Apply(p).Equals(outer.Apply(inner.Apply(p)), Tol));
         }
 
         [TestMethod, TestCategory("Compose")]
@@ -109,7 +107,7 @@ namespace RP.Math.Tests
         {
             var pose = new Pose(new Vector(10, -5, 2), new Attitude(Deg(20), Deg(35), Deg(50)), OrthogonalAxes.DirectX);
             var p = new Vector(3, 4, 5);
-            (pose * pose.Inverse()).Apply(p).Equals(p, Tol).Should().BeTrue();
+            Assert.IsTrue((pose * pose.Inverse()).Apply(p).Equals(p, Tol));
         }
 
         #endregion
@@ -121,7 +119,7 @@ namespace RP.Math.Tests
         {
             var euler = new Rotation(Deg(15), Deg(40), Deg(20));
             var pose = new Pose(new Vector(0, 0, 0), euler);
-            pose.RotationAsEuler.Equals(euler, Tol).Should().BeTrue();
+            Assert.IsTrue(pose.RotationAsEuler.Equals(euler, Tol));
         }
 
         #endregion
@@ -133,8 +131,8 @@ namespace RP.Math.Tests
         {
             var pose = new Pose(new Vector(1, 1, 1), Rotation.AboutZ(Deg(90)));
             var moved = pose.Translate(new Vector(2, 0, 0));
-            moved.Position.Should().Be(new Vector(3, 1, 1));
-            moved.Rotation.Equals(pose.Rotation, Tol).Should().BeTrue();
+            Assert.AreEqual(new Vector(3, 1, 1), moved.Position);
+            Assert.IsTrue(moved.Rotation.Equals(pose.Rotation, Tol));
         }
 
         [TestMethod, TestCategory("Conversion")]
@@ -142,8 +140,8 @@ namespace RP.Math.Tests
         {
             var pose = new Pose(new Vector(1, 2, 3), Quaternion.Identity);
             var (position, rotation) = pose;
-            position.Should().Be(new Vector(1, 2, 3));
-            rotation.Equals(Quaternion.Identity, Tol).Should().BeTrue();
+            Assert.AreEqual(new Vector(1, 2, 3), position);
+            Assert.IsTrue(rotation.Equals(Quaternion.Identity, Tol));
         }
 
         #endregion

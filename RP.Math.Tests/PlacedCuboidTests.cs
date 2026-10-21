@@ -1,7 +1,5 @@
 namespace RP.Math.Tests
 {
-    using FluentAssertions;
-
     using Microsoft.VisualStudio.TestTools.UnitTesting;
 
     /// <summary>Unit tests for the positioned <see cref="PlacedCuboid"/> type.</summary>
@@ -20,55 +18,55 @@ namespace RP.Math.Tests
         public void Measurements_ShouldDelegateToShape_Test()
         {
             var c = Unit();
-            c.Volume.Should().Be(8);
-            c.SurfaceArea.Should().Be(24);
+            Assert.AreEqual(8, c.Volume);
+            Assert.AreEqual(24, c.SurfaceArea);
         }
 
         [TestMethod, TestCategory("Containment")]
         public void Contains_ShouldRespectExtents_Test()
         {
             var c = Unit();
-            c.Contains(new Vector(0.5, 0.5, 0.5), Tol).Should().BeTrue();
-            c.Contains(new Vector(1.5, 0, 0), Tol).Should().BeFalse();
+            Assert.IsTrue(c.Contains(new Vector(0.5, 0.5, 0.5), Tol));
+            Assert.IsFalse(c.Contains(new Vector(1.5, 0, 0), Tol));
         }
 
         [TestMethod, TestCategory("Query")]
         public void ClosestPoint_ShouldClampPerAxis_Test()
         {
-            Unit().ClosestPoint(new Vector(5, 0, 0)).Equals(new Vector(1, 0, 0), Tol).Should().BeTrue();
-            Unit().ClosestPoint(new Vector(5, 5, 5)).Equals(new Vector(1, 1, 1), Tol).Should().BeTrue();
+            Assert.IsTrue(Unit().ClosestPoint(new Vector(5, 0, 0)).Equals(new Vector(1, 0, 0), Tol));
+            Assert.IsTrue(Unit().ClosestPoint(new Vector(5, 5, 5)).Equals(new Vector(1, 1, 1), Tol));
         }
 
         [TestMethod, TestCategory("Intersect")]
         public void TryIntersectRay_FromOutside_ShouldHitNearFace_Test()
         {
             var ray = new Ray(new Vector(5, 0, 0), new Vector(-1, 0, 0));
-            Unit().TryIntersect(ray, out Vector p).Should().BeTrue();
-            p.Equals(new Vector(1, 0, 0), LooseTol).Should().BeTrue();
+            Assert.IsTrue(Unit().TryIntersect(ray, out Vector p));
+            Assert.IsTrue(p.Equals(new Vector(1, 0, 0), LooseTol));
         }
 
         [TestMethod, TestCategory("Intersect")]
         public void TryIntersectRay_FromInside_ShouldHitExit_Test()
         {
             var ray = new Ray(new Vector(0, 0, 0), new Vector(1, 0, 0));
-            Unit().TryIntersect(ray, out Vector p).Should().BeTrue();
-            p.Equals(new Vector(1, 0, 0), LooseTol).Should().BeTrue();
+            Assert.IsTrue(Unit().TryIntersect(ray, out Vector p));
+            Assert.IsTrue(p.Equals(new Vector(1, 0, 0), LooseTol));
         }
 
         [TestMethod, TestCategory("Intersect")]
         public void TryIntersectLine_ShouldGiveBothFaces_Test()
         {
             var line = new Line(new Vector(0, 0, 0), new Vector(1, 0, 0));
-            Unit().TryIntersect(line, out Vector near, out Vector far).Should().BeTrue();
-            near.Equals(new Vector(-1, 0, 0), LooseTol).Should().BeTrue();
-            far.Equals(new Vector(1, 0, 0), LooseTol).Should().BeTrue();
+            Assert.IsTrue(Unit().TryIntersect(line, out Vector near, out Vector far));
+            Assert.IsTrue(near.Equals(new Vector(-1, 0, 0), LooseTol));
+            Assert.IsTrue(far.Equals(new Vector(1, 0, 0), LooseTol));
         }
 
         [TestMethod, TestCategory("Intersect")]
         public void TryIntersectRay_Missing_ShouldBeFalse_Test()
         {
             var ray = new Ray(new Vector(5, 5, 5), new Vector(1, 1, 1));
-            Unit().TryIntersect(ray, out _).Should().BeFalse();
+            Assert.IsFalse(Unit().TryIntersect(ray, out _));
         }
 
         [TestMethod, TestCategory("Placement")]
@@ -77,15 +75,15 @@ namespace RP.Math.Tests
             var pose = Pose.FromAxisAngle(new Vector(3, 0, 0), new Vector(0, 1, 0), new Angle(45, AngleUnits.DEG));
             var c = new PlacedCuboid(new Cuboid(2, 2, 2), pose);
 
-            c.Contains(pose.Apply(new Vector(0.9, 0.9, 0.9)), LooseTol).Should().BeTrue();
-            c.Contains(pose.Apply(new Vector(1.1, 0, 0)), LooseTol).Should().BeFalse();
-            c.Center.Equals(new Vector(3, 0, 0), Tol).Should().BeTrue();
+            Assert.IsTrue(c.Contains(pose.Apply(new Vector(0.9, 0.9, 0.9)), LooseTol));
+            Assert.IsFalse(c.Contains(pose.Apply(new Vector(1.1, 0, 0)), LooseTol));
+            Assert.IsTrue(c.Center.Equals(new Vector(3, 0, 0), Tol));
         }
 
         [TestMethod, TestCategory("Corners")]
         public void Corners_ShouldReturnEight_Test()
         {
-            Unit().Corners().Length.Should().Be(8);
+            Assert.AreEqual(8, Unit().Corners().Length);
         }
     }
 }

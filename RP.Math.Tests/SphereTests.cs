@@ -2,7 +2,6 @@ namespace RP.Math.Tests
 {
     using System;
 
-    using FluentAssertions;
 
     using Microsoft.VisualStudio.TestTools.UnitTesting;
 
@@ -19,41 +18,41 @@ namespace RP.Math.Tests
         public void Measurements_Test()
         {
             var s = new Sphere(2);
-            s.Volume.Should().BeApproximately((4.0 / 3.0) * Math.PI * 8, Tol);
-            s.SurfaceArea.Should().BeApproximately(4 * Math.PI * 4, Tol);
-            s.Diameter.Should().Be(4);
+            Assert.AreEqual((4.0 / 3.0) * Math.PI * 8, s.Volume, Tol);
+            Assert.AreEqual(4 * Math.PI * 4, s.SurfaceArea, Tol);
+            Assert.AreEqual(4, s.Diameter);
         }
 
         [TestMethod, TestCategory("Conceptual")]
         public void Unit_And_NegativeRadius_Test()
         {
-            Sphere.Unit.Radius.Should().Be(1);
+            Assert.AreEqual(1, Sphere.Unit.Radius);
             Action act = () => new Sphere(-1);
-            act.Should().Throw<ArgumentOutOfRangeException>();
+            Assert.ThrowsException<ArgumentOutOfRangeException>(act);
         }
 
         [TestMethod, TestCategory("Conceptual")]
         public void Comparison_ByVolume_Test()
         {
-            (new Sphere(3) > new Sphere(2)).Should().BeTrue();
+            Assert.IsTrue((new Sphere(3) > new Sphere(2)));
         }
 
         [TestMethod, TestCategory("Placed")]
         public void Contains_Test()
         {
             var s = PlacedSphere.At(new Sphere(2), new Vector(0, 0, 0));
-            s.Contains(new Vector(1, 0, 0)).Should().BeTrue();
-            s.Contains(new Vector(2, 0, 0)).Should().BeTrue();   // on the surface
-            s.Contains(new Vector(3, 0, 0)).Should().BeFalse();
+            Assert.IsTrue(s.Contains(new Vector(1, 0, 0)));
+            Assert.IsTrue(s.Contains(new Vector(2, 0, 0)));   // on the surface
+            Assert.IsFalse(s.Contains(new Vector(3, 0, 0)));
         }
 
         [TestMethod, TestCategory("Placed")]
         public void ClosestSurfacePoint_And_SignedDistance_Test()
         {
             var s = PlacedSphere.At(new Sphere(2), new Vector(0, 0, 0));
-            s.ClosestSurfacePoint(new Vector(10, 0, 0)).Equals(new Vector(2, 0, 0), LooseTol).Should().BeTrue();
-            s.SignedDistanceTo(new Vector(5, 0, 0)).Should().BeApproximately(3, Tol);
-            s.SignedDistanceTo(new Vector(1, 0, 0)).Should().BeApproximately(-1, Tol); // inside
+            Assert.IsTrue(s.ClosestSurfacePoint(new Vector(10, 0, 0)).Equals(new Vector(2, 0, 0), LooseTol));
+            Assert.AreEqual(3, s.SignedDistanceTo(new Vector(5, 0, 0)), Tol);
+            Assert.AreEqual(-1, s.SignedDistanceTo(new Vector(1, 0, 0)), Tol); // inside
         }
 
         [TestMethod, TestCategory("Placed")]
@@ -62,37 +61,37 @@ namespace RP.Math.Tests
             var a = PlacedSphere.At(new Sphere(2), new Vector(0, 0, 0));
             var near = PlacedSphere.At(new Sphere(2), new Vector(3, 0, 0));
             var far = PlacedSphere.At(new Sphere(2), new Vector(10, 0, 0));
-            a.Intersects(near).Should().BeTrue();
-            a.Intersects(far).Should().BeFalse();
+            Assert.IsTrue(a.Intersects(near));
+            Assert.IsFalse(a.Intersects(far));
         }
 
         [TestMethod, TestCategory("Placed")]
         public void TryIntersectRay_FromOutsideAndInside_Test()
         {
             var s = PlacedSphere.At(new Sphere(2), new Vector(0, 0, 0));
-            s.TryIntersect(new Ray(new Vector(10, 0, 0), new Vector(-1, 0, 0)), out Vector p).Should().BeTrue();
-            p.Equals(new Vector(2, 0, 0), LooseTol).Should().BeTrue();
+            Assert.IsTrue(s.TryIntersect(new Ray(new Vector(10, 0, 0), new Vector(-1, 0, 0)), out Vector p));
+            Assert.IsTrue(p.Equals(new Vector(2, 0, 0), LooseTol));
 
-            s.TryIntersect(new Ray(new Vector(0, 0, 0), new Vector(1, 0, 0)), out Vector exit).Should().BeTrue();
-            exit.Equals(new Vector(2, 0, 0), LooseTol).Should().BeTrue();
+            Assert.IsTrue(s.TryIntersect(new Ray(new Vector(0, 0, 0), new Vector(1, 0, 0)), out Vector exit));
+            Assert.IsTrue(exit.Equals(new Vector(2, 0, 0), LooseTol));
 
-            s.TryIntersect(new Ray(new Vector(10, 0, 0), new Vector(1, 0, 0)), out _).Should().BeFalse();
+            Assert.IsFalse(s.TryIntersect(new Ray(new Vector(10, 0, 0), new Vector(1, 0, 0)), out _));
         }
 
         [TestMethod, TestCategory("Placed")]
         public void TryIntersectLine_BothCrossings_Test()
         {
             var s = PlacedSphere.At(new Sphere(2), new Vector(0, 0, 0));
-            s.TryIntersect(new Line(new Vector(0, 0, 0), new Vector(1, 0, 0)), out Vector near, out Vector far).Should().BeTrue();
-            near.Equals(new Vector(-2, 0, 0), LooseTol).Should().BeTrue();
-            far.Equals(new Vector(2, 0, 0), LooseTol).Should().BeTrue();
+            Assert.IsTrue(s.TryIntersect(new Line(new Vector(0, 0, 0), new Vector(1, 0, 0)), out Vector near, out Vector far));
+            Assert.IsTrue(near.Equals(new Vector(-2, 0, 0), LooseTol));
+            Assert.IsTrue(far.Equals(new Vector(2, 0, 0), LooseTol));
         }
 
         [TestMethod, TestCategory("Placed")]
         public void Translate_MovesCentre_Test()
         {
             var s = PlacedSphere.At(new Sphere(2), new Vector(0, 0, 0)).Translate(new Vector(1, 2, 3));
-            s.Center.Equals(new Vector(1, 2, 3), Tol).Should().BeTrue();
+            Assert.IsTrue(s.Center.Equals(new Vector(1, 2, 3), Tol));
         }
     }
 }

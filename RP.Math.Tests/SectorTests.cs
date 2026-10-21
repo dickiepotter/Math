@@ -1,7 +1,5 @@
 namespace RP.Math.Tests
 {
-    using FluentAssertions;
-
     using Microsoft.VisualStudio.TestTools.UnitTesting;
 
     using Math = System.Math;
@@ -22,36 +20,36 @@ namespace RP.Math.Tests
         public void Measurements_Test()
         {
             var s = QuarterCircle();
-            s.Area.Should().BeApproximately(0.5 * 4 * (Math.PI / 2), Tol); // = pi
-            s.ArcLength.Should().BeApproximately(2 * (Math.PI / 2), Tol);  // = pi
-            s.ChordLength.Should().BeApproximately(2 * 2 * Math.Sin(Math.PI / 4), Tol);
+            Assert.AreEqual(0.5 * 4 * (Math.PI / 2), s.Area, Tol); // = pi
+            Assert.AreEqual(2 * (Math.PI / 2), s.ArcLength, Tol);  // = pi
+            Assert.AreEqual(2 * 2 * Math.Sin(Math.PI / 4), s.ChordLength, Tol);
         }
 
         [TestMethod, TestCategory("Placed")]
         public void Contains_WithinRadiusAndSweep_Test()
         {
             var s = PlacedSector.InXYPlane(QuarterCircle(), new Vector(0, 0, 0));
-            s.Contains(new Vector(1, 0.5, 0), LooseTol).Should().BeTrue();   // angle ~27deg, r ~1.1
-            s.Contains(new Vector(-1, 0, 0), LooseTol).Should().BeFalse();   // angle 180deg, outside sweep
-            s.Contains(new Vector(1, -0.5, 0), LooseTol).Should().BeFalse(); // negative angle, outside sweep
-            s.Contains(new Vector(3, 0, 0), LooseTol).Should().BeFalse();    // beyond the radius
+            Assert.IsTrue(s.Contains(new Vector(1, 0.5, 0), LooseTol));   // angle ~27deg, r ~1.1
+            Assert.IsFalse(s.Contains(new Vector(-1, 0, 0), LooseTol));   // angle 180deg, outside sweep
+            Assert.IsFalse(s.Contains(new Vector(1, -0.5, 0), LooseTol)); // negative angle, outside sweep
+            Assert.IsFalse(s.Contains(new Vector(3, 0, 0), LooseTol));    // beyond the radius
         }
 
         [TestMethod, TestCategory("Placed")]
         public void ClosestPoint_OnArcAndToApex_Test()
         {
             var s = PlacedSector.InXYPlane(QuarterCircle(), new Vector(0, 0, 0));
-            s.ClosestPoint(new Vector(3, 0, 0)).Equals(new Vector(2, 0, 0), LooseTol).Should().BeTrue(); // out along the arc
-            s.ClosestPoint(new Vector(-1, 0, 0)).Equals(new Vector(0, 0, 0), LooseTol).Should().BeTrue(); // nearest is the apex
+            Assert.IsTrue(s.ClosestPoint(new Vector(3, 0, 0)).Equals(new Vector(2, 0, 0), LooseTol)); // out along the arc
+            Assert.IsTrue(s.ClosestPoint(new Vector(-1, 0, 0)).Equals(new Vector(0, 0, 0), LooseTol)); // nearest is the apex
         }
 
         [TestMethod, TestCategory("Placed")]
         public void TryIntersect_InsideAndOutsideSweep_Test()
         {
             var s = PlacedSector.InXYPlane(QuarterCircle(), new Vector(0, 0, 0));
-            s.TryIntersect(new Ray(new Vector(1, 0.2, 5), new Vector(0, 0, -1)), out Vector p).Should().BeTrue();
-            p.Equals(new Vector(1, 0.2, 0), LooseTol).Should().BeTrue();
-            s.TryIntersect(new Ray(new Vector(-1, 0, 5), new Vector(0, 0, -1)), out _).Should().BeFalse();
+            Assert.IsTrue(s.TryIntersect(new Ray(new Vector(1, 0.2, 5), new Vector(0, 0, -1)), out Vector p));
+            Assert.IsTrue(p.Equals(new Vector(1, 0.2, 0), LooseTol));
+            Assert.IsFalse(s.TryIntersect(new Ray(new Vector(-1, 0, 5), new Vector(0, 0, -1)), out _));
         }
     }
 }

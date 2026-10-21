@@ -3,7 +3,6 @@ namespace RP.Math.Tests
     using System;
     using System.Linq;
 
-    using FluentAssertions;
 
     using Microsoft.VisualStudio.TestTools.UnitTesting;
 
@@ -53,9 +52,8 @@ namespace RP.Math.Tests
 
                 double angle = Vector.Angle(v, opposite);
 
-                double.IsNaN(angle).Should().BeFalse(
-                    $"the angle between {v} and its negation must be pi, not NaN");
-                angle.Should().BeApproximately(Math.PI, 1e-9);
+                Assert.IsFalse(double.IsNaN(angle), $"the angle between {v} and its negation must be pi, not NaN");
+                Assert.AreEqual(Math.PI, angle, 1e-9);
             }
         }
 
@@ -83,12 +81,12 @@ namespace RP.Math.Tests
 
             // The translation column must survive composition unchanged (scale has no
             // translation part): (T*S)[0,3] == 10.  Reversed product gives 20.
-            ts[0, 3].Should().Be(10);
+            Assert.AreEqual(10, ts[0, 3]);
 
             var mapped = ts * new Vector(1, 0, 0);
-            mapped.X.Should().Be(12);
-            mapped.Y.Should().Be(0);
-            mapped.Z.Should().Be(0);
+            Assert.AreEqual(12, mapped.X);
+            Assert.AreEqual(0, mapped.Y);
+            Assert.AreEqual(0, mapped.Z);
         }
 
         // ------------------------------------------------------------------
@@ -107,13 +105,13 @@ namespace RP.Math.Tests
             var scale = Matrix.ScalingMatrix(new[] { 2.0, 3.0, 4.0 });
 
             // Diagonal carries the scale factors; translation column is zero.
-            scale[0, 0].Should().Be(2);
-            scale[1, 1].Should().Be(3);
-            scale[2, 2].Should().Be(4);
-            scale[0, 3].Should().Be(0);
+            Assert.AreEqual(2, scale[0, 0]);
+            Assert.AreEqual(3, scale[1, 1]);
+            Assert.AreEqual(4, scale[2, 2]);
+            Assert.AreEqual(0, scale[0, 3]);
 
             var scaled = scale * new Vector(1, 1, 1);
-            scaled.Should().Be(new Vector(2, 3, 4));
+            Assert.AreEqual(new Vector(2, 3, 4), scaled);
         }
 
         // ------------------------------------------------------------------
@@ -133,8 +131,8 @@ namespace RP.Math.Tests
             var a = new Angle(540, AngleUnits.DEG);
 
             // 540 deg and 180 deg are the same direction; the canonical value is +180.
-            a.Deg.Should().BeApproximately(180, 1e-9);
-            a.Rad.Should().BeApproximately(Math.PI, 1e-9);
+            Assert.AreEqual(180, a.Deg, 1e-9);
+            Assert.AreEqual(Math.PI, a.Rad, 1e-9);
         }
 
         // ------------------------------------------------------------------
@@ -155,16 +153,16 @@ namespace RP.Math.Tests
         {
             double[] roots = PolynomialRoots.SolveQuadratic(1, -1e8, 1);
 
-            roots.Should().HaveCount(2);
+            Assert.AreEqual(2, roots.Length);
 
             double small = roots.Min();
             double large = roots.Max();
 
             // Product of the roots equals c/a = 1 (Vieta).  This is the cleanest invariant.
-            (small * large).Should().BeApproximately(1.0, 1e-9);
+            Assert.AreEqual(1.0, (small * large), 1e-9);
 
             // The small root is 1e-8 to far better than the ~25% error the naive form gives.
-            small.Should().BeApproximately(1e-8, 1e-11);
+            Assert.AreEqual(1e-8, small, 1e-11);
         }
 
         // ------------------------------------------------------------------
@@ -183,7 +181,7 @@ namespace RP.Math.Tests
 
             Action act = () => axes.ToString();
 
-            act.Should().NotThrow();
+            act();
         }
 
         // ------------------------------------------------------------------
@@ -204,8 +202,8 @@ namespace RP.Math.Tests
             var negated = -a;
 
             // The negative of +90 deg is -90 deg, and the two must cancel.
-            negated.Rad.Should().BeApproximately(-Math.PI / 2, 1e-9);
-            (a + negated).Rad.Should().BeApproximately(0, 1e-9);
+            Assert.AreEqual(-Math.PI / 2, negated.Rad, 1e-9);
+            Assert.AreEqual(0, (a + negated).Rad, 1e-9);
         }
     }
 }

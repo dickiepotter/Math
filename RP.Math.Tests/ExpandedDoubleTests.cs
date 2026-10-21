@@ -9,8 +9,6 @@
 
 namespace RP.Math.Tests
 {
-    using FluentAssertions;
-
     using Microsoft.VisualStudio.TestTools.UnitTesting;
 
     [TestClass]
@@ -24,7 +22,7 @@ namespace RP.Math.Tests
             double d = 100;
             var result = new ExpandedDouble(d);
 
-            result.IsNegative.Should().Be(false, "100 is a positive number");
+            Assert.AreEqual(false, result.IsNegative, "100 is a positive number");
         }
 
         [TestMethod, TestCategory("IsNegative")]
@@ -33,7 +31,7 @@ namespace RP.Math.Tests
             double d = -100;
             var result = new ExpandedDouble(d);
 
-            result.IsNegative.Should().Be(true, "-100 is a negative number");
+            Assert.AreEqual(true, result.IsNegative, "-100 is a negative number");
         }
 
         [TestMethod, TestCategory("IsNegative")]
@@ -42,7 +40,7 @@ namespace RP.Math.Tests
             double d = 100.005;
             var result = new ExpandedDouble(d);
 
-            result.IsNegative.Should().Be(false, "100.005 is a positive number");
+            Assert.AreEqual(false, result.IsNegative, "100.005 is a positive number");
         }
 
         [TestMethod, TestCategory("IsNegative")]
@@ -51,7 +49,7 @@ namespace RP.Math.Tests
             double d = -100.005;
             var result = new ExpandedDouble(d);
 
-            result.IsNegative.Should().Be(true, "-100.005 is a negative number");
+            Assert.AreEqual(true, result.IsNegative, "-100.005 is a negative number");
         }
 
         [TestMethod, TestCategory("IsNegative")]
@@ -60,7 +58,7 @@ namespace RP.Math.Tests
             double d = double.PositiveInfinity;
             var result = new ExpandedDouble(d);
 
-            result.IsNegative.Should().Be(false, "+inf is a positive number");
+            Assert.AreEqual(false, result.IsNegative, "+inf is a positive number");
         }
 
         [TestMethod, TestCategory("IsNegative")]
@@ -69,7 +67,7 @@ namespace RP.Math.Tests
             double d = double.NegativeInfinity;
             var result = new ExpandedDouble(d);
 
-            result.IsNegative.Should().Be(true, "-inf is a negative number");
+            Assert.AreEqual(true, result.IsNegative, "-inf is a negative number");
         }
 
         [TestMethod, TestCategory("IsNegative")]
@@ -79,7 +77,7 @@ namespace RP.Math.Tests
             double d = double.NaN;
             var result = new ExpandedDouble(d);
 
-            result.IsNegative.Should().Be(true, "-NaN is a negative number");
+            Assert.AreEqual(true, result.IsNegative, "-NaN is a negative number");
         }
 
         #endregion
@@ -92,7 +90,7 @@ namespace RP.Math.Tests
             double d = double.NaN;
             var result = new ExpandedDouble(d);
 
-            result.IsNaN.Should().Be(true);
+            Assert.AreEqual(true, result.IsNaN);
         }
 
         [TestMethod]
@@ -101,7 +99,7 @@ namespace RP.Math.Tests
             double d = 1d;
             var result = new ExpandedDouble(d);
 
-            result.IsNaN.Should().Be(false);
+            Assert.AreEqual(false, result.IsNaN);
         }
 
         [TestMethod]
@@ -110,7 +108,7 @@ namespace RP.Math.Tests
             double d = -1d;
             var result = new ExpandedDouble(d);
 
-            result.IsNaN.Should().Be(false);
+            Assert.AreEqual(false, result.IsNaN);
         }
 
         /// <summary>
@@ -122,7 +120,7 @@ namespace RP.Math.Tests
             double d = 0d / 0d; // Produces quite NaN
             var result = new ExpandedDouble(d);
 
-            result.IsSignallingNaN.Should().Be(true);
+            Assert.AreEqual(true, result.IsSignallingNaN);
         }
 
         [TestMethod]
@@ -131,7 +129,7 @@ namespace RP.Math.Tests
             double d = 0d / 0d;
             var result = new ExpandedDouble(d);
 
-            result.IsQuietNaN.Should().Be(true);
+            Assert.AreEqual(true, result.IsQuietNaN);
         }
 
         #endregion
@@ -144,7 +142,7 @@ namespace RP.Math.Tests
             double d = double.PositiveInfinity;
             var result = new ExpandedDouble(d);
 
-            result.IsInifinite.Should().Be(true);
+            Assert.AreEqual(true, result.IsInifinite);
         }
 
         [TestMethod]
@@ -153,7 +151,7 @@ namespace RP.Math.Tests
             double d = double.NegativeInfinity;
             var result = new ExpandedDouble(d);
 
-            result.IsInifinite.Should().Be(true);
+            Assert.AreEqual(true, result.IsInifinite);
         }
 
         [TestMethod]
@@ -162,7 +160,7 @@ namespace RP.Math.Tests
             double d = 1d;
             var result = new ExpandedDouble(d);
 
-            result.IsInifinite.Should().Be(false);
+            Assert.AreEqual(false, result.IsInifinite);
         }
 
         [TestMethod]
@@ -171,7 +169,7 @@ namespace RP.Math.Tests
             double d = double.PositiveInfinity;
             var result = new ExpandedDouble(d);
 
-            result.IsPositiveInfinity.Should().Be(true);
+            Assert.AreEqual(true, result.IsPositiveInfinity);
         }
 
         [TestMethod]
@@ -180,7 +178,7 @@ namespace RP.Math.Tests
             double d = double.NegativeInfinity;
             var result = new ExpandedDouble(d);
 
-            result.IsPositiveInfinity.Should().Be(false);
+            Assert.AreEqual(false, result.IsPositiveInfinity);
         }
 
         [TestMethod]
@@ -189,7 +187,7 @@ namespace RP.Math.Tests
             double d = 1d;
             var result = new ExpandedDouble(d);
 
-            result.IsPositiveInfinity.Should().Be(false);
+            Assert.AreEqual(false, result.IsPositiveInfinity);
         }
 
         [TestMethod]
@@ -198,7 +196,7 @@ namespace RP.Math.Tests
             double d = double.PositiveInfinity;
             var result = new ExpandedDouble(d);
 
-            result.IsNegativeInfinity.Should().Be(false);
+            Assert.AreEqual(false, result.IsNegativeInfinity);
         }
 
         [TestMethod]
@@ -207,7 +205,7 @@ namespace RP.Math.Tests
             double d = double.NegativeInfinity;
             var result = new ExpandedDouble(d);
 
-            result.IsNegativeInfinity.Should().Be(true);
+            Assert.AreEqual(true, result.IsNegativeInfinity);
         }
 
         [TestMethod]
@@ -216,7 +214,7 @@ namespace RP.Math.Tests
             double d = 1d;
             var result = new ExpandedDouble(d);
 
-            result.IsNegativeInfinity.Should().Be(false);
+            Assert.AreEqual(false, result.IsNegativeInfinity);
         }
 
         #endregion
@@ -229,7 +227,7 @@ namespace RP.Math.Tests
             double d = 75.5;
             var result = new ExpandedDouble(d);
 
-            result.ExponentAsStored.Should().Be(1029, "The exponent of 75.5 should be 1029 before removing the bias");
+            Assert.AreEqual(1029, result.ExponentAsStored, "The exponent of 75.5 should be 1029 before removing the bias");
         }
 
         [TestMethod]
@@ -238,7 +236,7 @@ namespace RP.Math.Tests
             double d = 75.5;
             var result = new ExpandedDouble(d);
 
-            result.Exponent.Should().Be(6, "75.5 = 1.0010111 x 2^6, so the unbiased exponent is 6 (stored 1029 minus the IEEE-754 bias of 1023)");
+            Assert.AreEqual(6, result.Exponent, "75.5 = 1.0010111 x 2^6, so the unbiased exponent is 6 (stored 1029 minus the IEEE-754 bias of 1023)");
         }
 
         [TestMethod]
@@ -247,7 +245,7 @@ namespace RP.Math.Tests
             double d = 75.5;
             var result = new ExpandedDouble(d);
 
-            result.ExponentBitsAsStored.Should().BeEquivalentTo(new[] { 1, 0, 0, 0, 0, 0, 0, 0, 1, 0, 1 });
+            CollectionAssert.AreEqual(new[] { 1, 0, 0, 0, 0, 0, 0, 0, 1, 0, 1 }, System.Linq.Enumerable.ToArray(result.ExponentBitsAsStored));
         }
 
         #endregion
@@ -260,7 +258,7 @@ namespace RP.Math.Tests
             double d = 75.5;
             var result = new ExpandedDouble(d);
 
-            result.MantissaAsStored.Should().Be(809240558043136, "The mantissa of 75.5 should be 809240558043136 as it is stored in binary");
+            Assert.AreEqual(809240558043136UL, result.MantissaAsStored, "The mantissa of 75.5 should be 809240558043136 as it is stored in binary");
         }
 
         [TestMethod]
@@ -269,7 +267,7 @@ namespace RP.Math.Tests
             double d = 75.5;
             var result = new ExpandedDouble(d);
 
-            result.Mantissa.Should().Be(5312840185413632, "the mantissa of 75.5 is the stored 809240558043136 with the implicit leading one restored at bit 52 (+2^52)");
+            Assert.AreEqual(5312840185413632UL, result.Mantissa, "the mantissa of 75.5 is the stored 809240558043136 with the implicit leading one restored at bit 52 (+2^52)");
         }
 
         [TestMethod]
@@ -278,8 +276,7 @@ namespace RP.Math.Tests
             double d = 75.5;
             var result = new ExpandedDouble(d);
 
-            result.MantissaBitsAsStored.Should()
-                .BeEquivalentTo(new[] { 0, 0, 1, 0, 1, 1, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 });
+            CollectionAssert.AreEqual(new[] { 0, 0, 1, 0, 1, 1, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 }, System.Linq.Enumerable.ToArray(result.MantissaBitsAsStored));
         }
 
         #endregion

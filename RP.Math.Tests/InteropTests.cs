@@ -1,7 +1,5 @@
 namespace RP.Math.Tests
 {
-    using FluentAssertions;
-
     using Microsoft.VisualStudio.TestTools.UnitTesting;
 
     using Math = System.Math;
@@ -25,24 +23,24 @@ namespace RP.Math.Tests
         public void Vector_RotateByQuaternion_ShouldMatchQuaternionRotate_Test()
         {
             var q = Quaternion.FromAxisAngle(new Vector(0, 0, 1), new Angle(Math.PI / 2));
-            V.Rotate(q).Equals(q.Rotate(V), LooseTol).Should().BeTrue();
+            Assert.IsTrue(V.Rotate(q).Equals(q.Rotate(V), LooseTol));
         }
 
         [TestMethod, TestCategory("VectorInterop")]
         public void Vector_RotateByAxisAngle_ShouldMatch_Test()
         {
             var aa = new AxisAngle(new Vector(0, 1, 0), new Angle(Math.PI / 3));
-            V.Rotate(aa).Equals(aa.Rotate(V), LooseTol).Should().BeTrue();
+            Assert.IsTrue(V.Rotate(aa).Equals(aa.Rotate(V), LooseTol));
         }
 
         [TestMethod, TestCategory("VectorInterop")]
         public void Vector_RotateByRotationAndAttitude_ShouldMatch_Test()
         {
             var r = Rotation.AboutZ(new Angle(Math.PI / 2));
-            V.Rotate(r).Equals(r.Rotate(V), LooseTol).Should().BeTrue();
+            Assert.IsTrue(V.Rotate(r).Equals(r.Rotate(V), LooseTol));
 
             var a = Attitude.FromYaw(new Angle(Math.PI / 4));
-            V.Rotate(a, OrthogonalAxes.DirectX).Equals(a.Rotate(V, OrthogonalAxes.DirectX), LooseTol).Should().BeTrue();
+            Assert.IsTrue(V.Rotate(a, OrthogonalAxes.DirectX).Equals(a.Rotate(V, OrthogonalAxes.DirectX), LooseTol));
         }
 
         #endregion
@@ -53,14 +51,14 @@ namespace RP.Math.Tests
         public void Vector_TransformByMatrix_ShouldEqualMatrixTimesVector_Test()
         {
             var m = Rotation.AboutX(new Angle(Math.PI / 2)).ToMatrix();
-            V.Transform(m).Equals(m * V, LooseTol).Should().BeTrue();
+            Assert.IsTrue(V.Transform(m).Equals(m * V, LooseTol));
         }
 
         [TestMethod, TestCategory("VectorInterop")]
         public void Vector_TransformByPose_ShouldEqualPoseApply_Test()
         {
             var pose = new Pose(new Vector(10, 0, 0), Rotation.AboutZ(new Angle(Math.PI / 2)));
-            V.Transform(pose).Equals(pose.Apply(V), LooseTol).Should().BeTrue();
+            Assert.IsTrue(V.Transform(pose).Equals(pose.Apply(V), LooseTol));
         }
 
         #endregion
@@ -72,8 +70,8 @@ namespace RP.Math.Tests
         {
             var a = new Vector(1, 0, 0);
             var b = new Vector(0, 1, 0);
-            a.AngleTo(b).Rad.Should().BeApproximately(a.Angle(b), Tol);
-            a.AngleTo(b).Rad.Should().BeApproximately(Math.PI / 2, Tol);
+            Assert.AreEqual(a.Angle(b), a.AngleTo(b).Rad, Tol);
+            Assert.AreEqual(Math.PI / 2, a.AngleTo(b).Rad, Tol);
         }
 
         #endregion
@@ -85,7 +83,7 @@ namespace RP.Math.Tests
         {
             var q = Quaternion.FromAxisAngle(new Vector(1, 2, 3), new Angle(1.1));
             var back = q.ToMatrix().ToQuaternion();
-            back.AngleTo(q).Rad.Should().BeApproximately(0, LooseTol);
+            Assert.AreEqual(0, back.AngleTo(q).Rad, LooseTol);
         }
 
         [TestMethod, TestCategory("MatrixInterop")]
@@ -94,13 +92,13 @@ namespace RP.Math.Tests
             // A ~180° rotation drives the trace negative, exercising the pivot branches.
             var q = Quaternion.FromAxisAngle(new Vector(0, 1, 0), new Angle(Math.PI - 1e-3));
             var back = q.ToMatrix().ToQuaternion();
-            back.AngleTo(q).Rad.Should().BeApproximately(0, LooseTol);
+            Assert.AreEqual(0, back.AngleTo(q).Rad, LooseTol);
         }
 
         [TestMethod, TestCategory("MatrixInterop")]
         public void Matrix_ToQuaternion_OfIdentity_ShouldBeIdentity_Test()
         {
-            Matrix.Identity.ToQuaternion().Equals(Quaternion.Identity, LooseTol).Should().BeTrue();
+            Assert.IsTrue(Matrix.Identity.ToQuaternion().Equals(Quaternion.Identity, LooseTol));
         }
 
         #endregion
@@ -111,7 +109,7 @@ namespace RP.Math.Tests
         public void Quaternion_FromAxisAngleType_ShouldMatchVectorAngleForm_Test()
         {
             var aa = new AxisAngle(new Vector(0, 0, 1), new Angle(0.7));
-            Quaternion.FromAxisAngle(aa).Equals(Quaternion.FromAxisAngle(aa.Axis, aa.Angle), Tol).Should().BeTrue();
+            Assert.IsTrue(Quaternion.FromAxisAngle(aa).Equals(Quaternion.FromAxisAngle(aa.Axis, aa.Angle), Tol));
         }
 
         [TestMethod, TestCategory("Interop")]
@@ -119,7 +117,7 @@ namespace RP.Math.Tests
         {
             var aa = new AxisAngle(new Vector(0, 1, 0), new Angle(Math.PI / 2));
             var pose = new Pose(new Vector(0, 0, 0), aa);
-            pose.Apply(V).Equals(aa.Rotate(V), LooseTol).Should().BeTrue();
+            Assert.IsTrue(pose.Apply(V).Equals(aa.Rotate(V), LooseTol));
         }
 
         #endregion
@@ -131,8 +129,8 @@ namespace RP.Math.Tests
         {
             var line = new Line(new Vector(1, 2, 3), new Vector(0, 0, 2));
             var ray = line.ToRay();
-            ray.Origin.Equals(new Vector(1, 2, 3), Tol).Should().BeTrue();
-            ray.Direction.Equals(new Vector(0, 0, 1), Tol).Should().BeTrue();
+            Assert.IsTrue(ray.Origin.Equals(new Vector(1, 2, 3), Tol));
+            Assert.IsTrue(ray.Direction.Equals(new Vector(0, 0, 1), Tol));
         }
 
         [TestMethod, TestCategory("LineFamily")]
@@ -140,8 +138,8 @@ namespace RP.Math.Tests
         {
             var ray = new Ray(new Vector(1, 2, 3), new Vector(0, 5, 0));
             var line = ray.ToLine();
-            line.Point.Equals(new Vector(1, 2, 3), Tol).Should().BeTrue();
-            line.Direction.Equals(new Vector(0, 1, 0), Tol).Should().BeTrue();
+            Assert.IsTrue(line.Point.Equals(new Vector(1, 2, 3), Tol));
+            Assert.IsTrue(line.Direction.Equals(new Vector(0, 1, 0), Tol));
         }
 
         [TestMethod, TestCategory("LineFamily")]
@@ -149,8 +147,8 @@ namespace RP.Math.Tests
         {
             var seg = new LineSegment(new Vector(0, 0, 0), new Vector(0, 0, 4));
             var ray = seg.ToRay();
-            ray.Origin.Equals(new Vector(0, 0, 0), Tol).Should().BeTrue();
-            ray.Direction.Equals(new Vector(0, 0, 1), Tol).Should().BeTrue();
+            Assert.IsTrue(ray.Origin.Equals(new Vector(0, 0, 0), Tol));
+            Assert.IsTrue(ray.Direction.Equals(new Vector(0, 0, 1), Tol));
         }
 
         #endregion

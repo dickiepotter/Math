@@ -1,7 +1,5 @@
 namespace RP.Math.Tests
 {
-    using FluentAssertions;
-
     using Microsoft.VisualStudio.TestTools.UnitTesting;
 
     /// <summary>
@@ -17,68 +15,68 @@ namespace RP.Math.Tests
         public void Rad_FromRadianConstructor_ShouldRoundTrip_Test()
         {
             var a = new Angle(System.Math.PI);
-            a.Rad.Should().BeApproximately(System.Math.PI, Tolerance);
+            Assert.AreEqual(System.Math.PI, a.Rad, Tolerance);
         }
 
         [TestMethod, TestCategory("Angle")]
         public void Deg_FromDegreeConstructor_ShouldExposeThoseDegrees_Test()
         {
             var a = new Angle(90, AngleUnits.DEG);
-            a.Deg.Should().BeApproximately(90, Tolerance);
+            Assert.AreEqual(90, a.Deg, Tolerance);
         }
 
         [TestMethod, TestCategory("Angle")]
         public void Deg90_ShouldEqualHalfPiRadians_Test()
         {
             var a = new Angle(90, AngleUnits.DEG);
-            a.Rad.Should().BeApproximately(System.Math.PI / 2, Tolerance);
+            Assert.AreEqual(System.Math.PI / 2, a.Rad, Tolerance);
         }
 
         [TestMethod, TestCategory("Angle")]
         public void Grad_FromGradianConstructor_ShouldExposeThoseGradians_Test()
         {
             var a = new Angle(200, AngleUnits.GRAD);
-            a.Grad.Should().BeApproximately(200, Tolerance);
+            Assert.AreEqual(200, a.Grad, Tolerance);
         }
 
         [TestMethod, TestCategory("Angle")]
         public void RightAngle_ShouldBeHalfPi_Test()
         {
-            Angle.Right_Angle.Rad.Should().BeApproximately(System.Math.PI / 2, Tolerance);
+            Assert.AreEqual(System.Math.PI / 2, Angle.Right_Angle.Rad, Tolerance);
         }
 
         [TestMethod, TestCategory("Angle")]
         public void StraightAngle_ShouldBePi_Test()
         {
-            Angle.Strait_Angle.Rad.Should().BeApproximately(System.Math.PI, Tolerance);
+            Assert.AreEqual(System.Math.PI, Angle.Strait_Angle.Rad, Tolerance);
         }
 
         [TestMethod, TestCategory("Angle")]
         public void Addition_OfTwoAngles_ShouldSumRadians_Test()
         {
             var sum = new Angle(1.0) + new Angle(0.5);
-            sum.Rad.Should().BeApproximately(1.5, Tolerance);
+            Assert.AreEqual(1.5, sum.Rad, Tolerance);
         }
 
         [TestMethod, TestCategory("Angle")]
         public void Subtraction_OfTwoAngles_ShouldSubtractRadians_Test()
         {
             var diff = new Angle(1.0) - new Angle(0.25);
-            diff.Rad.Should().BeApproximately(0.75, Tolerance);
+            Assert.AreEqual(0.75, diff.Rad, Tolerance);
         }
 
         [TestMethod, TestCategory("Angle")]
         public void ImplicitConversion_FromDouble_ShouldSetRadians_Test()
         {
             Angle a = 1.25;
-            a.Rad.Should().BeApproximately(1.25, Tolerance);
+            Assert.AreEqual(1.25, a.Rad, Tolerance);
         }
 
         [TestMethod, TestCategory("Angle")]
         public void ImplicitConversion_ToDouble_ShouldYieldRadians_Test()
         {
             double r = new Angle(0.5);
-            r.Should().BeApproximately(0.5, Tolerance);
+            Assert.AreEqual(0.5, r, Tolerance);
         }
     }
 }

@@ -3,7 +3,6 @@
     using System;
     using System.Diagnostics.CodeAnalysis;
 
-    using FluentAssertions;
 
     using Microsoft.VisualStudio.TestTools.UnitTesting;
 
@@ -30,9 +29,9 @@
         public void Construction_WithXYZParameters_ShouldConstructCorrectly_Test()
         {
             var vector = new Vector(100, -100, 0.01);
-            vector.X.Should().Be(100d);
-            vector.Y.Should().Be(-100d);
-            vector.Z.Should().Be(0.01d);
+            Assert.AreEqual(100d, vector.X);
+            Assert.AreEqual(-100d, vector.Y);
+            Assert.AreEqual(0.01d, vector.Z);
         }
 
         [TestMethod, TestCategory("Construction")]
@@ -40,9 +39,9 @@
         {
             var vector = new Vector(new Vector(100, -100, 0));
 
-            vector.X.Should().Be(100);
-            vector.Y.Should().Be(-100);
-            vector.Z.Should().Be(0);
+            Assert.AreEqual(100, vector.X);
+            Assert.AreEqual(-100, vector.Y);
+            Assert.AreEqual(0, vector.Z);
         }
 
         [TestMethod, TestCategory("Construction")]
@@ -50,9 +49,9 @@
         {
             var vector = new Vector(new[] { 100, -100, 0.01 });
 
-            vector.X.Should().Be(100);
-            vector.Y.Should().Be(-100);
-            vector.Z.Should().Be(0.01);
+            Assert.AreEqual(100, vector.X);
+            Assert.AreEqual(-100, vector.Y);
+            Assert.AreEqual(0.01, vector.Z);
         }
 
         [TestMethod, TestCategory("Construction")]
@@ -60,9 +59,9 @@
         {
             var vector = new Vector();
 
-            vector.X.Should().Be(0);
-            vector.Y.Should().Be(0);
-            vector.Z.Should().Be(0);
+            Assert.AreEqual(0, vector.X);
+            Assert.AreEqual(0, vector.Y);
+            Assert.AreEqual(0, vector.Z);
         }
 
         #endregion
@@ -74,7 +73,7 @@
         {
             var vector = new Vector(0, 0, 0);
             var result = vector.Abs();
-            result.Should().Be(0);
+            Assert.AreEqual(0, result);
         }
 
         #endregion
@@ -87,9 +86,9 @@
             var vector = new Vector(2, 3, 4);
             var result = vector.SqrComponents();
 
-            result.X.Should().Be(4);
-            result.Y.Should().Be(9);
-            result.Z.Should().Be(16);
+            Assert.AreEqual(4, result.X);
+            Assert.AreEqual(9, result.Y);
+            Assert.AreEqual(16, result.Z);
         }
 
         [TestMethod]
@@ -98,9 +97,9 @@
             var vector = new Vector(4, 9, 16);
             var result = vector.SqrtComponents();
 
-            result.X.Should().Be(2);
-            result.Y.Should().Be(3);
-            result.Z.Should().Be(4);
+            Assert.AreEqual(2, result.X);
+            Assert.AreEqual(3, result.Y);
+            Assert.AreEqual(4, result.Z);
         }
 
         [TestMethod]
@@ -109,9 +108,9 @@
             var vector = new Vector(2, 1, 3);
             var result = vector.PowComponents(2);
 
-            result.X.Should().Be(4);
-            result.Y.Should().Be(1);
-            result.Z.Should().Be(9);
+            Assert.AreEqual(4, result.X);
+            Assert.AreEqual(1, result.Y);
+            Assert.AreEqual(9, result.Z);
         }
 
         #endregion
@@ -125,9 +124,9 @@
             var b = new Vector(2, 9, 11);
             var result = a + b;
 
-            result.X.Should().Be(5);
-            result.Y.Should().Be(16);
-            result.Z.Should().Be(15);
+            Assert.AreEqual(5, result.X);
+            Assert.AreEqual(16, result.Y);
+            Assert.AreEqual(15, result.Z);
         }
 
         [TestMethod]
@@ -137,9 +136,9 @@
             var b = new Vector(3, 3, 3);
             var result = a - b;
 
-            result.X.Should().Be(-2);
-            result.Y.Should().Be(-1);
-            result.Z.Should().Be(-0);
+            Assert.AreEqual(-2, result.X);
+            Assert.AreEqual(-1, result.Y);
+            Assert.AreEqual(-0, result.Z);
         }
 
         #endregion
@@ -152,7 +151,7 @@
             var a = new Vector(12, 20, 0);
             var b = new Vector(16, -5, 0);
 
-            a.DotProduct(b).Should().Be(92);
+            Assert.AreEqual(92, a.DotProduct(b));
         }
 
         [TestMethod, TestCategory("Product")]
@@ -163,7 +162,7 @@
 
             var result = v1.DotProduct(v2);
 
-            result.Should().Be(double.PositiveInfinity);
+            Assert.AreEqual(double.PositiveInfinity, result);
         }
 
         [TestMethod, TestCategory("Product")]
@@ -174,7 +173,7 @@
 
             var result = v1.DotProduct(v2);
 
-            result.Should().Be(double.PositiveInfinity);
+            Assert.AreEqual(double.PositiveInfinity, result);
         }
 
         [TestMethod, TestCategory("Product")]
@@ -185,7 +184,7 @@
 
             var result = v1.DotProduct(v2);
 
-            result.Should().Be(double.PositiveInfinity);
+            Assert.AreEqual(double.PositiveInfinity, result);
         }
 
         [TestMethod, TestCategory("Product")]
@@ -196,7 +195,7 @@
 
             var result = v1.DotProduct(v2);
 
-            result.Should().Be(double.NegativeInfinity);
+            Assert.AreEqual(double.NegativeInfinity, result);
         }
 
         [TestMethod, TestCategory("Product")]
@@ -207,7 +206,7 @@
 
             var result = v1.DotProduct(v2);
 
-            result.Should().Be(double.NegativeInfinity);
+            Assert.AreEqual(double.NegativeInfinity, result);
         }
 
         [TestMethod, TestCategory("Product")]
@@ -218,7 +217,7 @@
 
             var result = v1.DotProduct(v2);
 
-            result.Should().Be(double.PositiveInfinity);
+            Assert.AreEqual(double.PositiveInfinity, result);
         }
 
         [TestMethod, TestCategory("Product")]
@@ -229,7 +228,7 @@
 
             var result = v1.DotProduct(v2);
 
-            result.Should().Be(double.NaN);
+            Assert.AreEqual(double.NaN, result);
         }
 
         [TestMethod, TestCategory("Product")]
@@ -240,7 +239,7 @@
 
             var result = v1.DotProduct(v2);
 
-            result.Should().Be(10);
+            Assert.AreEqual(10, result);
         }
 
         [TestMethod, TestCategory("Product")]
@@ -251,7 +250,7 @@
 
             var result = v1.DotProduct(v2);
 
-            result.Should().Be(10);
+            Assert.AreEqual(10, result);
         }
 
         [TestMethod, TestCategory("Product")]
@@ -262,7 +261,7 @@
 
             var result = v1.DotProduct(v2);
 
-            result.Should().Be(-10);
+            Assert.AreEqual(-10, result);
         }
 
         [TestMethod, TestCategory("Product")]
@@ -272,9 +271,9 @@
             var b = new Vector(-5, 6, 0);
             var result = a.CrossProduct(b);
 
-            result.X.Should().Be(0);
-            result.Y.Should().Be(0);
-            result.Z.Should().Be(29);
+            Assert.AreEqual(0, result.X);
+            Assert.AreEqual(0, result.Y);
+            Assert.AreEqual(29, result.Z);
         }
 
         #endregion
@@ -287,7 +286,7 @@
             var vector = new Vector(0, 0, 0);
             var magnitude = vector.Magnitude;
 
-            magnitude.Should().Be(0);
+            Assert.AreEqual(0, magnitude);
         }
 
         [TestMethod, TestCategory("Magnitude")]
@@ -296,7 +295,7 @@
             var vector = new Vector(-0, -0, -0);
             var magnitude = vector.Magnitude;
 
-            magnitude.Should().Be(0);
+            Assert.AreEqual(0, magnitude);
         }
 
         [TestMethod, TestCategory("Magnitude")]
@@ -305,7 +304,7 @@
             var vector = new Vector(-0, +0, -0);
             var magnitude = vector.Magnitude;
 
-            magnitude.Should().Be(0);
+            Assert.AreEqual(0, magnitude);
         }
 
         [TestMethod, TestCategory("Magnitude")]
@@ -314,7 +313,7 @@
             var vector = new Vector(double.NaN, 0, 0);
             var magnitude = vector.Magnitude;
 
-            magnitude.Should().Be(double.NaN);
+            Assert.AreEqual(double.NaN, magnitude);
         }
 
         [TestMethod, TestCategory("Magnitude")]
@@ -323,7 +322,7 @@
             var vector = new Vector(1, 1, double.NaN);
             var magnitude = vector.Magnitude;
 
-            magnitude.Should().Be(double.NaN);
+            Assert.AreEqual(double.NaN, magnitude);
         }
 
         [TestMethod, TestCategory("Magnitude")]
@@ -332,7 +331,7 @@
             var vector = new Vector(10, 0, 0);
             var magnitude = vector.Magnitude;
 
-            magnitude.Should().Be(10);
+            Assert.AreEqual(10, magnitude);
         }
 
         [TestMethod, TestCategory("Magnitude")]
@@ -341,7 +340,7 @@
             var vector = new Vector(double.PositiveInfinity, 0, 0);
             var magnitude = vector.Magnitude;
 
-            magnitude.Should().Be(double.PositiveInfinity);
+            Assert.AreEqual(double.PositiveInfinity, magnitude);
         }
 
         [TestMethod, TestCategory("Magnitude")]
@@ -350,7 +349,7 @@
             var vector = new Vector(double.PositiveInfinity, 3, 6);
             var magnitude = vector.Magnitude;
 
-            magnitude.Should().Be(double.PositiveInfinity);
+            Assert.AreEqual(double.PositiveInfinity, magnitude);
         }
 
         [TestMethod, TestCategory("Magnitude")]
@@ -360,9 +359,9 @@
             var magnitude = vector.Magnitude;
 
             // Check .Net framework logic for ABS Infinity
-            (Math.Abs(double.NegativeInfinity)).Should().Be(double.PositiveInfinity, "the.Net framework should find ABS Negative Infinity equal to Positive Infinity(if this assumption is wrong then the logic of this test is also wrong");
+            Assert.AreEqual(double.PositiveInfinity, (Math.Abs(double.NegativeInfinity)), "the.Net framework should find ABS Negative Infinity equal to Positive Infinity(if this assumption is wrong then the logic of this test is also wrong");
 
-            magnitude.Should().Be(double.PositiveInfinity);
+            Assert.AreEqual(double.PositiveInfinity, magnitude);
         }
 
         [TestMethod, TestCategory("Magnitude")]
@@ -371,7 +370,7 @@
             var vector = new Vector(double.NegativeInfinity, 3, 6);
             var magnitude = vector.Magnitude;
 
-            magnitude.Should().Be(double.PositiveInfinity);
+            Assert.AreEqual(double.PositiveInfinity, magnitude);
         }
 
         [TestMethod, TestCategory("Magnitude")]
@@ -380,7 +379,7 @@
             var vector = new Vector(3, 1, -1);
             var magnitude = vector.Magnitude;
 
-            magnitude.Should().Be(System.Math.Sqrt(11));
+            Assert.AreEqual(System.Math.Sqrt(11), magnitude);
         }
 
         [TestMethod, TestCategory("Magnitude")]
@@ -389,7 +388,7 @@
             var vector = new Vector(2, 3, 4);
             var magnitude = vector.Magnitude;
 
-            magnitude.Should().Be(System.Math.Sqrt(29));
+            Assert.AreEqual(System.Math.Sqrt(29), magnitude);
         }
 
         /// <summary>
@@ -401,9 +400,9 @@
             var vector = new Vector(1, 0, 0);
             var result = vector.Scale(10);
 
-            result.X.Should().Be(10);
-            result.Y.Should().Be(0);
-            result.Z.Should().Be(0);
+            Assert.AreEqual(10, result.X);
+            Assert.AreEqual(0, result.Y);
+            Assert.AreEqual(0, result.Z);
         }
 
         /// <summary>
@@ -415,9 +414,9 @@
             var vector = new Vector(0, 1, 0);
             var result = vector.Scale(10);
 
-            result.X.Should().Be(0);
-            result.Y.Should().Be(10);
-            result.Z.Should().Be(0);
+            Assert.AreEqual(0, result.X);
+            Assert.AreEqual(10, result.Y);
+            Assert.AreEqual(0, result.Z);
         }
 
         /// <summary>
@@ -431,9 +430,9 @@
 
             var expected = System.Math.Round(5 * System.Math.Sqrt(2), 6);
 
-            System.Math.Round(result.X, 6).Should().Be(expected);
-            result.Y.Should().Be(0);
-            System.Math.Round(result.Z, 6).Should().Be(expected);
+            Assert.AreEqual(expected, System.Math.Round(result.X, 6));
+            Assert.AreEqual(0, result.Y);
+            Assert.AreEqual(expected, System.Math.Round(result.Z, 6));
         }
 
         #endregion
@@ -447,7 +446,7 @@
             var b = new Vector(0, 1, 0);
             var angle = a.Angle(b);
 
-            angle.Should().Be(Deg90AsRad, "vector (1,0,0) is perpendicular to vector (0,1,0)");
+            Assert.AreEqual(Deg90AsRad, angle, "vector (1,0,0) is perpendicular to vector (0,1,0)");
         }
 
         [TestMethod, TestCategory("Angle")]
@@ -457,7 +456,7 @@
             Vector v2 = new Vector(0, double.PositiveInfinity, 0);
             var result = v1.Angle(v2);
 
-            result.Should().Be(Deg90AsRad, "vector (+inf,0,0) is perpendicular to vector (0,+inf,0)");
+            Assert.AreEqual(Deg90AsRad, result, "vector (+inf,0,0) is perpendicular to vector (0,+inf,0)");
         }
 
         [TestMethod, TestCategory("Angle")]
@@ -467,7 +466,7 @@
             Vector v2 = new Vector(double.NaN, 3, 6);
             var result = v1.Angle(v2);
 
-            result.Should().Be(double.NaN, "the angle between vector (+NaN,3,6) and (+NaN,3,6) should be NaN");
+            Assert.AreEqual(double.NaN, result, "the angle between vector (+NaN,3,6) and (+NaN,3,6) should be NaN");
         }
 
         [TestMethod, TestCategory("Angle")]
@@ -477,7 +476,7 @@
             Vector v2 = new Vector(double.NaN, 1, 2);
             var result = v1.Angle(v2);
 
-            result.Should().Be(double.NaN, "the angle between vector (+NaN,0,0) and (+NaN,1,2) should be NaN");
+            Assert.AreEqual(double.NaN, result, "the angle between vector (+NaN,0,0) and (+NaN,1,2) should be NaN");
         }
 
         [TestMethod, TestCategory("Angle")]
@@ -487,7 +486,7 @@
             Vector v2 = new Vector(double.PositiveInfinity, 3, 6);
             var result = v1.Angle(v2);
 
-            result.Should().Be(0, "vector (+inf,3,6) equal to (+inf,3,6)");
+            Assert.AreEqual(0, result, "vector (+inf,3,6) equal to (+inf,3,6)");
         }
 
         [TestMethod, TestCategory("Angle")]
@@ -497,7 +496,7 @@
             Vector v2 = new Vector(1, 0, 0);
             var result = v1.Angle(v2);
 
-            result.Should().Be(Deg90AsRad, "vector (0,1,0) is perpendicular to vector (1,0,0)");
+            Assert.AreEqual(Deg90AsRad, result, "vector (0,1,0) is perpendicular to vector (1,0,0)");
         }
 
         [TestMethod, TestCategory("Angle")]
@@ -507,7 +506,7 @@
             Vector v2 = new Vector(double.PositiveInfinity, 0, 0);
             var result = v1.Angle(v2);
 
-            result.Should().Be(Deg90AsRad, "vector (0,+inf,0) is perpendicular to vector (+inf,0,0)");
+            Assert.AreEqual(Deg90AsRad, result, "vector (0,+inf,0) is perpendicular to vector (+inf,0,0)");
         }
 
         [TestMethod, TestCategory("Angle")]
@@ -517,7 +516,7 @@
             Vector v2 = new Vector(0, -1, 0);
             var result = v1.Angle(v2);
 
-            result.Should().Be(Deg90AsRad, "vector (1,0,0) is perpendicular to vector (0,-1,0)");
+            Assert.AreEqual(Deg90AsRad, result, "vector (1,0,0) is perpendicular to vector (0,-1,0)");
         }
 
         [TestMethod, TestCategory("Angle")]
@@ -527,7 +526,7 @@
             Vector v2 = new Vector(0, double.NegativeInfinity, 0);
             var result = v1.Angle(v2);
 
-            result.Should().Be(Deg90AsRad, "vector (+inf,0,0) is perpendicular to vector (0,-inf,0)");
+            Assert.AreEqual(Deg90AsRad, result, "vector (+inf,0,0) is perpendicular to vector (0,-inf,0)");
         }
 
         [TestMethod, TestCategory("Angle")]
@@ -537,7 +536,7 @@
             Vector v2 = new Vector(1, 0, 0);
             var result = v1.Angle(v2);
 
-            result.Should().Be(Deg90AsRad, "vector (0,-1,0) is perpendicular to vector (1,0,0)");
+            Assert.AreEqual(Deg90AsRad, result, "vector (0,-1,0) is perpendicular to vector (1,0,0)");
         }
 
         [TestMethod, TestCategory("Angle")]
@@ -547,7 +546,7 @@
             Vector v2 = new Vector(double.PositiveInfinity, 0, 0);
             var result = v1.Angle(v2);
 
-            result.Should().Be(Deg90AsRad, "vector (0,-inf,0) is perpendicular to vector (+inf,0,0)");
+            Assert.AreEqual(Deg90AsRad, result, "vector (0,-inf,0) is perpendicular to vector (+inf,0,0)");
         }
 
         [TestMethod, TestCategory("Angle")]
@@ -557,7 +556,7 @@
             Vector v2 = new Vector(0, -1, 0);
             var result = v1.Angle(v2);
 
-            result.Should().Be(Deg90AsRad, "vector (-1,0,0) is perpendicular to vector (0,-1,0)");
+            Assert.AreEqual(Deg90AsRad, result, "vector (-1,0,0) is perpendicular to vector (0,-1,0)");
         }
 
         [TestMethod, TestCategory("Angle")]
@@ -567,7 +566,7 @@
             Vector v2 = new Vector(0, double.NegativeInfinity, 0);
             var result = v1.Angle(v2);
 
-            result.Should().Be(Deg90AsRad, "vector (-inf,0,0) is perpendicular to vector (0,-inf,0)");
+            Assert.AreEqual(Deg90AsRad, result, "vector (-inf,0,0) is perpendicular to vector (0,-inf,0)");
         }
 
         [TestMethod, TestCategory("Angle")]
@@ -577,7 +576,7 @@
             Vector v2 = new Vector(-1, 0, 0);
             var result = v1.Angle(v2);
 
-            result.Should().Be(Deg90AsRad, "vector (0,-1,0) is perpendicular to vector (-1,0,0)");
+            Assert.AreEqual(Deg90AsRad, result, "vector (0,-1,0) is perpendicular to vector (-1,0,0)");
         }
 
         [TestMethod, TestCategory("Angle")]
@@ -587,7 +586,7 @@
             Vector v2 = new Vector(double.NegativeInfinity, 0, 0);
             var result = v1.Angle(v2);
 
-            result.Should().Be(Deg90AsRad, "vector (0,-inf,0) is perpendicular to vector (-inf,0,0)");
+            Assert.AreEqual(Deg90AsRad, result, "vector (0,-inf,0) is perpendicular to vector (-inf,0,0)");
         }
 
         [TestMethod, TestCategory("Angle")]
@@ -597,7 +596,7 @@
             Vector v2 = new Vector(0, 1, 0);
             var result = v1.Angle(v2);
 
-            result.Should().Be(Deg90AsRad, "vector (-1,0,0) is perpendicular to vector (0,1,0)");
+            Assert.AreEqual(Deg90AsRad, result, "vector (-1,0,0) is perpendicular to vector (0,1,0)");
         }
 
         [TestMethod, TestCategory("Angle")]
@@ -607,7 +606,7 @@
             Vector v2 = new Vector(0, double.PositiveInfinity, 0);
             var result = v1.Angle(v2);
 
-            result.Should().Be(Deg90AsRad, "vector (-inf,0,0) is perpendicular to vector (0,+inf,0)");
+            Assert.AreEqual(Deg90AsRad, result, "vector (-inf,0,0) is perpendicular to vector (0,+inf,0)");
         }
 
         [TestMethod, TestCategory("Angle")]
@@ -617,7 +616,7 @@
             Vector v2 = new Vector(-1, 0, 0);
             var result = v1.Angle(v2);
 
-            result.Should().Be(Deg90AsRad, "vector (0,1,0) is perpendicular to vector (-1,0,0)");
+            Assert.AreEqual(Deg90AsRad, result, "vector (0,1,0) is perpendicular to vector (-1,0,0)");
         }
 
         [TestMethod, TestCategory("Angle")]
@@ -627,7 +626,7 @@
             Vector v2 = new Vector(double.NegativeInfinity, 0, 0);
             var result = v1.Angle(v2);
 
-            result.Should().Be(Deg90AsRad, "vector (0,+inf,0) is perpendicular to vector (-inf,0,0)");
+            Assert.AreEqual(Deg90AsRad, result, "vector (0,+inf,0) is perpendicular to vector (-inf,0,0)");
         }
 
         [TestMethod, TestCategory("Angle")]
@@ -637,7 +636,7 @@
             Vector v2 = new Vector(0, ArbitaryTestDouble, 0);
             var result = v1.Angle(v2);
 
-            result.Should().Be(Deg90AsRad, "vector (n,0,0) is perpendicular to vector (0,n,0)");
+            Assert.AreEqual(Deg90AsRad, result, "vector (n,0,0) is perpendicular to vector (0,n,0)");
         }
 
         [TestMethod, TestCategory("Angle")]
@@ -647,7 +646,7 @@
             Vector v2 = new Vector(ArbitaryTestDouble, 0, 0);
             var result = v1.Angle(v2);
 
-            result.Should().Be(Deg90AsRad, "vector (0,n,0) is perpendicular to vector (n,0,0)");
+            Assert.AreEqual(Deg90AsRad, result, "vector (0,n,0) is perpendicular to vector (n,0,0)");
         }
 
         [TestMethod, TestCategory("Angle")]
@@ -657,7 +656,7 @@
             Vector v2 = new Vector(0, -ArbitaryTestDouble, 0);
             var result = v1.Angle(v2);
 
-            result.Should().Be(Deg90AsRad, "vector (n,0,0) is perpendicular to vector (0,-n,0)");
+            Assert.AreEqual(Deg90AsRad, result, "vector (n,0,0) is perpendicular to vector (0,-n,0)");
         }
 
         [TestMethod, TestCategory("Angle")]
@@ -667,7 +666,7 @@
             Vector v2 = new Vector(ArbitaryTestDouble, 0, 0);
             var result = v1.Angle(v2);
 
-            result.Should().Be(Deg90AsRad, "vector (0,-n,0) is perpendicular to vector (n,0,0)");
+            Assert.AreEqual(Deg90AsRad, result, "vector (0,-n,0) is perpendicular to vector (n,0,0)");
         }
 
         [TestMethod, TestCategory("Angle")]
@@ -677,7 +676,7 @@
             Vector v2 = new Vector(0, -ArbitaryTestDouble, 0);
             var result = v1.Angle(v2);
 
-            result.Should().Be(Deg90AsRad, "vector (-n,0,0) is perpendicular to vector (0,-n,0)");
+            Assert.AreEqual(Deg90AsRad, result, "vector (-n,0,0) is perpendicular to vector (0,-n,0)");
         }
 
         [TestMethod, TestCategory("Angle")]
@@ -687,7 +686,7 @@
             Vector v2 = new Vector(-ArbitaryTestDouble, 0, 0);
             var result = v1.Angle(v2);
 
-            result.Should().Be(Deg90AsRad, "vector (0,-n,0) is perpendicular to vector (-n,0,0)");
+            Assert.AreEqual(Deg90AsRad, result, "vector (0,-n,0) is perpendicular to vector (-n,0,0)");
         }
 
         [TestMethod, TestCategory("Angle")]
@@ -697,7 +696,7 @@
             Vector v2 = new Vector(0, ArbitaryTestDouble, 0);
             var result = v1.Angle(v2);
 
-            result.Should().Be(Deg90AsRad, "vector (-n,0,0) is perpendicular to vector (0,n,0)");
+            Assert.AreEqual(Deg90AsRad, result, "vector (-n,0,0) is perpendicular to vector (0,n,0)");
         }
 
         [TestMethod, TestCategory("Angle")]
@@ -707,7 +706,7 @@
             Vector v2 = new Vector(-ArbitaryTestDouble, 0, 0);
             var result = v1.Angle(v2);
 
-            result.Should().Be(Deg90AsRad, "vector (0,n,0) is perpendicular to vector (-n,0,0)");
+            Assert.AreEqual(Deg90AsRad, result, "vector (0,n,0) is perpendicular to vector (-n,0,0)");
         }
 
         [TestMethod, TestCategory("Angle")]
@@ -717,7 +716,7 @@
             var b = new Vector(-1, 0, 0);
             var angle = a.Angle(b);
 
-            angle.Should().Be(System.Math.PI);
+            Assert.AreEqual(System.Math.PI, angle);
         }
 
         [TestMethod, TestCategory("Angle")]
@@ -727,7 +726,7 @@
             var b = new Vector(-1, 0, 0);
             var angle = a.Angle(b);
 
-            angle.Should().Be(System.Math.PI);
+            Assert.AreEqual(System.Math.PI, angle);
         }
 
         [TestMethod, TestCategory("Angle")]
@@ -737,7 +736,7 @@
             var b = new Vector(1, 0, 0);
             var angle = a.Angle(b);
 
-            angle.Should().Be(0);
+            Assert.AreEqual(0, angle);
         }
 
         [TestMethod, TestCategory("Angle")]
@@ -747,7 +746,7 @@
             var b = new Vector(0.795271508195995f, -0.0612034045226753f, -0.603156175071185f);
             var angle = a.Angle(b);
 
-            angle.Should().Be(0);
+            Assert.AreEqual(0, angle);
         }
 
         /// <summary>
@@ -762,9 +761,9 @@
             var b = new Vector(0.795271508449802f, -0.0612033993276936f, -0.60315617526368f);
             var angle = a.Angle(b);
 
-            angle.Should().NotBe(float.NaN);
-            angle.Should().BeLessThan(1);
-            angle.Should().BeGreaterOrEqualTo(0);
+            Assert.AreNotEqual(float.NaN, angle);
+            Assert.IsTrue((angle) < (1));
+            Assert.IsTrue((angle) >= (0));
         }
 
         [TestMethod, TestCategory("Angle")]
@@ -774,7 +773,7 @@
             var b = new Vector(0.795271508195995d, -0.0612034045226753d, -0.603156175071185d);
             var angle = a.Angle(b);
 
-            angle.Should().Be(0);
+            Assert.AreEqual(0, angle);
         }
 
         /// <summary>
@@ -789,9 +788,9 @@
             var b = new Vector(0.795271508449802d, -0.0612033993276936d, -0.60315617526368d);
             var angle = a.Angle(b);
 
-            angle.Should().NotBe(float.NaN);
-            angle.Should().BeLessThan(1);
-            angle.Should().BeGreaterOrEqualTo(0);
+            Assert.AreNotEqual(float.NaN, angle);
+            Assert.IsTrue((angle) < (1));
+            Assert.IsTrue((angle) >= (0));
         }
 
         [TestMethod, TestCategory("Angle")]
@@ -801,7 +800,7 @@
             var b = new Vector(float.MaxValue, float.MinValue, 0);
             var angle = a.Angle(b);
 
-            angle.Should().Be(0);
+            Assert.AreEqual(0, angle);
         }
 
         [TestMethod, TestCategory("Angle")]
@@ -811,8 +810,8 @@
             Vector v1 = new Vector(38, 0, 7719);
             var result = s0.Angle(v1);
 
-            result.Should().Be(1.560950571379345, "this was the result worked out by Pex");
-            Math.Round(result, 3, MidpointRounding.AwayFromZero).Should().Be(1.561d, @"this is what http://calculator.tutorvista.com/angle-between-two-vectors-calculator.html worked out the result to be");
+            Assert.AreEqual(1.560950571379345, result, "this was the result worked out by Pex");
+            Assert.AreEqual(1.561d, Math.Round(result, 3, MidpointRounding.AwayFromZero), @"this is what http://calculator.tutorvista.com/angle-between-two-vectors-calculator.html worked out the result to be");
         }
 
         #endregion
@@ -825,7 +824,7 @@
             var vector = new Vector(0, 0, 0);
             var result = Vector.NormalizeOrDefault(vector);
 
-            result.Should().Be(new Vector(0, 0, 0));
+            Assert.AreEqual(new Vector(0, 0, 0), result);
         }
 
         [TestMethod, TestCategory("Normalize")]
@@ -834,7 +833,7 @@
             var vector = new Vector(0, 0, 0);
             Action action = () => vector.Normalize();
 
-            action.Should().Throw<NormalizeVectorException>();
+            Assert.ThrowsException<NormalizeVectorException>(action);
         }
 
         [TestMethod, TestCategory("Normalize")]
@@ -843,7 +842,7 @@
             var vector = new Vector(-0, -0, -0);
             var result = Vector.NormalizeOrDefault(vector);
 
-            result.Should().Be(new Vector(0, 0, 0));
+            Assert.AreEqual(new Vector(0, 0, 0), result);
         }
 
         [TestMethod, TestCategory("Normalize")]
@@ -852,7 +851,7 @@
             var vector = new Vector(-0, -0, -0);
             Action action = () => vector.Normalize();
 
-            action.Should().Throw<NormalizeVectorException>();
+            Assert.ThrowsException<NormalizeVectorException>(action);
         }
 
         [TestMethod, TestCategory("Normalize")]
@@ -861,7 +860,7 @@
             var vector = new Vector(-0, +0, -0);
             var result = Vector.NormalizeOrDefault(vector);
 
-            result.Should().Be(new Vector(0, 0, 0));
+            Assert.AreEqual(new Vector(0, 0, 0), result);
         }
 
         [TestMethod, TestCategory("Normalize")]
@@ -870,7 +869,7 @@
             var vector = new Vector(-0, +0, -0);
             Action action = () => vector.Normalize();
 
-            action.Should().Throw<NormalizeVectorException>();
+            Assert.ThrowsException<NormalizeVectorException>(action);
         }
 
         [TestMethod, TestCategory("Normalize")]
@@ -879,7 +878,7 @@
             var vector = new Vector(-0, +0, -0);
             var result = Vector.NormalizeOrDefault(vector);
 
-            result.Should().Be(new Vector(-0, +0, -0));
+            Assert.AreEqual(new Vector(-0, +0, -0), result);
         }
 
         [TestMethod, TestCategory("Normalize")]
@@ -888,9 +887,9 @@
             var vector = new Vector(1, 0, 0);
             var result = vector.Normalize();
 
-            result.X.Should().Be(1);
-            result.Y.Should().Be(0);
-            result.Z.Should().Be(0);
+            Assert.AreEqual(1, result.X);
+            Assert.AreEqual(0, result.Y);
+            Assert.AreEqual(0, result.Z);
         }
 
         [TestMethod, TestCategory("Normalize")]
@@ -899,9 +898,9 @@
             var vector = new Vector(1, 0, 0);
             var result = Vector.NormalizeOrDefault(vector);
 
-            result.X.Should().Be(1);
-            result.Y.Should().Be(0);
-            result.Z.Should().Be(0);
+            Assert.AreEqual(1, result.X);
+            Assert.AreEqual(0, result.Y);
+            Assert.AreEqual(0, result.Z);
         }
 
         [TestMethod, TestCategory("Normalize")]
@@ -910,9 +909,9 @@
             var vector = new Vector(-1, 0, 0);
             var result = vector.Normalize();
 
-            result.X.Should().Be(-1);
-            result.Y.Should().Be(0);
-            result.Z.Should().Be(0);
+            Assert.AreEqual(-1, result.X);
+            Assert.AreEqual(0, result.Y);
+            Assert.AreEqual(0, result.Z);
         }
 
         [TestMethod, TestCategory("Normalize")]
@@ -921,9 +920,9 @@
             var vector = new Vector(-1, 0, 0);
             var result = Vector.NormalizeOrDefault(vector);
 
-            result.X.Should().Be(-1);
-            result.Y.Should().Be(0);
-            result.Z.Should().Be(0);
+            Assert.AreEqual(-1, result.X);
+            Assert.AreEqual(0, result.Y);
+            Assert.AreEqual(0, result.Z);
         }
 
         [TestMethod, TestCategory("Normalize")]
@@ -932,9 +931,9 @@
             var vector = new Vector(double.PositiveInfinity, 0, 0);
             var result = vector.Normalize();
 
-            result.X.Should().Be(1);
-            result.Y.Should().Be(0);
-            result.Z.Should().Be(0);
+            Assert.AreEqual(1, result.X);
+            Assert.AreEqual(0, result.Y);
+            Assert.AreEqual(0, result.Z);
         }
 
         [TestMethod, TestCategory("Normalize")]
@@ -943,9 +942,9 @@
             var vector = new Vector(double.PositiveInfinity, 0, 0);
             var result = Vector.NormalizeOrDefault(vector);
 
-            result.X.Should().Be(1);
-            result.Y.Should().Be(0);
-            result.Z.Should().Be(0);
+            Assert.AreEqual(1, result.X);
+            Assert.AreEqual(0, result.Y);
+            Assert.AreEqual(0, result.Z);
         }
 
         [TestMethod, TestCategory("Normalize")]
@@ -954,7 +953,7 @@
             var vector = new Vector(double.PositiveInfinity, 3, 6);
             Action action = () => vector.Normalize();
 
-            action.Should().Throw<NormalizeVectorException>();
+            Assert.ThrowsException<NormalizeVectorException>(action);
         }
 
         [TestMethod, TestCategory("Normalize")]
@@ -963,9 +962,9 @@
             var vector = new Vector(double.PositiveInfinity, 3, 6);
             var result = Vector.NormalizeOrDefault(vector);
 
-            result.X.Should().Be(double.NaN);
-            result.Y.Should().Be(double.NaN);
-            result.Z.Should().Be(double.NaN);
+            Assert.AreEqual(double.NaN, result.X);
+            Assert.AreEqual(double.NaN, result.Y);
+            Assert.AreEqual(double.NaN, result.Z);
         }
 
         [TestMethod, TestCategory("Normalize")]
@@ -974,9 +973,9 @@
             var vector = new Vector(double.NegativeInfinity, 0, 0);
             var result = vector.Normalize();
 
-            result.X.Should().Be(-1);
-            result.Y.Should().Be(0);
-            result.Z.Should().Be(0);
+            Assert.AreEqual(-1, result.X);
+            Assert.AreEqual(0, result.Y);
+            Assert.AreEqual(0, result.Z);
         }
 
         [TestMethod, TestCategory("Normalize")]
@@ -985,7 +984,7 @@
             var vector = new Vector(double.NegativeInfinity, 3, 6);
             Action action = () => vector.Normalize();
 
-            action.Should().Throw<NormalizeVectorException>();
+            Assert.ThrowsException<NormalizeVectorException>(action);
         }
 
         [TestMethod, TestCategory("Normalize")]
@@ -994,9 +993,9 @@
             var vector = new Vector(double.NegativeInfinity, 3, 6);
             var result = Vector.NormalizeOrDefault(vector);
 
-            result.X.Should().Be(double.NaN);
-            result.Y.Should().Be(double.NaN);
-            result.Z.Should().Be(double.NaN);
+            Assert.AreEqual(double.NaN, result.X);
+            Assert.AreEqual(double.NaN, result.Y);
+            Assert.AreEqual(double.NaN, result.Z);
         }
 
         [TestMethod, TestCategory("Normalize")]
@@ -1005,9 +1004,9 @@
             var vector = new Vector(double.NegativeInfinity, 0, 0);
             var result = Vector.NormalizeOrDefault(vector);
 
-            result.X.Should().Be(-1);
-            result.Y.Should().Be(0);
-            result.Z.Should().Be(0);
+            Assert.AreEqual(-1, result.X);
+            Assert.AreEqual(0, result.Y);
+            Assert.AreEqual(0, result.Z);
         }
 
         [TestMethod, TestCategory("Normalize")]
@@ -1016,9 +1015,9 @@
             var vector = new Vector(10, 0, 0);
             var result = vector.Normalize();
 
-            result.X.Should().Be(1);
-            result.Y.Should().Be(0);
-            result.Z.Should().Be(0);
+            Assert.AreEqual(1, result.X);
+            Assert.AreEqual(0, result.Y);
+            Assert.AreEqual(0, result.Z);
         }
 
         [TestMethod, TestCategory("Normalize")]
@@ -1027,9 +1026,9 @@
             var vector = new Vector(10, 0, 0);
             var result = Vector.NormalizeOrDefault(vector);
 
-            result.X.Should().Be(1);
-            result.Y.Should().Be(0);
-            result.Z.Should().Be(0);
+            Assert.AreEqual(1, result.X);
+            Assert.AreEqual(0, result.Y);
+            Assert.AreEqual(0, result.Z);
         }
 
         /// <summary>
@@ -1042,7 +1041,7 @@
 
             Action act = () => vector.Normalize();
 
-            act.Should().Throw<NormalizeVectorException>("you should not be able to normalize NaN values");
+            Assert.ThrowsException<NormalizeVectorException>(act, "you should not be able to normalize NaN values");
         }
 
         [TestMethod, TestCategory("Normalize")]
@@ -1051,9 +1050,9 @@
             var vector = new Vector(double.NaN, 0, 0);
             var result = Vector.NormalizeOrDefault(vector);
 
-            result.X.Should().Be(double.NaN);
-            result.Y.Should().Be(double.NaN);
-            result.Z.Should().Be(double.NaN);
+            Assert.AreEqual(double.NaN, result.X);
+            Assert.AreEqual(double.NaN, result.Y);
+            Assert.AreEqual(double.NaN, result.Z);
         }
 
         /// <summary>
@@ -1066,9 +1065,9 @@
             var vector = new Vector(3, 1, 2);
             var result = vector.Normalize();
 
-            result.X.Should().BeInRange(0.8014, 0.8026);
-            result.Y.Should().BeInRange(0.2664, 0.2676);
-            result.Z.Should().BeInRange(0.5334, 0.5346);
+            Assert.IsTrue((result.X) >= (0.8014) && (result.X) <= (0.8026));
+            Assert.IsTrue((result.Y) >= (0.2664) && (result.Y) <= (0.2676));
+            Assert.IsTrue((result.Z) >= (0.5334) && (result.Z) <= (0.5346));
         }
 
         /// <summary>
@@ -1080,9 +1079,9 @@
             var vector = new Vector(3, 1, 2);
             var result = Vector.NormalizeOrDefault(vector);
 
-            result.X.Should().BeInRange(0.8014, 0.8026);
-            result.Y.Should().BeInRange(0.2664, 0.2676);
-            result.Z.Should().BeInRange(0.5334, 0.5346);
+            Assert.IsTrue((result.X) >= (0.8014) && (result.X) <= (0.8026));
+            Assert.IsTrue((result.Y) >= (0.2664) && (result.Y) <= (0.2676));
+            Assert.IsTrue((result.Z) >= (0.5334) && (result.Z) <= (0.5346));
         }
 
         #endregion
@@ -1098,9 +1097,9 @@
             var vector = new Vector(1, 0, 0);
             var result = vector.Yaw(new Angle(Deg90AsRad), OrthogonalAxes.DirectX);
 
-            System.Math.Round(result.X, 6).Should().Be(0);
-            System.Math.Round(result.Y, 6).Should().Be(0);
-            System.Math.Round(result.Z, 6).Should().Be(-1);
+            Assert.AreEqual(0, System.Math.Round(result.X, 6));
+            Assert.AreEqual(0, System.Math.Round(result.Y, 6));
+            Assert.AreEqual(-1, System.Math.Round(result.Z, 6));
         }
 
         /// <summary>
@@ -1112,9 +1111,9 @@
             var vector = new Vector(0, 1, 0);
             var result = vector.Pitch(new Angle(Deg90AsRad), OrthogonalAxes.DirectX);
 
-            System.Math.Round(result.X, 6).Should().Be(0);
-            System.Math.Round(result.Y, 6).Should().Be(0);
-            System.Math.Round(result.Z, 6).Should().Be(1);
+            Assert.AreEqual(0, System.Math.Round(result.X, 6));
+            Assert.AreEqual(0, System.Math.Round(result.Y, 6));
+            Assert.AreEqual(1, System.Math.Round(result.Z, 6));
         }
 
         /// <summary>
@@ -1126,9 +1125,9 @@
             var vector = new Vector(1, 0, 0);
             var result = vector.Roll(new Angle(Deg90AsRad), OrthogonalAxes.DirectX);
 
-            System.Math.Round(result.X, 6).Should().Be(0);
-            System.Math.Round(result.Y, 6).Should().Be(1);
-            System.Math.Round(result.Z, 6).Should().Be(0);
+            Assert.AreEqual(0, System.Math.Round(result.X, 6));
+            Assert.AreEqual(1, System.Math.Round(result.Y, 6));
+            Assert.AreEqual(0, System.Math.Round(result.Z, 6));
         }
 
         #endregion
@@ -1146,9 +1145,9 @@
             var b = new Vector(-3, 4, 0);
             var result = a.Projection(b);
 
-            result.X.Should().Be(6d / 25d, "X should be 6/25");
-            result.Y.Should().Be(-(8d / 25d), "Y should be -(8/25)");
-            result.Z.Should().Be(0, "Z should be 0");
+            Assert.AreEqual(6d / 25d, result.X, "X should be 6/25");
+            Assert.AreEqual(-(8d / 25d), result.Y, "Y should be -(8/25)");
+            Assert.AreEqual(0, result.Z, "Z should be 0");
         }
 
         /// <summary>
@@ -1162,9 +1161,9 @@
             var b = new Vector(0, 1, 0);
             var result = a.Projection(b);
 
-            result.X.Should().Be(0, "X should be 0");
-            result.Y.Should().Be(0, "Y should be 0");
-            result.Z.Should().Be(0, "Z should be 0");
+            Assert.AreEqual(0, result.X, "X should be 0");
+            Assert.AreEqual(0, result.Y, "Y should be 0");
+            Assert.AreEqual(0, result.Z, "Z should be 0");
         }
 
         /// <summary>
@@ -1177,9 +1176,9 @@
             var b = new Vector(-3, 4, 0);
             var result = a.Rejection(b);
 
-            result.X.Should().Be(2d - (6d / 25d), "X should be 2-(6/25)");
-            result.Y.Should().Be(1d + (8d / 25d), "Y should be 1+(8/25)");
-            result.Z.Should().Be(0, "Z should be 0");
+            Assert.AreEqual(2d - (6d / 25d), result.X, "X should be 2-(6/25)");
+            Assert.AreEqual(1d + (8d / 25d), result.Y, "Y should be 1+(8/25)");
+            Assert.AreEqual(0, result.Z, "Z should be 0");
         }
 
         [TestMethod]
@@ -1189,9 +1188,9 @@
             var b = new Vector(0, 1, 0);
             var result = a.Reflection(b);
 
-            result.X.Should().Be(-1, "X should be -1");
-            result.Y.Should().Be(0, "Y should be 0");
-            result.Z.Should().Be(0, "Z should be 0");
+            Assert.AreEqual(-1, result.X, "X should be -1");
+            Assert.AreEqual(0, result.Y, "Y should be 0");
+            Assert.AreEqual(0, result.Z, "Z should be 0");
         }
 
         [TestMethod]
@@ -1201,9 +1200,9 @@
             var b = new Vector(0, 1, 0); // about y unit vector
             var result = a.Reflection(b);
 
-            result.X.Should().Be(10, "X should be 10");
-            result.Y.Should().Be(10, "Y should be 10");
-            result.Z.Should().Be(0, "Z should be 0");
+            Assert.AreEqual(10, result.X, "X should be 10");
+            Assert.AreEqual(10, result.Y, "Y should be 10");
+            Assert.AreEqual(0, result.Z, "Z should be 0");
         }
 
         [TestMethod]
@@ -1213,14 +1212,14 @@
             var b = new Vector(5, 5, 0);
             var result = a.Reflection(b);
 
-            result.X.Should().Be(10, "X should be 10");
+            Assert.AreEqual(10, result.X, "X should be 10");
 
             // Epsilon is not tolerant enough
             //result.Y.Should().BeInRange(-double.Epsilon, double.Epsilon, "Y should be 0 with a tolerance (double.epsilon)");
             //result.Z.Should().BeInRange(-double.Epsilon, double.Epsilon, "Z should be 0 with a tolerance (double.epsilon)");
 
-            result.Y.Should().BeInRange(-1E-10, 1E-10, "Y should be 0 with a tolerance");
-            result.Z.Should().BeInRange(-1E-10, 1E-10, "Z should be 0 with a tolerance");
+            Assert.IsTrue((result.Y) >= (-1E-10) && (result.Y) <= (1E-10), "Y should be 0 with a tolerance");
+            Assert.IsTrue((result.Z) >= (-1E-10) && (result.Z) <= (1E-10), "Z should be 0 with a tolerance");
         }
 
         #endregion
@@ -1233,9 +1232,9 @@
             var vector = new Vector(0.1, 0.5, 0.9);
             var result = vector.Round(MidpointRounding.AwayFromZero);
 
-            result.X.Should().Be(0, "X should be rounded down");
-            result.Y.Should().Be(1, "Y should be rounded up");
-            result.Z.Should().Be(1, "Z should be rounded up");
+            Assert.AreEqual(0, result.X, "X should be rounded down");
+            Assert.AreEqual(1, result.Y, "Y should be rounded up");
+            Assert.AreEqual(1, result.Z, "Z should be rounded up");
         }
 
         #endregion
@@ -1249,7 +1248,7 @@
             var yaw = vector.Yaw(new Angle(Deg90AsRad), OrthogonalAxes.DirectX);
             var rotate = vector.RotateY(Deg90AsRad);
 
-            rotate.Equals(yaw, 1e-9).Should().BeTrue();
+            Assert.IsTrue(rotate.Equals(yaw, 1e-9));
         }
 
         /// <summary>
@@ -1262,11 +1261,11 @@
             var pitch = vector.Pitch(new Angle(Deg90AsRad), OrthogonalAxes.DirectX);
             var rotate = vector.RotateX(Deg90AsRad);
 
-            System.Math.Round(pitch.X, 6).Should().Be(0);
-            System.Math.Round(pitch.Y, 6).Should().Be(0);
-            System.Math.Round(pitch.Z, 6).Should().Be(1);
+            Assert.AreEqual(0, System.Math.Round(pitch.X, 6));
+            Assert.AreEqual(0, System.Math.Round(pitch.Y, 6));
+            Assert.AreEqual(1, System.Math.Round(pitch.Z, 6));
 
-            rotate.Equals(pitch, 1e-9).Should().BeTrue();
+            Assert.IsTrue(rotate.Equals(pitch, 1e-9));
         }
 
         /// <summary>
@@ -1279,7 +1278,7 @@
             var roll = vector.Roll(new Angle(Deg90AsRad), OrthogonalAxes.DirectX);
             var rotate = vector.RotateZ(Deg90AsRad);
 
-            rotate.Equals(roll, 1e-9).Should().BeTrue();
+            Assert.IsTrue(rotate.Equals(roll, 1e-9));
         }
 
         [TestMethod]
@@ -1289,7 +1288,7 @@
             var yaw = vector.Yaw(new Angle(Deg90AsRad), OrthogonalAxes.DirectX);
             var rotate = vector.RotateY(0, 0, Deg90AsRad);
 
-            rotate.Equals(yaw, 1e-9).Should().BeTrue();
+            Assert.IsTrue(rotate.Equals(yaw, 1e-9));
         }
 
         /// <summary>
@@ -1302,11 +1301,11 @@
             var pitch = vector.Pitch(new Angle(Deg90AsRad), OrthogonalAxes.DirectX);
             var rotate = vector.RotateX(0, 0, Deg90AsRad);
 
-            System.Math.Round(pitch.X, 6).Should().Be(0);
-            System.Math.Round(pitch.Y, 6).Should().Be(0);
-            System.Math.Round(pitch.Z, 6).Should().Be(1);
+            Assert.AreEqual(0, System.Math.Round(pitch.X, 6));
+            Assert.AreEqual(0, System.Math.Round(pitch.Y, 6));
+            Assert.AreEqual(1, System.Math.Round(pitch.Z, 6));
 
-            rotate.Equals(pitch, 1e-9).Should().BeTrue();
+            Assert.IsTrue(rotate.Equals(pitch, 1e-9));
         }
 
         /// <summary>
@@ -1319,7 +1318,7 @@
             var roll = vector.Roll(new Angle(Deg90AsRad), OrthogonalAxes.DirectX);
             var rotate = vector.RotateZ(0, 0, Deg90AsRad);
 
-            rotate.Equals(roll, 1e-9).Should().BeTrue();
+            Assert.IsTrue(rotate.Equals(roll, 1e-9));
         }
 
         #endregion
@@ -1337,13 +1336,13 @@
             Vector v1 = new Vector(449, 2282, 609);
 
             var result = s0.CompareTo(v1);
-            result.Should().Be(1, "magnitude of s0 is bigger than magnitude of s1");
+            Assert.AreEqual(1, result, "magnitude of s0 is bigger than magnitude of s1");
 
             result = v1.CompareTo(s0);
-            result.Should().Be(-1, "magnitude of s1 is less than magnitude of s0");
+            Assert.AreEqual(-1, result, "magnitude of s1 is less than magnitude of s0");
 
             result = v1.CompareTo(box);
-            result.Should().Be(-1, "magnitude of s1 is less than magnitude of s0 even when s0 has been cast to an object");
+            Assert.AreEqual(-1, result, "magnitude of s1 is less than magnitude of s0 even when s0 has been cast to an object");
         }
 
         [TestMethod, TestCategory("CompareTo")]
@@ -1356,13 +1355,13 @@
             var result = v1.CompareTo(v2);
 
             // Test our assumption about the .Net framework expectations
-            double.PositiveInfinity.CompareTo(double.PositiveInfinity).Should().Be(0, "the .Net framework should find double positive infinty equal to positive infinity (if this assumption is wrong then the logic of this test is also wrong)");
+            Assert.AreEqual(0, double.PositiveInfinity.CompareTo(double.PositiveInfinity), "the .Net framework should find double positive infinty equal to positive infinity (if this assumption is wrong then the logic of this test is also wrong)");
 
             // Test that the component operation matches our assumption about the .Net framework
-            zComponentResult.Should().Be(0, "z components of positive infinty and positive infinty should be equal");
+            Assert.AreEqual(0, zComponentResult, "z components of positive infinty and positive infinty should be equal");
 
             // Test that our result matches the assumption
-            result.Should().Be(0, "positive infinty and positive infinty should be equal, as should the other components");
+            Assert.AreEqual(0, result, "positive infinty and positive infinty should be equal, as should the other components");
         }
 
         [TestMethod, TestCategory("CompareTo")]
@@ -1375,13 +1374,13 @@
             var result = v1.CompareTo(v2);
 
             // Test our assumption about the .Net framework expectations
-            double.NaN.CompareTo(double.NaN).Should().Be(0, "the .Net framework should find double NaN equal to NaN (if this assumption is wrong then the logic of this test is also wrong)");
+            Assert.AreEqual(0, double.NaN.CompareTo(double.NaN), "the .Net framework should find double NaN equal to NaN (if this assumption is wrong then the logic of this test is also wrong)");
 
             // Test that the component operation matches our assumption about the .Net framework
-            zComponentResult.Should().Be(0, "z components of NaN and NaN should be equal");
+            Assert.AreEqual(0, zComponentResult, "z components of NaN and NaN should be equal");
 
             // Test that our result matches the assumption
-            result.Should().Be(0, "NaN and NaN should be equal, as should the other components");
+            Assert.AreEqual(0, result, "NaN and NaN should be equal, as should the other components");
         }
 
         [TestMethod, TestCategory("CompareTo")]
@@ -1392,7 +1391,7 @@
 
             var result = v1.CompareTo(v2);
 
-            result.Should().Be(0, "both magnitudes should be NaN so comparison should find the vectors equivelent");
+            Assert.AreEqual(0, result, "both magnitudes should be NaN so comparison should find the vectors equivelent");
         }
 
         [TestMethod, TestCategory("CompareTo")]
@@ -1403,7 +1402,7 @@
 
             var result = v1.CompareTo(v2);
 
-            result.Should().Be(0, "both magnitudes should be NaN when any component is NaN so comparison should find the vectors equivelent");
+            Assert.AreEqual(0, result, "both magnitudes should be NaN when any component is NaN so comparison should find the vectors equivelent");
         }
 
         [TestMethod, TestCategory("CompareTo")]
@@ -1414,7 +1413,7 @@
 
             var result = v1.CompareTo(v2);
 
-            result.Should().Be(0, "both magnitudes should be NaN so comparison should find the vectors equivelent");
+            Assert.AreEqual(0, result, "both magnitudes should be NaN so comparison should find the vectors equivelent");
         }
 
         [TestMethod, TestCategory("CompareTo")]
@@ -1427,13 +1426,13 @@
             var result = v1.CompareTo(v2);
 
             // Test our assumption about the .Net framework expectations
-            double.NegativeInfinity.CompareTo(double.NegativeInfinity).Should().Be(0, "the .Net framework should find double negative infinty equal to negative infinity (if this assumption is wrong then the logic of this test is also wrong)");
+            Assert.AreEqual(0, double.NegativeInfinity.CompareTo(double.NegativeInfinity), "the .Net framework should find double negative infinty equal to negative infinity (if this assumption is wrong then the logic of this test is also wrong)");
 
             // Test that the component operation matches our assumption about the.Net framework
-            zComponentResult.Should().Be(0, "z components of negative infinty and negative infinty should be equal");
+            Assert.AreEqual(0, zComponentResult, "z components of negative infinty and negative infinty should be equal");
 
             // Test that our result matches the assumption
-            result.Should().Be(0, "negative infinty and negative infinty should be equal, as should the other components");
+            Assert.AreEqual(0, result, "negative infinty and negative infinty should be equal, as should the other components");
         }
 
         [TestMethod, TestCategory("CompareTo")]
@@ -1445,8 +1444,8 @@
             var s1s2Result = v1.CompareTo(v2);
             var s2s1Result = v2.CompareTo(v1);
 
-            s1s2Result.Should().Be(0, "when comparing magnitude sign should not be important so positive infinty should be equal to negative infinty");
-            s2s1Result.Should().Be(0, "when comparing magnitude sign should not be important so negative infinty should be equal to positive infinty");
+            Assert.AreEqual(0, s1s2Result, "when comparing magnitude sign should not be important so positive infinty should be equal to negative infinty");
+            Assert.AreEqual(0, s2s1Result, "when comparing magnitude sign should not be important so negative infinty should be equal to positive infinty");
         }
 
         [TestMethod, TestCategory("CompareTo")]
@@ -1458,10 +1457,10 @@
             var result = v1.CompareTo(v2, 0.0002);
 
             // Quick test to ensure that the double minus operation does not introduce an unexpected margin of error that is higher than our margin of error
-            (3d - (2.9999d)).Should().BeLessThan(0.0002d, "the double calculations of 3 minus 2.9999 should be less than 0.0002 or our test is incorrect");
+            Assert.IsTrue(((3d - (2.9999d))) < (0.0002d), "the double calculations of 3 minus 2.9999 should be less than 0.0002 or our test is incorrect");
 
             // Assert our acual test
-            result.Should().Be(0, "the tolerance should have been greter than the difference between the z components for s1 and s2");
+            Assert.AreEqual(0, result, "the tolerance should have been greter than the difference between the z components for s1 and s2");
         }
 
         [TestMethod, TestCategory("CompareTo")]
@@ -1473,9 +1472,9 @@
             var result = v1.CompareTo(v2, 0.00009);
 
             // Quick test to ensure that the double minus operation does not introduce an unexpected margin of error
-            (3d - 2.9999d).Should().BeGreaterThan(0.00009d, "the double calculations of 3 minus 2.9999 should be greater than 0.00009 or our test is incorrect");
+            Assert.IsTrue(((3d - 2.9999d)) > (0.00009d), "the double calculations of 3 minus 2.9999 should be greater than 0.00009 or our test is incorrect");
 
-            result.Should().Be(1, "the tolerance should be less than the difference between the z components for s1 and s2, so 3 should be greater than 2.9999");
+            Assert.AreEqual(1, result, "the tolerance should be less than the difference between the z components for s1 and s2, so 3 should be greater than 2.9999");
         }
 
         [TestMethod, TestCategory("CompareTo")]
@@ -1487,9 +1486,9 @@
             var result = v1.CompareTo(v2, 0.00009);
 
             // Quick test to ensure that the double minus operation does not introduce an unexpected margin of error
-            (3d - 2.9999d).Should().BeGreaterThan(0.00009d, "the double calculations of 3 minus 2.9999 should be greater than 0.00009 or our test is incorrect");
+            Assert.IsTrue(((3d - 2.9999d)) > (0.00009d), "the double calculations of 3 minus 2.9999 should be greater than 0.00009 or our test is incorrect");
 
-            result.Should().Be(-1, "the tolerance should be less than the difference between the z components for s1 and s2, so 2.9999 should be less than 3");
+            Assert.AreEqual(-1, result, "the tolerance should be less than the difference between the z components for s1 and s2, so 2.9999 should be less than 3");
         }
 
         [TestMethod, TestCategory("CompareTo")]
@@ -1500,7 +1499,7 @@
 
             var result = v1.CompareTo(v2, 0.00001);
 
-            result.Should().Be(0, "positive infinty and positive infinty should be equal regardless of tolerance, as should the other components");
+            Assert.AreEqual(0, result, "positive infinty and positive infinty should be equal regardless of tolerance, as should the other components");
         }
 
         [TestMethod, TestCategory("CompareTo")]
@@ -1511,7 +1510,7 @@
 
             var result = v1.CompareTo(v2, 0.00001);
 
-            result.Should().Be(0, "negative infinty and negative infinty should be equal regardless of tolerance, as should the other components");
+            Assert.AreEqual(0, result, "negative infinty and negative infinty should be equal regardless of tolerance, as should the other components");
         }
 
         [TestMethod, TestCategory("CompareTo")]
@@ -1523,8 +1522,8 @@
             var s1s2Result = v1.CompareTo(v2, 0.00001);
             var s2s1Result = v2.CompareTo(v1, 0.00001);
 
-            s1s2Result.Should().Be(0, "when comparing magnitude sign should not be important so positive infinty should be equal to negative infinty");
-            s2s1Result.Should().Be(0, "when comparing magnitude sign should not be important so negative infinty should be equal to positive infinty");
+            Assert.AreEqual(0, s1s2Result, "when comparing magnitude sign should not be important so positive infinty should be equal to negative infinty");
+            Assert.AreEqual(0, s2s1Result, "when comparing magnitude sign should not be important so negative infinty should be equal to positive infinty");
         }
 
         #endregion
@@ -1539,7 +1538,7 @@
 
             var result = v1 == v2;
 
-            result.Should().Be(true);
+            Assert.AreEqual(true, result);
         }
 
         [TestMethod, TestCategory("Equals")]
@@ -1550,7 +1549,7 @@
 
             var result = v1 == v2;
 
-            result.Should().Be(false);
+            Assert.AreEqual(false, result);
         }
 
         [TestMethod, TestCategory("Equals")]
@@ -1563,13 +1562,13 @@
             var result = v1 == v2;
 
             // Test our assumption about the .Net framework expectations
-            (double.PositiveInfinity == double.PositiveInfinity).Should().Be(true, "the .Net framework should find double positive infinty equal to positive infinity (if this assumption is wrong then the logic of this test is also wrong)");
+            Assert.AreEqual(true, (double.PositiveInfinity == double.PositiveInfinity), "the .Net framework should find double positive infinty equal to positive infinity (if this assumption is wrong then the logic of this test is also wrong)");
 
             // Test that the component operation matches our assumption about the .Net framework
-            zComponentResult.Should().Be(true, "z components of positive infinty and positive infinty should be equal");
+            Assert.AreEqual(true, zComponentResult, "z components of positive infinty and positive infinty should be equal");
 
             // Test that our result matches the assumption
-            result.Should().Be(true, "positive infinty and positive infinty should be equal");
+            Assert.AreEqual(true, result, "positive infinty and positive infinty should be equal");
         }
 
         [TestMethod, TestCategory("Equals")]
@@ -1582,13 +1581,13 @@
             var result = v1 == v2;
 
             // Test our assumption about the .Net framework expectations
-            (double.NegativeInfinity == double.NegativeInfinity).Should().Be(true, "the .Net framework should find double negative infinty equal to negative infinity (if this assumption is wrong then the logic of this test is also wrong)");
+            Assert.AreEqual(true, (double.NegativeInfinity == double.NegativeInfinity), "the .Net framework should find double negative infinty equal to negative infinity (if this assumption is wrong then the logic of this test is also wrong)");
 
             // Test that the component operation matches our assumption about the.Net framework
-            zComponentResult.Should().Be(true, "z components of negative infinty and negative infinty should be equal");
+            Assert.AreEqual(true, zComponentResult, "z components of negative infinty and negative infinty should be equal");
 
             // Test that our result matches the assumption
-            result.Should().Be(true, "negative infinty and negative infinty should be equal");
+            Assert.AreEqual(true, result, "negative infinty and negative infinty should be equal");
         }
 
         [TestMethod, TestCategory("Equals")]
@@ -1601,13 +1600,13 @@
             var result = v1 == v2;
 
             // Test our assumption about the .Net framework expectations
-            (3 == double.NaN).Should().Be(false, "the .Net framework should find double 3 not equal to double NaN (if this assumption is wrong then the logic of this test is also wrong)");
+            Assert.AreEqual(false, (3 == double.NaN), "the .Net framework should find double 3 not equal to double NaN (if this assumption is wrong then the logic of this test is also wrong)");
 
             // Test that the component operation matches our assumption about the .Net framework
-            zComponentResult.Should().Be(false, "3 and NaN should not be equal");
+            Assert.AreEqual(false, zComponentResult, "3 and NaN should not be equal");
 
             // Test that our result matches the assumption
-            result.Should().Be(false, "the two vectors should not be equal given one of the Z components is NaN");
+            Assert.AreEqual(false, result, "the two vectors should not be equal given one of the Z components is NaN");
         }
 
         [TestMethod, TestCategory("Equals")]
@@ -1623,13 +1622,13 @@
             var result = v1 == v2;
 
             // Test our assumption about the .Net framework expectations
-            (double.NaN == double.NaN).Should().Be(false, "the .Net framework should find double NaN not equal to double NaN using the == operator (if this assumption is wrong then the logic of this test is also wrong)");
+            Assert.AreEqual(false, (double.NaN == double.NaN), "the .Net framework should find double NaN not equal to double NaN using the == operator (if this assumption is wrong then the logic of this test is also wrong)");
 
             // Test that the component operation matches our assumption about the .Net framework
-            zComponentResult.Should().Be(false, "NaN and NaN should not be equal when using the == operator");
+            Assert.AreEqual(false, zComponentResult, "NaN and NaN should not be equal when using the == operator");
 
             // Test that our result matches the assumption
-            result.Should().Be(false, "the two vectors should be not equal given the z components are NaN");
+            Assert.AreEqual(false, result, "the two vectors should be not equal given the z components are NaN");
         }
 
         [TestMethod, TestCategory("Equals")]
@@ -1640,7 +1639,7 @@
 
             var result = v1.Equals(v2);
 
-            result.Should().Be(true);
+            Assert.AreEqual(true, result);
         }
 
         [TestMethod, TestCategory("Equals")]
@@ -1651,7 +1650,7 @@
 
             var result = v1.Equals(v2);
 
-            result.Should().Be(false);
+            Assert.AreEqual(false, result);
         }
 
         [TestMethod, TestCategory("Equals")]
@@ -1664,13 +1663,13 @@
             var result = v1.Equals(v2);
 
             // Test our assumption about the .Net framework expectations
-            double.PositiveInfinity.Equals(double.PositiveInfinity).Should().Be(true, "the .Net framework should find double positive infinty equal to positive infinity (if this assumption is wrong then the logic of this test is also wrong)");
+            Assert.AreEqual(true, double.PositiveInfinity.Equals(double.PositiveInfinity), "the .Net framework should find double positive infinty equal to positive infinity (if this assumption is wrong then the logic of this test is also wrong)");
 
             // Test that the component operation matches our assumption about the .Net framework
-            zComponentResult.Should().Be(true, "z components of positive infinty and positive infinty should be equal");
+            Assert.AreEqual(true, zComponentResult, "z components of positive infinty and positive infinty should be equal");
 
             // Test that our result matches the assumption
-            result.Should().Be(true, "positive infinty and positive infinty should be equal");
+            Assert.AreEqual(true, result, "positive infinty and positive infinty should be equal");
         }
 
         [TestMethod, TestCategory("Equals")]
@@ -1683,13 +1682,13 @@
             var result = v1.Equals(v2);
 
             // Test our assumption about the .Net framework expectations
-            double.NegativeInfinity.Equals(double.NegativeInfinity).Should().Be(true, "the .Net framework should find double negative infinty equal to negative infinity (if this assumption is wrong then the logic of this test is also wrong)");
+            Assert.AreEqual(true, double.NegativeInfinity.Equals(double.NegativeInfinity), "the .Net framework should find double negative infinty equal to negative infinity (if this assumption is wrong then the logic of this test is also wrong)");
 
             // Test that the component operation matches our assumption about the.Net framework
-            zComponentResult.Should().Be(true, "z components of negative infinty and negative infinty should be equal");
+            Assert.AreEqual(true, zComponentResult, "z components of negative infinty and negative infinty should be equal");
 
             // Test that our result matches the assumption
-            result.Should().Be(true, "negative infinty and negative infinty should be equal");
+            Assert.AreEqual(true, result, "negative infinty and negative infinty should be equal");
         }
 
         [TestMethod, TestCategory("Equals")]
@@ -1702,13 +1701,13 @@
             var result = v1.Equals(v2);
 
             // Test our assumption about the .Net framework expectations
-            3.Equals(double.NaN).Should().Be(false, "the .Net framework should find double 3 not equal to double NaN (if this assumption is wrong then the logic of this test is also wrong)");
+            Assert.AreEqual(false, 3.Equals(double.NaN), "the .Net framework should find double 3 not equal to double NaN (if this assumption is wrong then the logic of this test is also wrong)");
 
             // Test that the component operation matches our assumption about the .Net framework
-            zComponentResult.Should().Be(false, "3 and NaN should not be equal");
+            Assert.AreEqual(false, zComponentResult, "3 and NaN should not be equal");
 
             // Test that our result matches the assumption
-            result.Should().Be(false, "the two vectors should not be equal given one of the Z components is NaN");
+            Assert.AreEqual(false, result, "the two vectors should not be equal given one of the Z components is NaN");
         }
 
         [TestMethod, TestCategory("Equals")]
@@ -1724,13 +1723,13 @@
             var result = v1.Equals(v2);
 
             // Test our assumption about the .Net framework expectations
-            double.NaN.Equals(double.NaN).Should().Be(true, "the .Net framework should find double NaN equal to double NaN using the Equals method (if this assumption is wrong then the logic of this test is also wrong)");
+            Assert.AreEqual(true, double.NaN.Equals(double.NaN), "the .Net framework should find double NaN equal to double NaN using the Equals method (if this assumption is wrong then the logic of this test is also wrong)");
 
             // Test that the component operation matches our assumption about the .Net framework
-            zComponentResult.Should().Be(true, "NaN and NaN should be equal");
+            Assert.AreEqual(true, zComponentResult, "NaN and NaN should be equal");
 
             // Test that our result matches the assumption
-            result.Should().Be(true, "the two vectors should be equal");
+            Assert.AreEqual(true, result, "the two vectors should be equal");
         }
 
         [TestMethod, TestCategory("Equals")]
@@ -1742,10 +1741,10 @@
             var result = v1.Equals(v2, 0.0002);
 
             // Quick test to ensure that the double minus operation does not introduce an unexpected margin of error that is higher than our margin of error
-            (3d - (2.9999d)).Should().BeLessThan(0.0002d, "the double calculations of 3 minus 2.9999 should be less than 0.0002 or our test is incorrect");
+            Assert.IsTrue(((3d - (2.9999d))) < (0.0002d), "the double calculations of 3 minus 2.9999 should be less than 0.0002 or our test is incorrect");
             
             // Assert our acual test
-            result.Should().Be(true, "the tolerance should have been greter than the difference between the z components for s1 and s2");
+            Assert.AreEqual(true, result, "the tolerance should have been greter than the difference between the z components for s1 and s2");
         }
 
         [TestMethod, TestCategory("Equals")]
@@ -1757,9 +1756,9 @@
             var result = v1.Equals(v2, 0.00009);
 
             // Quick test to ensure that the double minus operation does not introduce an unexpected margin of error
-            (3d - 2.9999d).Should().BeGreaterThan(0.00009d, "the double calculations of 3 minus 2.9999 should be greater than 0.00009 or our test is incorrect");
+            Assert.IsTrue(((3d - 2.9999d)) > (0.00009d), "the double calculations of 3 minus 2.9999 should be greater than 0.00009 or our test is incorrect");
 
-            result.Should().Be(false, "the tolerance should be less than the difference between the z components for s1 and s2");
+            Assert.AreEqual(false, result, "the tolerance should be less than the difference between the z components for s1 and s2");
         }
 
         [TestMethod, TestCategory("Equals")]
@@ -1772,13 +1771,13 @@
             var result = v1.Equals(v2, 0.00001);
 
             // Test our assumption about the .Net framework expectations
-            double.PositiveInfinity.Equals(double.PositiveInfinity).Should().Be(true, "the .Net framework should find double positive infinty equal to positive infinity (if this assumption is wrong then the logic of this test is also wrong)");
+            Assert.AreEqual(true, double.PositiveInfinity.Equals(double.PositiveInfinity), "the .Net framework should find double positive infinty equal to positive infinity (if this assumption is wrong then the logic of this test is also wrong)");
 
             // Test that the component operation matches our assumption about the .Net framework
-            zComponentResult.Should().Be(true, "positive infinty and positive infinty should be equal regardless of tolerance");
+            Assert.AreEqual(true, zComponentResult, "positive infinty and positive infinty should be equal regardless of tolerance");
 
             // Test that our result matches the assumption
-            result.Should().Be(true, "positive infinty and positive infinty should be equal regardless of tolerance");
+            Assert.AreEqual(true, result, "positive infinty and positive infinty should be equal regardless of tolerance");
         }
 
         [TestMethod, TestCategory("Equals")]
@@ -1791,13 +1790,13 @@
             var result = v1.Equals(v2, 0.00001);
 
             // Test our assumption about the .Net framework expectations
-            double.NegativeInfinity.Equals(double.NegativeInfinity).Should().Be(true, "the .Net framework should find double negative infinty equal to negative infinity (if this assumption is wrong then the logic of this test is also wrong)");
+            Assert.AreEqual(true, double.NegativeInfinity.Equals(double.NegativeInfinity), "the .Net framework should find double negative infinty equal to negative infinity (if this assumption is wrong then the logic of this test is also wrong)");
 
             // Test that the component operation matches our assumption about the .Net framework
-            zComponentResult.Should().Be(true, "negative infinty and negative infinty should be equal regardless of tolerance");
+            Assert.AreEqual(true, zComponentResult, "negative infinty and negative infinty should be equal regardless of tolerance");
 
             // Test that our result matches the assumption
-            result.Should().Be(true, "the two vectors should be equal given negative infinty and negative infinty should be equal regardless of tolerance");
+            Assert.AreEqual(true, result, "the two vectors should be equal given negative infinty and negative infinty should be equal regardless of tolerance");
         }
 
         [TestMethod, TestCategory("Equals")]
@@ -1810,13 +1809,13 @@
             var result = v1.Equals(v2, 0.00001);
 
             // Test our assumption about the .Net framework expectations
-            double.PositiveInfinity.Equals(double.NegativeInfinity).Should().Be(false, "the .Net framework should find double positive infinty not equal to negative infinity (if this assumption is wrong then the logic of this test is also wrong)");
+            Assert.AreEqual(false, double.PositiveInfinity.Equals(double.NegativeInfinity), "the .Net framework should find double positive infinty not equal to negative infinity (if this assumption is wrong then the logic of this test is also wrong)");
 
             // Test that the component operation matches our assumption about the .Net framework
-            zComponentResult.Should().Be(false, "positive infinty and negative infinty should not be equal");
+            Assert.AreEqual(false, zComponentResult, "positive infinty and negative infinty should not be equal");
 
             // Test that our result matches the assumption
-            result.Should().Be(false, "the two vectors should not be equal given positive infinty and negative infinty should not be equal");
+            Assert.AreEqual(false, result, "the two vectors should not be equal given positive infinty and negative infinty should not be equal");
         }
 
         [TestMethod, TestCategory("Equals")]
@@ -1829,13 +1828,13 @@
             var result = v1.Equals(v2, 0.00001);
 
             // Test our assumption about the .Net framework expectations
-            3.Equals(double.NaN).Should().Be(false, "the .Net framework should find double 3 not equal to double NaN (if this assumption is wrong then the logic of this test is also wrong)");
+            Assert.AreEqual(false, 3.Equals(double.NaN), "the .Net framework should find double 3 not equal to double NaN (if this assumption is wrong then the logic of this test is also wrong)");
 
             // Test that the component operation matches our assumption about the .Net framework
-            zComponentResult.Should().Be(false, "3 and NaN should not be equal");
+            Assert.AreEqual(false, zComponentResult, "3 and NaN should not be equal");
 
             // Test that our result matches the assumption
-            result.Should().Be(false, "the two vectors should not be equal given one of the Z components is NaN");
+            Assert.AreEqual(false, result, "the two vectors should not be equal given one of the Z components is NaN");
         }
 
         [TestMethod, TestCategory("Equals")]
@@ -1851,13 +1850,13 @@
             var result = v1.Equals(v2, 0.00001);
 
             // Test our assumption about the .Net framework expectations
-            double.NaN.Equals(double.NaN).Should().Be(true, "the .Net framework should find double NaN equal to double NaN using the Equals method (if this assumption is wrong then the logic of this test is also wrong)");
+            Assert.AreEqual(true, double.NaN.Equals(double.NaN), "the .Net framework should find double NaN equal to double NaN using the Equals method (if this assumption is wrong then the logic of this test is also wrong)");
 
             // Test that the component operation matches our assumption about the .Net framework
-            zComponentResult.Should().Be(true, "NaN and NaN should be equal");
+            Assert.AreEqual(true, zComponentResult, "NaN and NaN should be equal");
 
             // Test that our result matches the assumption
-            result.Should().Be(true, "the two vectors should be equal");
+            Assert.AreEqual(true, result, "the two vectors should be equal");
         }
 
         [TestMethod, TestCategory("Equals")]
@@ -1868,7 +1867,7 @@
 
             var result = v1.GetHashCode() == v2.GetHashCode();
 
-            result.Should().Be(true);
+            Assert.AreEqual(true, result);
         }
 
         [TestMethod, TestCategory("Equals")]
@@ -1879,7 +1878,7 @@
 
             var result = v1.GetHashCode() == v2.GetHashCode();
 
-            result.Should().Be(false);
+            Assert.AreEqual(false, result);
         }
 
         [TestMethod, TestCategory("Equals")]
@@ -1892,13 +1891,13 @@
             var result = v1.GetHashCode() == v2.GetHashCode();
 
             // Test our assumption about the .Net framework expectations
-            (double.PositiveInfinity.GetHashCode() == double.PositiveInfinity.GetHashCode()).Should().Be(true, "the .Net framework should find double positive infinty's hash code equal to positive infinity's hash code (if this assumption is wrong then the logic of this test is also wrong)");
+            Assert.AreEqual(true, (double.PositiveInfinity.GetHashCode() == double.PositiveInfinity.GetHashCode()), "the .Net framework should find double positive infinty's hash code equal to positive infinity's hash code (if this assumption is wrong then the logic of this test is also wrong)");
 
             // Test that the component operation matches our assumption about the .Net framework
-            zComponentResult.Should().Be(true, "z component hash codes of positive infinty and positive infinty should be equal");
+            Assert.AreEqual(true, zComponentResult, "z component hash codes of positive infinty and positive infinty should be equal");
 
             // Test that our result matches the assumption
-            result.Should().Be(true, "positive infinty and positive infinty hash codes should be equal");
+            Assert.AreEqual(true, result, "positive infinty and positive infinty hash codes should be equal");
         }
 
         [TestMethod, TestCategory("Equals")]
@@ -1911,13 +1910,13 @@
             var result = v1.GetHashCode() == v2.GetHashCode();
 
             // Test our assumption about the .Net framework expectations
-            (double.NegativeInfinity.GetHashCode() == double.NegativeInfinity.GetHashCode()).Should().Be(true, "the .Net framework should find double negative infinty's has code equal to negative infinity's hash code (if this assumption is wrong then the logic of this test is also wrong)");
+            Assert.AreEqual(true, (double.NegativeInfinity.GetHashCode() == double.NegativeInfinity.GetHashCode()), "the .Net framework should find double negative infinty's has code equal to negative infinity's hash code (if this assumption is wrong then the logic of this test is also wrong)");
 
             // Test that the component operation matches our assumption about the.Net framework
-            zComponentResult.Should().Be(true, "z component hash codes of negative infinty and negative infinty should be equal");
+            Assert.AreEqual(true, zComponentResult, "z component hash codes of negative infinty and negative infinty should be equal");
 
             // Test that our result matches the assumption
-            result.Should().Be(true, "negative infinty and negative infinty hash codes should be equal");
+            Assert.AreEqual(true, result, "negative infinty and negative infinty hash codes should be equal");
         }
 
         [TestMethod, TestCategory("Equals")]
@@ -1928,7 +1927,7 @@
 
             var result = v1.GetHashCode() == v2.GetHashCode();
 
-            result.Should().Be(false, "the two vectors' hash codes should not be equal given one of the Z components is NaN");
+            Assert.AreEqual(false, result, "the two vectors' hash codes should not be equal given one of the Z components is NaN");
         }
 
         [TestMethod, TestCategory("Equals")]
@@ -1944,13 +1943,13 @@
             var result = v1.GetHashCode() == v2.GetHashCode();
 
             // Test our assumption about the .Net framework expectations
-            (double.NaN.GetHashCode() == double.NaN.GetHashCode()).Should().Be(true, "the .Net framework should find the hash codes of double NaN and double NaN equal (if this assumption is wrong then the logic of this test is also wrong)");
+            Assert.AreEqual(true, (double.NaN.GetHashCode() == double.NaN.GetHashCode()), "the .Net framework should find the hash codes of double NaN and double NaN equal (if this assumption is wrong then the logic of this test is also wrong)");
 
             // Test that the component operation matches our assumption about the .Net framework
-            zComponentResult.Should().Be(true, "the hash codes of NaN and NaN should be equal");
+            Assert.AreEqual(true, zComponentResult, "the hash codes of NaN and NaN should be equal");
 
             // Test that our result matches the assumption
-            result.Should().Be(true, "the two vectors' hashcodes should be equal given the z components are NaN");
+            Assert.AreEqual(true, result, "the two vectors' hashcodes should be equal given the z components are NaN");
         }
 
         #endregion
@@ -1963,7 +1962,7 @@
             Vector v1 = new Vector(double.NaN, 0, 0);
             var result = v1.IsUnitVector();
 
-            result.Should().Be(false, "vector (NaN,0,0) is not a unit vector");
+            Assert.AreEqual(false, result, "vector (NaN,0,0) is not a unit vector");
         }
 
         [TestMethod, TestCategory("IsUnitVector")]
@@ -1972,7 +1971,7 @@
             Vector v1 = new Vector(1, 0, 0);
             var result = v1.IsUnitVector();
 
-            result.Should().Be(true, "vector (1,0,0) is a unit vector");
+            Assert.AreEqual(true, result, "vector (1,0,0) is a unit vector");
         }
 
         [TestMethod, TestCategory("IsUnitVector")]
@@ -1981,7 +1980,7 @@
             Vector v1 = new Vector(1, 1, 1);
             var result = v1.IsUnitVector();
 
-            result.Should().Be(false, "vector (1,1,1) is not a unit vector");
+            Assert.AreEqual(false, result, "vector (1,1,1) is not a unit vector");
         }
 
         [TestMethod, TestCategory("IsUnitVector")]
@@ -1990,7 +1989,7 @@
             Vector v1 = new Vector(1, 2, double.PositiveInfinity);
             var result = v1.IsUnitVector();
 
-            result.Should().Be(false, "vector (0,0, +Inf) is not a unit vector");
+            Assert.AreEqual(false, result, "vector (0,0, +Inf) is not a unit vector");
         }
 
         [TestMethod, TestCategory("IsUnitVector")]
@@ -1999,7 +1998,7 @@
             Vector v1 = new Vector(1, 2, double.NegativeInfinity);
             var result = v1.IsUnitVector();
 
-            result.Should().Be(false, "vector (0,0, -Inf) is not a unit vector");
+            Assert.AreEqual(false, result, "vector (0,0, -Inf) is not a unit vector");
         }
 
         [TestMethod, TestCategory("IsUnitVector")]
@@ -2008,7 +2007,7 @@
             Vector v1 = new Vector(1, 0, 0);
             var result = v1.IsUnitVector(0.0002);
 
-            result.Should().Be(true, "vector (1,0,0) is a unit vector");
+            Assert.AreEqual(true, result, "vector (1,0,0) is a unit vector");
         }
 
         [TestMethod, TestCategory("IsUnitVector")]
@@ -2018,10 +2017,10 @@
             var result = v1.IsUnitVector(0.0002);
 
             // Quick test to ensure that the double minus operation does not introduce an unexpected margin of error that is higher than our margin of error
-            (1d - 0.9999d).Should().BeLessThan(0.0002d, "the double calculations of 1 minus 0.9999 should be less than 0.0002 or our test is incorrect");
+            Assert.IsTrue(((1d - 0.9999d)) < (0.0002d), "the double calculations of 1 minus 0.9999 should be less than 0.0002 or our test is incorrect");
 
             // Assert our acual test
-            result.Should().Be(true, "the tolerance should have been greater than the difference between the z components and 1");
+            Assert.AreEqual(true, result, "the tolerance should have been greater than the difference between the z components and 1");
         }
 
         [TestMethod, TestCategory("IsUnitVector")]
@@ -2032,9 +2031,9 @@
             var result = v1.IsUnitVector(0.00009);
 
             // Quick test to ensure that the double minus operation does not introduce an unexpected margin of error
-            (1d - 0.9999d).Should().BeGreaterThan(0.00009d, "the double calculations of 3 minus 2.9999 should be greater than 0.00009 or our test is incorrect");
+            Assert.IsTrue(((1d - 0.9999d)) > (0.00009d), "the double calculations of 3 minus 2.9999 should be greater than 0.00009 or our test is incorrect");
 
-            result.Should().Be(false, "the tolerance should be less than the difference between the z component and 1");
+            Assert.AreEqual(false, result, "the tolerance should be less than the difference between the z component and 1");
         }
 
         #endregion
@@ -2048,7 +2047,7 @@
             Vector v2 = new Vector(0, 1, 0);
             var result = v1.IsPerpendicular(v2);
 
-            result.Should().Be(true, "vector (1,0,0) is perpendicular to vector (0,1,0)");
+            Assert.AreEqual(true, result, "vector (1,0,0) is perpendicular to vector (0,1,0)");
         }
 
         [TestMethod, TestCategory("IsPerpendicular")]
@@ -2058,7 +2057,7 @@
             Vector v2 = new Vector(0, double.PositiveInfinity, 0);
             var result = v1.IsPerpendicular(v2);
 
-            result.Should().Be(true, "vector (+inf,0,0) is perpendicular to vector (0,+inf,0)");
+            Assert.AreEqual(true, result, "vector (+inf,0,0) is perpendicular to vector (0,+inf,0)");
         }
 
         [TestMethod, TestCategory("IsPerpendicular")]
@@ -2068,7 +2067,7 @@
             Vector v2 = new Vector(1, 0, 0);
             var result = v1.IsPerpendicular(v2);
 
-            result.Should().Be(true, "vector (0,1,0) is perpendicular to vector (1,0,0)");
+            Assert.AreEqual(true, result, "vector (0,1,0) is perpendicular to vector (1,0,0)");
         }
 
         [TestMethod, TestCategory("IsPerpendicular")]
@@ -2078,7 +2077,7 @@
             Vector v2 = new Vector(double.PositiveInfinity, 0, 0);
             var result = v1.IsPerpendicular(v2);
 
-            result.Should().Be(true, "vector (0,+inf,0) is perpendicular to vector (+inf,0,0)");
+            Assert.AreEqual(true, result, "vector (0,+inf,0) is perpendicular to vector (+inf,0,0)");
         }
 
         [TestMethod, TestCategory("IsPerpendicular")]
@@ -2088,7 +2087,7 @@
             Vector v2 = new Vector(0, -1, 0);
             var result = v1.IsPerpendicular(v2);
 
-            result.Should().Be(true, "vector (1,0,0) is perpendicular to vector (0,-1,0)");
+            Assert.AreEqual(true, result, "vector (1,0,0) is perpendicular to vector (0,-1,0)");
         }
 
         [TestMethod, TestCategory("IsPerpendicular")]
@@ -2098,7 +2097,7 @@
             Vector v2 = new Vector(0, double.NegativeInfinity, 0);
             var result = v1.IsPerpendicular(v2);
 
-            result.Should().Be(true, "vector (+inf,0,0) is perpendicular to vector (0,-inf,0)");
+            Assert.AreEqual(true, result, "vector (+inf,0,0) is perpendicular to vector (0,-inf,0)");
         }
 
         [TestMethod, TestCategory("IsPerpendicular")]
@@ -2108,7 +2107,7 @@
             Vector v2 = new Vector(1, 0, 0);
             var result = v1.IsPerpendicular(v2);
 
-            result.Should().Be(true, "vector (0,-1,0) is perpendicular to vector (1,0,0)");
+            Assert.AreEqual(true, result, "vector (0,-1,0) is perpendicular to vector (1,0,0)");
         }
 
         [TestMethod, TestCategory("IsPerpendicular")]
@@ -2118,7 +2117,7 @@
             Vector v2 = new Vector(double.PositiveInfinity, 0, 0);
             var result = v1.IsPerpendicular(v2);
 
-            result.Should().Be(true, "vector (0,-inf,0) is perpendicular to vector (+inf,0,0)");
+            Assert.AreEqual(true, result, "vector (0,-inf,0) is perpendicular to vector (+inf,0,0)");
         }
 
         [TestMethod, TestCategory("IsPerpendicular")]
@@ -2128,7 +2127,7 @@
             Vector v2 = new Vector(0, -1, 0);
             var result = v1.IsPerpendicular(v2);
 
-            result.Should().Be(true, "vector (-1,0,0) is perpendicular to vector (0,-1,0)");
+            Assert.AreEqual(true, result, "vector (-1,0,0) is perpendicular to vector (0,-1,0)");
         }
 
         [TestMethod, TestCategory("IsPerpendicular")]
@@ -2138,7 +2137,7 @@
             Vector v2 = new Vector(0, double.NegativeInfinity, 0);
             var result = v1.IsPerpendicular(v2);
 
-            result.Should().Be(true, "vector (-inf,0,0) is perpendicular to vector (0,-inf,0)");
+            Assert.AreEqual(true, result, "vector (-inf,0,0) is perpendicular to vector (0,-inf,0)");
         }
 
         [TestMethod, TestCategory("IsPerpendicular")]
@@ -2148,7 +2147,7 @@
             Vector v2 = new Vector(-1, 0, 0);
             var result = v1.IsPerpendicular(v2);
 
-            result.Should().Be(true, "vector (0,-1,0) is perpendicular to vector (-1,0,0)");
+            Assert.AreEqual(true, result, "vector (0,-1,0) is perpendicular to vector (-1,0,0)");
         }
 
         [TestMethod, TestCategory("IsPerpendicular")]
@@ -2158,7 +2157,7 @@
             Vector v2 = new Vector(double.NegativeInfinity, 0, 0);
             var result = v1.IsPerpendicular(v2);
 
-            result.Should().Be(true, "vector (0,-inf,0) is perpendicular to vector (-inf,0,0)");
+            Assert.AreEqual(true, result, "vector (0,-inf,0) is perpendicular to vector (-inf,0,0)");
         }
 
         [TestMethod, TestCategory("IsPerpendicular")]
@@ -2168,7 +2167,7 @@
             Vector v2 = new Vector(0, 1, 0);
             var result = v1.IsPerpendicular(v2);
 
-            result.Should().Be(true, "vector (-1,0,0) is perpendicular to vector (0,1,0)");
+            Assert.AreEqual(true, result, "vector (-1,0,0) is perpendicular to vector (0,1,0)");
         }
 
         [TestMethod, TestCategory("IsPerpendicular")]
@@ -2178,7 +2177,7 @@
             Vector v2 = new Vector(0, double.PositiveInfinity, 0);
             var result = v1.IsPerpendicular(v2);
 
-            result.Should().Be(true, "vector (-inf,0,0) is perpendicular to vector (0,+inf,0) but ");
+            Assert.AreEqual(true, result, "vector (-inf,0,0) is perpendicular to vector (0,+inf,0) but ");
         }
 
         [TestMethod, TestCategory("IsPerpendicular")]
@@ -2188,7 +2187,7 @@
             Vector v2 = new Vector(-1, 0, 0);
             var result = v1.IsPerpendicular(v2);
 
-            result.Should().Be(true, "vector (0,1,0) is perpendicular to vector (-1,0,0)");
+            Assert.AreEqual(true, result, "vector (0,1,0) is perpendicular to vector (-1,0,0)");
         }
 
         [TestMethod, TestCategory("IsPerpendicular")]
@@ -2198,7 +2197,7 @@
             Vector v2 = new Vector(double.NegativeInfinity, 0, 0);
             var result = v1.IsPerpendicular(v2);
 
-            result.Should().Be(true, "vector (0,+inf,0) is perpendicular to vector (-inf,0,0)");
+            Assert.AreEqual(true, result, "vector (0,+inf,0) is perpendicular to vector (-inf,0,0)");
         }
 
         [TestMethod, TestCategory("IsPerpendicular")]
@@ -2208,7 +2207,7 @@
             Vector v2 = new Vector(0, ArbitaryTestDouble, 0);
             var result = v1.IsPerpendicular(v2);
 
-            result.Should().Be(true, "vector (n,0,0) is perpendicular to vector (0,n,0)");
+            Assert.AreEqual(true, result, "vector (n,0,0) is perpendicular to vector (0,n,0)");
         }
 
         [TestMethod, TestCategory("IsPerpendicular")]
@@ -2218,7 +2217,7 @@
             Vector v2 = new Vector(ArbitaryTestDouble, 0, 0);
             var result = v1.IsPerpendicular(v2);
 
-            result.Should().Be(true, "vector (0,n,0) is perpendicular to vector (n,0,0)");
+            Assert.AreEqual(true, result, "vector (0,n,0) is perpendicular to vector (n,0,0)");
         }
 
         [TestMethod, TestCategory("IsPerpendicular")]
@@ -2228,7 +2227,7 @@
             Vector v2 = new Vector(0, -ArbitaryTestDouble, 0);
             var result = v1.IsPerpendicular(v2);
 
-            result.Should().Be(true, "vector (n,0,0) is perpendicular to vector (0,-n,0)");
+            Assert.AreEqual(true, result, "vector (n,0,0) is perpendicular to vector (0,-n,0)");
         }
 
         [TestMethod, TestCategory("IsPerpendicular")]
@@ -2238,7 +2237,7 @@
             Vector v2 = new Vector(ArbitaryTestDouble, 0, 0);
             var result = v1.IsPerpendicular(v2);
 
-            result.Should().Be(true, "vector (0,-n,0) is perpendicular to vector (n,0,0)");
+            Assert.AreEqual(true, result, "vector (0,-n,0) is perpendicular to vector (n,0,0)");
         }
 
         [TestMethod, TestCategory("IsPerpendicular")]
@@ -2248,7 +2247,7 @@
             Vector v2 = new Vector(0, -ArbitaryTestDouble, 0);
             var result = v1.IsPerpendicular(v2);
 
-            result.Should().Be(true, "vector (-n,0,0) is perpendicular to vector (0,-n,0)");
+            Assert.AreEqual(true, result, "vector (-n,0,0) is perpendicular to vector (0,-n,0)");
         }
 
         [TestMethod, TestCategory("IsPerpendicular")]
@@ -2258,7 +2257,7 @@
             Vector v2 = new Vector(-ArbitaryTestDouble, 0, 0);
             var result = v1.IsPerpendicular(v2);
 
-            result.Should().Be(true, "vector (0,-n,0) is perpendicular to vector (-n,0,0)");
+            Assert.AreEqual(true, result, "vector (0,-n,0) is perpendicular to vector (-n,0,0)");
         }
 
         [TestMethod, TestCategory("IsPerpendicular")]
@@ -2268,7 +2267,7 @@
             Vector v2 = new Vector(0, ArbitaryTestDouble, 0);
             var result = v1.IsPerpendicular(v2);
 
-            result.Should().Be(true, "vector (-n,0,0) is perpendicular to vector (0,n,0)");
+            Assert.AreEqual(true, result, "vector (-n,0,0) is perpendicular to vector (0,n,0)");
         }
 
         [TestMethod, TestCategory("IsPerpendicular")]
@@ -2278,7 +2277,7 @@
             Vector v2 = new Vector(-ArbitaryTestDouble, 0, 0);
             var result = v1.IsPerpendicular(v2);
 
-            result.Should().Be(true, "vector (0,n,0) is perpendicular to vector (-n,0,0)");
+            Assert.AreEqual(true, result, "vector (0,n,0) is perpendicular to vector (-n,0,0)");
         }
 
         [TestMethod, TestCategory("IsPerpendicular")]
@@ -2288,7 +2287,7 @@
             Vector v2 = new Vector(1, 1, 0);
             var result = v1.IsPerpendicular(v2);
 
-            result.Should().Be(false, "vector (1,0,0) is not perpendicular to vector (1,1,0)");
+            Assert.AreEqual(false, result, "vector (1,0,0) is not perpendicular to vector (1,1,0)");
         }
 
         [TestMethod, TestCategory("IsPerpendicular")]
@@ -2298,7 +2297,7 @@
             Vector v2 = new Vector(double.PositiveInfinity, double.PositiveInfinity, 0);
             var result = v1.IsPerpendicular(v2);
 
-            result.Should().Be(false, "vector (+inf,0,0) is not perpendicular to vector (+inf,+inf,0)");
+            Assert.AreEqual(false, result, "vector (+inf,0,0) is not perpendicular to vector (+inf,+inf,0)");
         }
 
         [TestMethod, TestCategory("IsPerpendicular")]
@@ -2308,7 +2307,7 @@
             Vector v2 = new Vector(-1, -1, 0);
             var result = v1.IsPerpendicular(v2);
 
-            result.Should().Be(false, "vector (1,0,0) is not perpendicular to vector (-1,-1,0)");
+            Assert.AreEqual(false, result, "vector (1,0,0) is not perpendicular to vector (-1,-1,0)");
         }
 
         [TestMethod, TestCategory("IsPerpendicular")]
@@ -2318,7 +2317,7 @@
             Vector v2 = new Vector(double.NegativeInfinity, double.NegativeInfinity, 0);
             var result = v1.IsPerpendicular(v2);
 
-            result.Should().Be(false, "vector (+inf,0,0) is not perpendicular to vector (-inf,-inf,0)");
+            Assert.AreEqual(false, result, "vector (+inf,0,0) is not perpendicular to vector (-inf,-inf,0)");
         }
 
         [TestMethod, TestCategory("IsPerpendicular")]
@@ -2328,7 +2327,7 @@
             Vector v2 = new Vector(0, 0, 0);
             var result = v1.IsPerpendicular(v2);
 
-            result.Should().Be(false, "vector (0,0,0) is not perpendicular to vector (0,0,0)");
+            Assert.AreEqual(false, result, "vector (0,0,0) is not perpendicular to vector (0,0,0)");
         }
 
         [TestMethod, TestCategory("IsPerpendicular")]
@@ -2339,7 +2338,7 @@
 
             var result = v1.IsPerpendicular(v2, 0.0002); // remember the tolerance should be for the angle in Rad compared to 90deg (as a rad)
 
-            result.Should().Be(true, "vector (0,1,0) is perpendicular to vector (1,0,0)");
+            Assert.AreEqual(true, result, "vector (0,1,0) is perpendicular to vector (1,0,0)");
         }
 
         [TestMethod, TestCategory("IsPerpendicular")]
@@ -2350,7 +2349,7 @@
 
             var result = v1.IsPerpendicular(v2, 0.0002); // remember the tolerance should be for the angle in Rad compared to 90deg (as a rad)
 
-            result.Should().Be(true, "vector (0,+inf,0) is perpendicular to vector (+inf,0,0)");
+            Assert.AreEqual(true, result, "vector (0,+inf,0) is perpendicular to vector (+inf,0,0)");
         }
 
         [TestMethod, TestCategory("IsPerpendicular")]
@@ -2363,10 +2362,10 @@
 
             // Check the tolerance on the angle
             var angle = v1.Angle(v2);
-            angle.AlmostEqualsWithAbsTolerance(Deg90AsRad, 0.001).Should().Be(true, string.Format("the angle between v1 and v2 should be 90 deg within 0.001 radians (found {0} rad)", angle));
+            Assert.AreEqual(true, angle.AlmostEqualsWithAbsTolerance(Deg90AsRad, 0.001), string.Format("the angle between v1 and v2 should be 90 deg within 0.001 radians (found {0} rad)", angle));
 
             // Check the actual result
-            result.Should().Be(true, "vector (0,1,0) is perpendicular to vector (1,0.001,0)");
+            Assert.AreEqual(true, result, "vector (0,1,0) is perpendicular to vector (1,0.001,0)");
         }
 
         /// <summary>
@@ -2384,10 +2383,10 @@
 
             // Check the tolerance on the angle after normalization
             var angle = v1.NormalizeOrDefault().Angle(v2.NormalizeOrDefault());
-            angle.AlmostEqualsWithAbsTolerance(Deg90AsRad, 0.001).Should().Be(true, string.Format("the angle between v1 and v2 should be 90 deg within 0.001 radians (found {0} rad)", angle));
+            Assert.AreEqual(true, angle.AlmostEqualsWithAbsTolerance(Deg90AsRad, 0.001), string.Format("the angle between v1 and v2 should be 90 deg within 0.001 radians (found {0} rad)", angle));
 
             // Check the actual result
-            result.Should().Be(true, "vector (0,+inf,0) is perpendicular to vector (+inf,0.001,0)");
+            Assert.AreEqual(true, result, "vector (0,+inf,0) is perpendicular to vector (+inf,0.001,0)");
         }
 
         [TestMethod, TestCategory("IsPerpendicular")]
@@ -2397,7 +2396,7 @@
             Vector v2 = new Vector(0, 1, 0);
             var result = v1.IsPerpendicular(v2);
 
-            result.Should().Be(false, "vector (NaN,0,0) is not perpendicular to vector (0,1,0)");
+            Assert.AreEqual(false, result, "vector (NaN,0,0) is not perpendicular to vector (0,1,0)");
         }
 
         [TestMethod, TestCategory("IsPerpendicular")]
@@ -2407,7 +2406,7 @@
             Vector v2 = new Vector(0, double.NaN, 0);
             var result = v1.IsPerpendicular(v2);
 
-            result.Should().Be(false, "vector (NaN,0,0) is not perpendicular to vector (0,NaN,0)");
+            Assert.AreEqual(false, result, "vector (NaN,0,0) is not perpendicular to vector (0,NaN,0)");
         }
 
         [TestMethod, TestCategory("IsPerpendicular")]
@@ -2417,7 +2416,7 @@
             Vector v2 = new Vector(0, 1, 0);
             var result = v1.IsPerpendicular(v2, 1);
 
-            result.Should().Be(false, "vector (NaN,0,0) is not perpendicular to vector (0,1,0) regardless of tolerance");
+            Assert.AreEqual(false, result, "vector (NaN,0,0) is not perpendicular to vector (0,1,0) regardless of tolerance");
         }
 
         [TestMethod, TestCategory("IsPerpendicular")]
@@ -2427,7 +2426,7 @@
             Vector v2 = new Vector(0, double.NaN, 0);
             var result = v1.IsPerpendicular(v2, 1);
 
-            result.Should().Be(false, "vector (NaN,0,0) is not perpendicular to vector (0,NaN,0) regardless of tolerance");
+            Assert.AreEqual(false, result, "vector (NaN,0,0) is not perpendicular to vector (0,NaN,0) regardless of tolerance");
         }
 
         [TestMethod, TestCategory("IsPerpendicular")]
@@ -2437,7 +2436,7 @@
             Vector v2 = new Vector(0, 0, 0);
             var result = v1.IsPerpendicular(v2, 1);
 
-            result.Should().Be(false, "vector (0,0,0) is not perpendicular to vector (0,0,0) regardless of tolerance");
+            Assert.AreEqual(false, result, "vector (0,0,0) is not perpendicular to vector (0,0,0) regardless of tolerance");
         }
 
         #endregion
@@ -2450,7 +2449,7 @@
             Vector v1 = new Vector(double.NaN, 0, 0);
             var result = v1.IsNaN();
 
-            result.Should().Be(true);
+            Assert.AreEqual(true, result);
         }
 
         [TestMethod, TestCategory("IsNaN")]
@@ -2459,7 +2458,7 @@
             Vector v1 = new Vector(0, double.NaN, 0);
             var result = v1.IsNaN();
 
-            result.Should().Be(true);
+            Assert.AreEqual(true, result);
         }
 
         [TestMethod, TestCategory("IsNaN")]
@@ -2468,7 +2467,7 @@
             Vector v1 = new Vector(0, 0, double.NaN);
             var result = v1.IsNaN();
 
-            result.Should().Be(true);
+            Assert.AreEqual(true, result);
         }
 
         [TestMethod, TestCategory("IsNaN")]
@@ -2477,7 +2476,7 @@
             Vector v1 = new Vector(0, double.NaN, double.NaN);
             var result = v1.IsNaN();
 
-            result.Should().Be(true);
+            Assert.AreEqual(true, result);
         }
 
         [TestMethod, TestCategory("IsNaN")]
@@ -2486,7 +2485,7 @@
             Vector v1 = new Vector(double.NaN, double.NaN, double.NaN);
             var result = v1.IsNaN();
 
-            result.Should().Be(true);
+            Assert.AreEqual(true, result);
         }
 
         [TestMethod, TestCategory("IsNaN")]
@@ -2495,7 +2494,7 @@
             Vector v1 = new Vector(1, 2, 3);
             var result = v1.IsNaN();
 
-            result.Should().Be(false);
+            Assert.AreEqual(false, result);
         }
 
         #endregion

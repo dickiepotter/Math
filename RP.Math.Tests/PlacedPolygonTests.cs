@@ -2,7 +2,6 @@ namespace RP.Math.Tests
 {
     using System;
 
-    using FluentAssertions;
 
     using Microsoft.VisualStudio.TestTools.UnitTesting;
 
@@ -27,26 +26,26 @@ namespace RP.Math.Tests
         public void TooFewVertices_ShouldThrow_Test()
         {
             Action act = () => new PlacedPolygon(new Vector(0, 0, 0), new Vector(1, 0, 0));
-            act.Should().Throw<ArgumentException>();
+            Assert.ThrowsException<ArgumentException>(act);
         }
 
         [TestMethod, TestCategory("Measurement")]
         public void Area_Perimeter_Normal_Centroid_Test()
         {
             var s = Square();
-            s.Area.Should().BeApproximately(4, Tol);
-            s.Perimeter.Should().BeApproximately(8, Tol);
-            s.Normal.Equals(new Vector(0, 0, 1), Tol).Should().BeTrue();
-            s.Centroid.Equals(new Vector(1, 1, 0), LooseTol).Should().BeTrue();
+            Assert.AreEqual(4, s.Area, Tol);
+            Assert.AreEqual(8, s.Perimeter, Tol);
+            Assert.IsTrue(s.Normal.Equals(new Vector(0, 0, 1), Tol));
+            Assert.IsTrue(s.Centroid.Equals(new Vector(1, 1, 0), LooseTol));
         }
 
         [TestMethod, TestCategory("Containment")]
         public void Contains_Test()
         {
             var s = Square();
-            s.Contains(new Vector(1, 1, 0), Tol).Should().BeTrue();
-            s.Contains(new Vector(3, 1, 0), Tol).Should().BeFalse();
-            s.Contains(new Vector(1, 1, 0.5), Tol).Should().BeFalse(); // off the plane
+            Assert.IsTrue(s.Contains(new Vector(1, 1, 0), Tol));
+            Assert.IsFalse(s.Contains(new Vector(3, 1, 0), Tol));
+            Assert.IsFalse(s.Contains(new Vector(1, 1, 0.5), Tol)); // off the plane
         }
 
         [TestMethod, TestCategory("Containment")]
@@ -59,31 +58,31 @@ namespace RP.Math.Tests
                 new Vector(4, 4, 0),
                 new Vector(2, 2, 0),
                 new Vector(0, 4, 0));
-            concave.IsConvex(Tol).Should().BeFalse();
-            concave.Contains(new Vector(2, 1, 0), Tol).Should().BeTrue();  // below the notch
-            concave.Contains(new Vector(2, 3, 0), Tol).Should().BeFalse(); // inside the notch (outside the polygon)
+            Assert.IsFalse(concave.IsConvex(Tol));
+            Assert.IsTrue(concave.Contains(new Vector(2, 1, 0), Tol));  // below the notch
+            Assert.IsFalse(concave.Contains(new Vector(2, 3, 0), Tol)); // inside the notch (outside the polygon)
         }
 
         [TestMethod, TestCategory("Query")]
         public void ClosestPoint_OnEdge_Test()
         {
-            Square().ClosestPoint(new Vector(3, 1, 0)).Equals(new Vector(2, 1, 0), Tol).Should().BeTrue();
+            Assert.IsTrue(Square().ClosestPoint(new Vector(3, 1, 0)).Equals(new Vector(2, 1, 0), Tol));
         }
 
         [TestMethod, TestCategory("Intersect")]
         public void TryIntersect_ThroughFace_Test()
         {
             var ray = new Ray(new Vector(1, 1, 5), new Vector(0, 0, -1));
-            Square().TryIntersect(ray, out Vector p).Should().BeTrue();
-            p.Equals(new Vector(1, 1, 0), LooseTol).Should().BeTrue();
+            Assert.IsTrue(Square().TryIntersect(ray, out Vector p));
+            Assert.IsTrue(p.Equals(new Vector(1, 1, 0), LooseTol));
         }
 
         [TestMethod, TestCategory("Transformation")]
         public void Transform_ShouldMoveVertices_Test()
         {
             var moved = Square().Translate(new Vector(0, 0, 5));
-            moved[0].Equals(new Vector(0, 0, 5), Tol).Should().BeTrue();
-            moved.Area.Should().BeApproximately(4, Tol);
+            Assert.IsTrue(moved[0].Equals(new Vector(0, 0, 5), Tol));
+            Assert.AreEqual(4, moved.Area, Tol);
         }
     }
 }
