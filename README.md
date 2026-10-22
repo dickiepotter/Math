@@ -2056,3 +2056,7 @@ types follow a settled conceptual/placed split — `Circle`, `Sphere`, `Triangle
 direction-based construction (`FromToRotation`, `LookRotation`); `Plane` gained plane-plane intersection;
 every placed shape gained `DistanceTo`; and two new families joined: the curves (`Bezier`, `Hermite`,
 `CatmullRom`) and the axis-aligned bounding volumes (`BoundingBox`, `BoundingSphere`).
+
+## Licence and disclaimer
+
+This is a personal project by Richard Potter, shared in the hope it's useful. Like the CodeProject article it grew out of, it's free to use under the Code Project Open License (CPOL) 1.02 (see [LICENSE.txt](LICENSE.txt)). It's provided as is: I make no promises that it works or suits your purpose, and I take no responsibility for anything that happens from using it. It isn't a product of, or supported by, any company I work for.

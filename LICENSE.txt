@@ -1,0 +1,26 @@
+The Code Project Open License (CPOL) 1.02
+
+Copyright © Richard Potter
+
+This software and the accompanying article documentation are licensed under
+The Code Project Open License (CPOL) 1.02. The full license text is available
+at:
+
+    https://www.codeproject.com/info/cpol10.aspx
+
+Summary of the main terms (the canonical license linked above governs):
+
+  - You may use the source code and executable, in whole or in part, in your
+    own applications, including commercial ones.
+  - You may modify the source code, and distribute the modified source and
+    derived binaries.
+  - The source code and binaries are provided "as is" without warranty of any
+    kind, and you use them at your own risk.
+  - You agree not to hold the author liable for any damages arising from the
+    use of the work.
+  - You may not sell the source code or the article(s) on their own, nor claim
+    authorship of the work.
+
+This library grew out of "A Vector Type for C#", originally published on
+CodeProject under the CPOL:
+    https://www.codeproject.com/Articles/17425/A-Vector-Type-for-C
