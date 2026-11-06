@@ -13,7 +13,7 @@ Three pages, reached from the bar at the top:
 |---|---|
 | **Vectors & geometry** (`/`) | `Vector`, the rotation types and the line/plane family, drawn in a 3D scene |
 | **Plane geometry** (`/plane`) | `Polygon2d`, `Polyline2d`, `Segment2d` — drag a shape and watch the shoelace area and winding, the winding-number inside test, ear-clipping triangles, the convex hull, Douglas-Peucker simplification, Sutherland-Hodgman clipping, segment intersection, booleans by overlay and offsetting, each explained beside it |
-| **Solids from triangles** (`/solids`) | `TriangleSurface` — a box, a ball, a ring and an open ball cut into triangles: volume by signed tetrahedra against the exact answer, surface area, the centre of volume, the closed-skin check, and Euler's formula counting the holes through |
+| **Solids from triangles** (`/solids`) | `TriangleSurface` — a box, a ball, a ring and an open ball cut into triangles: volume by signed tetrahedra against the exact answer, surface area, the centre of volume, the closed-skin check, Euler's formula counting the holes through, and `SurfaceRepair` flipping, re-orienting and filling |
 | **Noise fields** (`/noise`) | `RP.Math.Noise` — Perlin, Simplex, value and Worley fields, rendered as an image |
 
 ## Vectors & geometry

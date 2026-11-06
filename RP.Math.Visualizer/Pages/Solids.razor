@@ -34,6 +34,12 @@
         <div class="scene-tools">
             @Slider("turn", 0, 360, 1, turn, v => turn = v)
         </div>
+        <div class="scene-tools">
+            <button @onclick="Scramble">Flip some triangles</button>
+            <button @onclick="Orient">Orient consistently</button>
+            <button @onclick="Fill">Fill holes</button>
+            <span class="hint">@repairNote</span>
+        </div>
     </section>
 
     <aside class="panel">
@@ -87,6 +93,26 @@
     private double turn = 30;
     private List<Vector3d> corners = new List<Vector3d>();
     private List<(int A, int B, int C)> faces = new List<(int A, int B, int C)>();
+    private string repairNote = "SurfaceRepair mends a broken skin";
+
+    // turn every seventh triangle inside out, as a badly exported file might
+    private void Scramble()
+    {
+        for (int i = 0; i < faces.Count; i += 7)
+        {
+            faces[i] = (faces[i].A, faces[i].C, faces[i].B);
+        }
+
+        repairNote = $"{SurfaceRepair.MisorientedEdgeCount(faces)} edges now have both triangles running the same way";
+    }
+
+    private void Orient() => repairNote = $"turned {SurfaceRepair.OrientConsistently(corners, faces)} triangles";
+
+    private void Fill()
+    {
+        var (filled, open) = SurfaceRepair.FillHoles(corners, faces);
+        repairNote = $"closed {filled} hole(s), left {open}";
+    }
 
     protected override void OnInitialized() => Build();
 
@@ -111,6 +137,7 @@
 
     private void Build()
     {
+        repairNote = "SurfaceRepair mends a broken skin";
         corners = new List<Vector3d>();
         faces = new List<(int A, int B, int C)>();
         switch (shape)

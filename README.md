@@ -1874,7 +1874,12 @@ bool closed = TriangleSurface.IsClosed(faces);
 int holes = TriangleSurface.Genus(faces);
 ```
 
-Try it on the visualiser's **Solids from triangles** page.
+`SurfaceRepair` mends the skins model files arrive with: `Weld` joins corners a hair apart (a grid of cells the
+size of the tolerance keeps it fast), `RemoveDegenerate` and `RemoveDuplicates` drop empty and doubled faces,
+`OrientConsistently` walks across shared edges turning each face to match its neighbour and turns any piece with a
+negative volume round whole, and `FillHoles` follows each loop of one-sided edges and fans it shut.
+
+Try both on the visualiser's **Solids from triangles** page.
 
 ---
 
