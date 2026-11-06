@@ -35,6 +35,7 @@ more.*
 - [Curves: `Bezier`, `Hermite`, `CatmullRom`](#curves-bezier-hermite-catmullrom)
 - [Shapes: conceptual and placed](#shapes-conceptual-and-placed)
 - [Bounding volumes: `BoundingBox` and `BoundingSphere`](#bounding-volumes-boundingbox-and-boundingsphere)
+- [Plane geometry: polygons and the algorithms on them](#plane-geometry-polygons-and-the-algorithms-on-them)
 - [Noise: procedural fields](#noise-procedural-fields)
 - [Supporting numeric helpers](#supporting-numeric-helpers)
 - [Points of interest](#points-of-interest)
@@ -1752,6 +1753,89 @@ bool hitsBox  = s.Intersects(box);
 bool hitsBall = s.Intersects(other);
 BoundingSphere grown = s.Merge(extraPoint);
 ```
+
+---
+
+## Plane geometry: polygons and the algorithms on them
+
+Most of RP.Math lives in three dimensions, but a great deal of practical geometry is flat: the outline of a
+letter, a floor plan, a map region, one layer of a 3D print, the window a game draws into. The `Planar` types
+work in the plane with `Vector2d` points, and each method is one of the classic algorithms, written to be read.
+
+| Type | What it is |
+|---|---|
+| `Box2d` | An axis-aligned rectangle: the quick, conservative stand-in for a complicated shape. |
+| `Segment2d` | A straight piece of line between two points, with closest point, side test and intersection. |
+| `Polygon2d` | A closed outline through corners: area, winding, centroid, containment, triangles, hull, simplification, clipping. |
+| `Polyline2d` | An open line through points: length, walking along it, resampling and simplification. |
+| `Region2d` | Several outlines together: shapes, their holes, islands in the holes, read with a fill rule. |
+| `IPolygonClipper` | Union, difference, intersection and offsetting of arbitrary regions, for a specialist library to supply. |
+
+Try every one of these interactively on the visualiser's **Plane geometry** page.
+
+### The 2D cross product is the workhorse
+
+For two plane vectors `a` and `b`, `a.X * b.Y - a.Y * b.X` is twice the area of the triangle they span, signed:
+positive when `b` is anticlockwise of `a`, negative when clockwise, zero when they point the same way. Almost
+everything below is that one number used cleverly: which side of a line a point is on (`Segment2d.SideOf`),
+whether a corner turns left or right (`Polygon2d.IsConvex`), and the area of a whole polygon.
+
+### Area and winding — the shoelace formula
+
+Add up `x[i] * y[i+1] - x[i+1] * y[i]` round the polygon and halve it (`Polygon2d.SignedArea`). Each term is
+twice the signed area of the triangle from the origin to one edge; triangles for edges going one way round add,
+those coming back subtract, and what is left is exactly the polygon's area — for any simple polygon, convex or
+not. The sign is a bonus: positive means the corners run anticlockwise, negative clockwise (`Winding`). The
+centroid is the same sum with each triangle's centre weighted by its area.
+
+### Inside or outside — the winding number
+
+Fire a ray from the point to the right. Each edge crossing it going up adds one; each going down takes one away
+(`Polygon2d.WindingNumber`). Zero means outside. Unlike counting crossings, this stays right for outlines that
+loop over themselves, and with several outlines (`Region2d`) the numbers simply add: an anticlockwise outer edge
+and a clockwise hole cancel inside the hole. That is the **non-zero fill rule**; the **even-odd** rule looks only
+at whether the count is odd.
+
+### Triangles — ear clipping
+
+An *ear* is a corner that turns the convex way and whose triangle with its neighbours holds no other corner.
+Cutting it off leaves a simple polygon one corner smaller, and the *two ears theorem* guarantees one is always
+there to cut (`Polygon2d.Triangulate`): `n` corners always give `n - 2` triangles. Triangles are what a GPU
+draws, and what areas, centroids and physics are easiest to compute on.
+
+### Convex hull — Andrew's monotone chain
+
+The smallest convex polygon round a set of points — a rubber band snapped round pins (`Polygon2d.ConvexHull`).
+Sort the points left to right, walk along them keeping a lower edge and dropping any point that would make a
+clockwise turn, then walk back for the upper edge. Sorting dominates, so it runs in `n log n`.
+
+### Fewer corners — Douglas-Peucker
+
+Keep a stretch's two ends and find the point furthest from the straight line between them. If even that is
+within the tolerance, the straight line will do; otherwise keep it and repeat on each half
+(`Polyline2d.Simplify`, `Polygon2d.Simplify`). It keeps the corners that matter and drops near-straight wobble —
+how maps draw coastlines at different zooms.
+
+### Clipping to a window — Sutherland-Hodgman
+
+Clip against each edge of a convex window in turn: keep the corners on the inside of the edge's line and add a
+corner wherever the outline crosses it (`Polygon2d.ClipTo`). After the last edge, what remains is inside the
+window. Only a convex window works — which is why it is the classic algorithm for clipping to a screen.
+
+### Where two segments meet
+
+Write them as `P + t r` and `Q + u s`, set them equal, and take the cross product with `s` and then `r`: each
+removes one unknown, giving `t = (Q - P) x s / (r x s)` and `u = (Q - P) x r / (r x s)`. They meet when both
+lie between 0 and 1; when `r x s` is zero they are parallel and meet only if they share a line and overlap
+(`Segment2d.Intersect`).
+
+### Booleans and offsetting — described, not implemented
+
+Joining, subtracting and overlapping arbitrary polygons, and growing or shrinking them by a distance, sound easy
+and are famously hard: outlines that touch at a corner, share an edge or nearly coincide all need care, and
+floating-point rounding turns "nearly" into "sometimes". Robust implementations (Vatti's sweep line, as in Angus
+Johnson's Clipper) run to thousands of lines. RP.Math describes the operations as `IPolygonClipper` and leaves the
+work to such a library through an adapter, so RP.Math itself stays dependency-free.
 
 ---
 

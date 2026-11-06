@@ -7,11 +7,12 @@ real code — not a re-implementation.
 ![Operations covered](https://img.shields.io/badge/operations-67-4be0a8)
 ![Noise fields](https://img.shields.io/badge/noise%20fields-Perlin%2C%20Simplex%2C%20Value%2C%20Worley-4be0a8)
 
-Two pages, reached from the bar at the top:
+Three pages, reached from the bar at the top:
 
 | Page | What it explores |
 |---|---|
 | **Vectors & geometry** (`/`) | `Vector`, the rotation types and the line/plane family, drawn in a 3D scene |
+| **Plane geometry** (`/plane`) | `Polygon2d`, `Polyline2d`, `Segment2d` — drag a shape and watch the shoelace area and winding, the winding-number inside test, ear-clipping triangles, the convex hull, Douglas-Peucker simplification, Sutherland-Hodgman clipping and segment intersection, each explained beside it |
 | **Noise fields** (`/noise`) | `RP.Math.Noise` — Perlin, Simplex, value and Worley fields, rendered as an image |
 
 ## Vectors & geometry

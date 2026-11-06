@@ -1,0 +1,392 @@
+@page "/plane"
+@using System.Globalization
+@using RP.Math
+
+<PageTitle>RP.Math — Plane geometry</PageTitle>
+
+<header class="masthead">
+    <h1>RP.<span>Math</span> Plane geometry</h1>
+    <p>Polygons, lines and the classic algorithms that work on them, each running the real
+       <code>RP.Math</code> types (<code>Polygon2d</code>, <code>Polyline2d</code>, <code>Segment2d</code>,
+       <code>Box2d</code>) in the browser. Drag the corners and watch the answer change; read how each one works
+       on the right.</p>
+</header>
+
+<div class="workspace">
+    <section class="scene">
+        <svg viewBox="0 0 @Width @Height"
+             @onpointermove="OnPointerMove"
+             @onpointerup="OnPointerUp"
+             @onpointerleave="OnPointerUp"
+             @onpointerdown="OnScenePointerDown">
+
+            @* a light grid, one line every 50 units *@
+            @for (int x = 0; x <= Width; x += 50)
+            {
+                <line x1="@x" y1="0" x2="@x" y2="@Height" class="grid" />
+            }
+            @for (int y = 0; y <= Height; y += 50)
+            {
+                <line x1="0" y1="@y" x2="@Width" y2="@y" class="grid" />
+            }
+
+            @switch (demo)
+            {
+                case Demo.Area:
+                    <polygon points="@Svg(shape)" fill="@(shape.Winding == Winding.Anticlockwise ? "#4be0a833" : "#ff7ac633")" stroke="#ffce47" stroke-width="2" />
+                    @WindingArrows(shape)
+                    @Cross(shape.Centroid, "#4be0a8", "centroid")
+                    break;
+
+                case Demo.Inside:
+                    <polygon points="@Svg(shape)" fill="@(shape.Contains(probe) ? "#4be0a833" : "#ffffff0d")" stroke="#ffce47" stroke-width="2" />
+                    <line x1="@X(probe)" y1="@Y(probe)" x2="@Width" y2="@Y(probe)" stroke="#b39ddb" stroke-dasharray="6 5" />
+                    @foreach (var crossing in RayCrossings())
+                    {
+                        <circle cx="@X(crossing.Point)" cy="@Y(crossing.Point)" r="5" fill="@(crossing.Up ? "#4be0a8" : "#ff7ac6")" />
+                    }
+                    @Handle(probe, -1, "#b39ddb", "probe")
+                    break;
+
+                case Demo.Triangulate:
+                    @foreach (var (a, b, c) in shape.Triangulate())
+                    {
+                        <polygon points="@Svg(new[] { shape[a], shape[b], shape[c] })" fill="#4472c433" stroke="#4472c4" stroke-width="1" />
+                    }
+                    <polygon points="@Svg(shape)" fill="none" stroke="#ffce47" stroke-width="2" />
+                    break;
+
+                case Demo.Hull:
+                    @if (Polygon2d.ConvexHull(shape) is { } hull)
+                    {
+                        <polygon points="@Svg(hull)" fill="#4be0a822" stroke="#4be0a8" stroke-width="2" />
+                    }
+                    break;
+
+                case Demo.Simplify:
+                    <polygon points="@Svg(wiggle)" fill="none" stroke="#ffffff55" stroke-width="1" />
+                    var simple = wiggle.Simplify(tolerance);
+                    <polygon points="@Svg(simple)" fill="#ffce4722" stroke="#ffce47" stroke-width="2" />
+                    @foreach (var p in simple)
+                    {
+                        <circle cx="@X(p)" cy="@Y(p)" r="3.5" fill="#ffce47" />
+                    }
+                    break;
+
+                case Demo.Clip:
+                    <polygon points="@Svg(window)" fill="none" stroke="#b39ddb" stroke-width="2" stroke-dasharray="8 6" />
+                    <polygon points="@Svg(shape)" fill="none" stroke="#ffffff55" stroke-width="1" />
+                    @if (shape.ClipTo(window) is { } clipped)
+                    {
+                        <polygon points="@Svg(clipped)" fill="#4be0a844" stroke="#4be0a8" stroke-width="2" />
+                    }
+                    break;
+
+                case Demo.Segments:
+                    var s1 = new Segment2d(shape[0], shape[1]);
+                    var s2 = new Segment2d(shape[2], shape[3]);
+                    <line x1="@X(s1.Start)" y1="@Y(s1.Start)" x2="@X(s1.End)" y2="@Y(s1.End)" stroke="#ffce47" stroke-width="3" />
+                    <line x1="@X(s2.Start)" y1="@Y(s2.Start)" x2="@X(s2.End)" y2="@Y(s2.End)" stroke="#ff7ac6" stroke-width="3" />
+                    @if (s1.Intersect(s2, out var hit) != SegmentIntersectionKind.None)
+                    {
+                        @Cross(hit, "#4be0a8", "meet")
+                    }
+                    break;
+            }
+
+            @* the draggable corners *@
+            @{
+                var corners = demo == Demo.Simplify ? (IReadOnlyList<Vector2d>)wiggle : demo == Demo.Segments ? shape.Take(4).ToList() : shape;
+            }
+            @if (demo != Demo.Simplify)
+            {
+                @for (int i = 0; i < corners.Count; i++)
+                {
+                    @Handle(corners[i], i, demo == Demo.Segments ? (i < 2 ? "#ffce47" : "#ff7ac6") : "#ffce47", null)
+                }
+            }
+            @if (demo == Demo.Clip)
+            {
+                @for (int i = 0; i < window.Count; i++)
+                {
+                    @Handle(window[i], 100 + i, "#b39ddb", null)
+                }
+            }
+        </svg>
+
+        <div class="scene-tools">
+            <button @onclick="Reset">⟳ Reset shape</button>
+            @if (demo is Demo.Area or Demo.Inside or Demo.Triangulate or Demo.Hull or Demo.Clip)
+            {
+                <button @onclick="AddCorner">+ Corner</button>
+                <button @onclick="RemoveCorner" disabled="@(shape.Count <= 3)">− Corner</button>
+                <button @onclick="Flip">⇄ Reverse winding</button>
+            }
+            <span class="hint">drag the dots</span>
+        </div>
+    </section>
+
+    <aside class="panel">
+        <label class="field">
+            <span>Algorithm</span>
+            <select @bind="demo">
+                <option value="@Demo.Area">Area and winding — the shoelace formula</option>
+                <option value="@Demo.Inside">Inside or outside — the winding number</option>
+                <option value="@Demo.Triangulate">Triangles — ear clipping</option>
+                <option value="@Demo.Hull">Convex hull — Andrew's monotone chain</option>
+                <option value="@Demo.Simplify">Fewer corners — Douglas-Peucker</option>
+                <option value="@Demo.Clip">Clipping to a window — Sutherland-Hodgman</option>
+                <option value="@Demo.Segments">Where two segments meet</option>
+            </select>
+        </label>
+
+        <div class="result">
+            <span class="result__label">Result</span>
+            @switch (demo)
+            {
+                case Demo.Area:
+                    <div class="result__vec">area @F(shape.Area)</div>
+                    <div class="result__sub">signed area @F(shape.SignedArea) — @shape.Winding.ToString().ToLowerInvariant()</div>
+                    <div class="result__sub">perimeter @F(shape.Perimeter), @(shape.IsConvex ? "convex" : "not convex"), @(shape.IsSimple ? "simple" : "crosses itself")</div>
+                    break;
+                case Demo.Inside:
+                    <div class="result__vec">winding number @shape.WindingNumber(probe)</div>
+                    <div class="result__sub">the probe is @(shape.Contains(probe) ? "inside" : "outside")</div>
+                    break;
+                case Demo.Triangulate:
+                    <div class="result__vec">@shape.Triangulate().Count triangles</div>
+                    <div class="result__sub">a simple polygon with @shape.Count corners always gives @(shape.Count - 2)</div>
+                    break;
+                case Demo.Hull:
+                    <div class="result__vec">@(Polygon2d.ConvexHull(shape)?.Count ?? 0) of @shape.Count points on the hull</div>
+                    break;
+                case Demo.Simplify:
+                    <div class="result__vec">@wiggle.Simplify(tolerance).Count of @wiggle.Count corners kept</div>
+                    @Slider("tolerance", 0, 40, 0.5, tolerance, v => tolerance = v)
+                    break;
+                case Demo.Clip:
+                    <div class="result__vec">area inside the window @F(shape.ClipTo(window)?.Area ?? 0)</div>
+                    <div class="result__sub">of @F(shape.Area) in all</div>
+                    break;
+                case Demo.Segments:
+                    var k = new Segment2d(shape[0], shape[1]).Intersect(new Segment2d(shape[2], shape[3]), out var at);
+                    <div class="result__vec">@(k == SegmentIntersectionKind.None ? "they do not meet" : k == SegmentIntersectionKind.Point ? $"they meet at ({F(at.X)}, {F(at.Y)})" : "they overlap")</div>
+                    break;
+            }
+        </div>
+
+        <p class="desc">@Explanation</p>
+        <div class="formula"><code>@Code</code></div>
+    </aside>
+</div>
+
+@code {
+    private const int Width = 540;
+    private const int Height = 500;
+
+    private enum Demo { Area, Inside, Triangulate, Hull, Simplify, Clip, Segments }
+
+    private Demo demo = Demo.Area;
+    private Polygon2d shape = Start();
+    private Polygon2d window = Polygon2d.Rectangle(150, 120, 240, 220);
+    private Polygon2d wiggle = Wiggle();
+    private Vector2d probe = new Vector2d(270, 250);
+    private double tolerance = 8;
+
+    // dragging: which corner (-1 the probe, 100+ the clip window) and where the pointer was
+    private int dragging = int.MinValue;
+    private double lastX, lastY;
+
+    private static Polygon2d Start() => new Polygon2d(
+        new Vector2d(110, 90), new Vector2d(420, 110), new Vector2d(450, 300), new Vector2d(300, 230),
+        new Vector2d(260, 420), new Vector2d(90, 330));
+
+    // a circle with a wobble, to give Douglas-Peucker something to throw away
+    private static Polygon2d Wiggle()
+    {
+        var points = new List<Vector2d>();
+        for (int i = 0; i < 90; i++)
+        {
+            double a = 2 * Math.PI * i / 90;
+            double r = 160 + (18 * Math.Sin(5 * a)) + (4 * Math.Sin(31 * a));
+            points.Add(new Vector2d(270 + (r * Math.Cos(a)), 250 + (r * Math.Sin(a))));
+        }
+
+        return new Polygon2d(points);
+    }
+
+    private string Explanation => demo switch
+    {
+        Demo.Area => "Walk round the outline adding x[i]·y[i+1] − x[i+1]·y[i] for every edge, then halve it. Each term is twice the area of the triangle from the origin to that edge; going one way round they add, coming back they subtract, and what is left is the polygon's area. The sign says which way the corners run: positive anticlockwise (green), negative clockwise (pink). Reverse the winding to see it flip. The centroid is the same sum with each triangle's centre weighted by its area.",
+        Demo.Inside => "Fire a ray from the probe to the right. Each edge crossing it going upward adds one (green); each going downward takes one away (pink). The total is how many times the outline winds round the probe: zero means outside. Unlike simply counting crossings, this stays right for outlines that loop over themselves, and its sign follows the winding.",
+        Demo.Triangulate => "An ear is a corner that turns the convex way and whose triangle with its two neighbours has no other corner inside. Cut it off and what remains is still a simple polygon, one corner smaller. The two ears theorem promises every simple polygon with more than three corners has at least two ears, so this always finishes: n corners give n − 2 triangles.",
+        Demo.Hull => "Sort the points left to right. Walk along them building the lower edge: whenever the last two kept points and the new one turn clockwise, the middle point cannot be on the hull, so drop it. Walk back the other way for the upper edge and join the two. Sorting is the slow part, so it runs in n log n. Drag a corner inside to see it leave the hull.",
+        Demo.Simplify => "Keep the two ends of a stretch and find the point furthest from the straight line between them. If even that point is within the tolerance, the line will do and everything between can go. Otherwise keep it and repeat on each half. The faint outline is the original; the solid one is what survives. Slide the tolerance to trade detail for corners.",
+        Demo.Clip => "Clip against each edge of the convex window in turn. Each edge's line splits the plane in two; walk round the shape keeping the corners on the inside and adding a new corner wherever the outline crosses the line. After the last edge, what is left is inside them all. It needs a convex window — drag the window's corners and it still works as long as it stays convex.",
+        _ => "Write the segments as P + t·r and Q + u·s and solve P + t·r = Q + u·s. Taking the 2D cross product with s and then with r gives t = (Q − P) × s ⁄ (r × s) and u = (Q − P) × r ⁄ (r × s). They meet when both t and u lie between 0 and 1. When r × s is zero they are parallel, and meet only if they share a line and their ranges overlap.",
+    };
+
+    private string Code => demo switch
+    {
+        Demo.Area => "double area = polygon.SignedArea; var c = polygon.Centroid;",
+        Demo.Inside => "int turns = polygon.WindingNumber(point); bool inside = polygon.Contains(point);",
+        Demo.Triangulate => "foreach (var (a, b, c) in polygon.Triangulate()) { ... }",
+        Demo.Hull => "Polygon2d? hull = Polygon2d.ConvexHull(points);",
+        Demo.Simplify => "Polygon2d fewer = polygon.Simplify(tolerance);",
+        Demo.Clip => "Polygon2d? inside = polygon.ClipTo(convexWindow);",
+        _ => "var kind = segmentA.Intersect(segmentB, out Vector2d point);",
+    };
+
+    // the upward and downward crossings of the probe's ray, for the winding-number picture
+    private IEnumerable<(Vector2d Point, bool Up)> RayCrossings()
+    {
+        foreach (var edge in shape.Edges)
+        {
+            var a = edge.Start;
+            var b = edge.End;
+            bool up = a.Y <= probe.Y && b.Y > probe.Y;
+            bool down = a.Y > probe.Y && b.Y <= probe.Y;
+            if (!up && !down)
+            {
+                continue;
+            }
+
+            double t = (probe.Y - a.Y) / (b.Y - a.Y);
+            var p = a + ((b - a) * t);
+            if (p.X > probe.X)
+            {
+                yield return (p, up);
+            }
+        }
+    }
+
+    // ---------------------------------------------------------------- drawing
+
+    // the scene has y up, as the maths does; SVG has y down, so flip it
+    private static double X(Vector2d p) => p.X;
+
+    private static double Y(Vector2d p) => Height - p.Y;
+
+    private static string Svg(IEnumerable<Vector2d> points) =>
+        string.Join(" ", points.Select(p => string.Create(CultureInfo.InvariantCulture, $"{X(p):0.#},{Y(p):0.#}")));
+
+    private static string F(double v) => v.ToString("0.##", CultureInfo.InvariantCulture);
+
+    private RenderFragment Handle(Vector2d at, int index, string colour, string? label) => @<g>
+        <circle cx="@X(at)" cy="@Y(at)" r="8" fill="@colour" fill-opacity="0.85" stroke="#111" stroke-width="1.5" style="cursor: grab"
+                @onpointerdown="e => StartDrag(index, e)" @onpointerdown:stopPropagation="true" />
+        @if (label is not null)
+        {
+            <!text x="@(X(at) + 12)" y="@(Y(at) - 10)" class="label" fill="@colour">@label</!text>
+        }
+    </g>;
+
+    private RenderFragment Cross(Vector2d at, string colour, string label) => @<g>
+        <line x1="@(X(at) - 8)" y1="@(Y(at) - 8)" x2="@(X(at) + 8)" y2="@(Y(at) + 8)" stroke="@colour" stroke-width="3" />
+        <line x1="@(X(at) - 8)" y1="@(Y(at) + 8)" x2="@(X(at) + 8)" y2="@(Y(at) - 8)" stroke="@colour" stroke-width="3" />
+        <!text x="@(X(at) + 12)" y="@(Y(at) - 10)" class="label" fill="@colour">@label</!text>
+    </g>;
+
+    // a small arrow halfway along each edge, so the winding can be seen
+    private RenderFragment WindingArrows(Polygon2d polygon) => @<g>
+        @foreach (var edge in polygon.Edges)
+        {
+            var mid = edge.Midpoint;
+            var d = edge.Direction.NormalizeOrDefault() * 9;
+            var side = d.Perpendicular() * 0.6;
+            <polygon points="@Svg(new[] { mid + d, mid - d + side, mid - d - side })" fill="#ffce47" />
+        }
+    </g>;
+
+    private RenderFragment Slider(string label, double min, double max, double step, double value, Action<double> set) => @<label class="field slider">
+        <span>@label: @value.ToString("0.###", CultureInfo.InvariantCulture)</span>
+        <input type="range" min="@min" max="@max" step="@step" value="@value.ToString(CultureInfo.InvariantCulture)"
+               @oninput="e => { if (double.TryParse(Convert.ToString(e.Value, CultureInfo.InvariantCulture), NumberStyles.Any, CultureInfo.InvariantCulture, out var v)) set(v); }" />
+    </label>;
+
+    // ---------------------------------------------------------------- editing
+
+    private void StartDrag(int index, PointerEventArgs e)
+    {
+        dragging = index;
+        lastX = e.ClientX;
+        lastY = e.ClientY;
+    }
+
+    private void OnScenePointerDown(PointerEventArgs e)
+    {
+        dragging = int.MinValue;
+    }
+
+    private void OnPointerMove(PointerEventArgs e)
+    {
+        if (dragging == int.MinValue)
+        {
+            return;
+        }
+
+        // move by how far the pointer went (screen y is down, the scene's is up)
+        var by = new Vector2d(e.ClientX - lastX, -(e.ClientY - lastY));
+        lastX = e.ClientX;
+        lastY = e.ClientY;
+        if (dragging == -1)
+        {
+            probe += by;
+        }
+        else if (dragging >= 100)
+        {
+            window = Move(window, dragging - 100, by);
+        }
+        else
+        {
+            shape = Move(shape, dragging, by);
+        }
+    }
+
+    private void OnPointerUp(PointerEventArgs e) => dragging = int.MinValue;
+
+    private static Polygon2d Move(Polygon2d polygon, int index, Vector2d by)
+    {
+        var corners = polygon.ToArray();
+        corners[index] += by;
+        return new Polygon2d(corners);
+    }
+
+    private void Reset()
+    {
+        shape = Start();
+        window = Polygon2d.Rectangle(150, 120, 240, 220);
+        wiggle = Wiggle();
+        probe = new Vector2d(270, 250);
+    }
+
+    // a new corner halfway along the longest edge
+    private void AddCorner()
+    {
+        var corners = shape.ToList();
+        int longest = 0;
+        double best = -1;
+        for (int i = 0; i < corners.Count; i++)
+        {
+            double length = Vector2d.Distance(shape[i], shape[i + 1]);
+            if (length > best)
+            {
+                best = length;
+                longest = i;
+            }
+        }
+
+        corners.Insert(longest + 1, (shape[longest] + shape[longest + 1]) / 2);
+        shape = new Polygon2d(corners);
+    }
+
+    private void RemoveCorner()
+    {
+        if (shape.Count > 3)
+        {
+            shape = new Polygon2d(shape.Take(shape.Count - 1));
+        }
+    }
+
+    private void Flip() => shape = shape.Reversed();
+}
