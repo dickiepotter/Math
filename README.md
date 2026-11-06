@@ -1856,6 +1856,26 @@ Region2d inset = clipper.Offset(new[] { shape }, -0.4, JoinStyle.Miter);
 It favours clarity over speed. Production libraries (Vatti's sweep line, as in Angus Johnson's Clipper) are
 faster on very large inputs; anything implementing `IPolygonClipper` can stand in.
 
+### Solids from triangles — volume without slicing
+
+STL, OBJ and 3MF files describe a solid by its skin: a list of triangles, each wound anticlockwise seen from
+outside. `TriangleSurface` measures one. Join each triangle to the origin and it is a tetrahedron of volume
+`a · (b × c) / 6`; triangles facing away from the origin add, those facing it subtract, and for a closed skin
+everything outside cancels, leaving exactly the enclosed volume wherever the origin is. It is the shoelace formula
+one dimension up. Weighting each tetrahedron's centre by its volume gives the centre of the solid.
+
+A skin is closed when every edge is shared by exactly two triangles running opposite ways (`IsClosed`,
+`BadEdges`), and Euler's formula, corners − edges + faces = 2 − 2g, counts the holes g right through it
+(`EulerCharacteristic`, `Genus`): 0 for a ball, 1 for a ring.
+
+```csharp
+double volume = TriangleSurface.SignedVolume(triangles);   // negative: the skin is inside out
+bool closed = TriangleSurface.IsClosed(faces);
+int holes = TriangleSurface.Genus(faces);
+```
+
+Try it on the visualiser's **Solids from triangles** page.
+
 ---
 
 ## Noise: procedural fields

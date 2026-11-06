@@ -1,0 +1,218 @@
+@page "/solids"
+@using System.Globalization
+@using RP.Math
+
+<PageTitle>RP.Math — Solids from triangles</PageTitle>
+
+<header class="masthead">
+    <h1>RP.<span>Math</span> Solids from triangles</h1>
+    <p>A 3D printer, a game engine and a CAD program all pass solid shapes around as a skin of triangles.
+       <code>TriangleSurface</code> measures one: the volume it encloses, its centre, whether it is closed, and how
+       many holes go right through it. Pick a shape, change how finely it is cut into triangles, and compare the
+       answers with the exact ones.</p>
+</header>
+
+<div class="workspace">
+    <section class="scene">
+        <svg viewBox="0 0 @Width @Height">
+            @foreach (var (a, b, c) in Faces)
+            {
+                var pa = Project(corners[a]);
+                var pb = Project(corners[b]);
+                var pc = Project(corners[c]);
+                bool front = ((pb.X - pa.X) * (pc.Y - pa.Y)) - ((pb.Y - pa.Y) * (pc.X - pa.X)) < 0;
+                <polygon points="@P(pa) @P(pb) @P(pc)" fill="none" stroke="@(front ? "#ffce47" : "#ffffff1f")" stroke-width="@(front ? 1 : 0.6)" />
+            }
+            @if (Centre is { } centre)
+            {
+                var pc = Project(centre);
+                <circle cx="@F(pc.X)" cy="@F(pc.Y)" r="6" fill="#4be0a8" />
+                <!text x="@F(pc.X + 10)" y="@F(pc.Y - 8)" class="label" fill="#4be0a8">centre of volume</!text>
+            }
+        </svg>
+
+        <div class="scene-tools">
+            @Slider("turn", 0, 360, 1, turn, v => turn = v)
+        </div>
+    </section>
+
+    <aside class="panel">
+        <label class="field">
+            <span>Shape</span>
+            <select value="@shape" @onchange="e => { shape = Enum.Parse<Shape>((string)e.Value!); Build(); }">
+                <option value="@Shape.Box">A box, 2 × 3 × 4</option>
+                <option value="@Shape.Sphere">A ball, radius 2</option>
+                <option value="@Shape.Ring">A ring (torus), radii 3 and 1</option>
+                <option value="@Shape.Open">A ball with its top cut off</option>
+            </select>
+        </label>
+        @if (shape != Shape.Box)
+        {
+            @Slider("divisions", 4, 48, 1, divisions, v => { divisions = (int)v; Build(); })
+        }
+
+        <div class="result">
+            <span class="result__label">Result</span>
+            <div class="result__vec">volume @F(Volume)</div>
+            <div class="result__sub">exact @F(Exact) — the flat triangles sit just inside the curve, so the measured volume creeps up as they shrink</div>
+            <div class="result__sub">surface area @F(TriangleSurface.SurfaceArea(Soup))</div>
+            <div class="result__sub">@corners.Count corners − @EdgeCount edges + @faces.Count faces = @TriangleSurface.EulerCharacteristic(Faces)</div>
+            @if (TriangleSurface.IsClosed(Faces))
+            {
+                <div class="result__sub">closed: every edge shared by two triangles, running opposite ways — @TriangleSurface.Genus(Faces) hole(s) right through</div>
+            }
+            else
+            {
+                <div class="result__sub">not closed: @TriangleSurface.BadEdges(Faces).Count edges belong to only one triangle, so the volume means nothing</div>
+            }
+        </div>
+
+        <p class="desc">Join every triangle to the origin and it makes a tetrahedron of volume a · (b × c) ⁄ 6. Triangles facing
+           away from the origin count positive and those facing it negative, so for a closed skin everything
+           outside cancels and exactly the enclosed volume is left, wherever the origin is: the 3D cousin of the
+           shoelace formula. Weight each tetrahedron's centre by its volume and you have the centre of the solid.
+           Euler's formula, corners − edges + faces = 2 − 2 × holes, tells a ball from a ring by counting alone.</p>
+        <div class="formula"><code>double v = TriangleSurface.SignedVolume(triangles); int g = TriangleSurface.Genus(faces);</code></div>
+    </aside>
+</div>
+
+@code {
+    private const int Width = 540;
+    private const int Height = 500;
+
+    private enum Shape { Box, Sphere, Ring, Open }
+
+    private Shape shape = Shape.Sphere;
+    private int divisions = 12;
+    private double turn = 30;
+    private List<Vector3d> corners = new List<Vector3d>();
+    private List<(int A, int B, int C)> faces = new List<(int A, int B, int C)>();
+
+    protected override void OnInitialized() => Build();
+
+    private IEnumerable<(int A, int B, int C)> Faces => faces;
+
+    private IEnumerable<(Vector3d A, Vector3d B, Vector3d C)> Soup => faces.Select(f => (corners[f.A], corners[f.B], corners[f.C]));
+
+    private double Volume => TriangleSurface.SignedVolume(Soup);
+
+    private Vector3d? Centre => TriangleSurface.IsClosed(Faces) ? TriangleSurface.Centroid(Soup) : null;
+
+    private int EdgeCount => faces.SelectMany(f => new[] { (f.A, f.B), (f.B, f.C), (f.C, f.A) }).Select(e => e.Item1 < e.Item2 ? e : (e.Item2, e.Item1)).Distinct().Count();
+
+    private double Exact => shape switch
+    {
+        Shape.Box => 24,
+        Shape.Ring => 2 * Math.PI * Math.PI * 3 * 1 * 1,
+        _ => 4.0 / 3 * Math.PI * 8,
+    };
+
+    // ---------------------------------------------------------------- shapes
+
+    private void Build()
+    {
+        corners = new List<Vector3d>();
+        faces = new List<(int A, int B, int C)>();
+        switch (shape)
+        {
+            case Shape.Box:
+                foreach (var z in new[] { -2.0, 2.0 })
+                {
+                    corners.Add(new Vector3d(-1, -1.5, z));
+                    corners.Add(new Vector3d(1, -1.5, z));
+                    corners.Add(new Vector3d(1, 1.5, z));
+                    corners.Add(new Vector3d(-1, 1.5, z));
+                }
+
+                faces.AddRange(new[] { (0, 2, 1), (0, 3, 2), (4, 5, 6), (4, 6, 7), (0, 1, 5), (0, 5, 4), (1, 2, 6), (1, 6, 5), (2, 3, 7), (2, 7, 6), (3, 0, 4), (3, 4, 7) });
+                break;
+
+            case Shape.Ring:
+                Grid(divisions * 2, divisions, wrapBoth: true, (u, v) => new Vector3d((3 + Math.Cos(v)) * Math.Cos(u), (3 + Math.Cos(v)) * Math.Sin(u), Math.Sin(v)));
+                break;
+
+            default:
+                Sphere(2, shape == Shape.Open);
+                break;
+        }
+    }
+
+    // a grid of quads over (u, v), each split into two triangles wound outwards
+    private void Grid(int nu, int nv, bool wrapBoth, Func<double, double, Vector3d> at)
+    {
+        for (int i = 0; i < nu; i++)
+        {
+            for (int j = 0; j < nv; j++)
+            {
+                corners.Add(at(2 * Math.PI * i / nu, 2 * Math.PI * j / nv));
+            }
+        }
+
+        int Index(int i, int j) => ((i % nu) * nv) + (j % nv);
+        for (int i = 0; i < nu; i++)
+        {
+            for (int j = 0; j < nv; j++)
+            {
+                faces.Add((Index(i, j), Index(i + 1, j), Index(i + 1, j + 1)));
+                faces.Add((Index(i, j), Index(i + 1, j + 1), Index(i, j + 1)));
+            }
+        }
+    }
+
+    // a UV sphere: rings of latitude between a south and a north pole; the open one leaves out the top cap
+    private void Sphere(double r, bool open)
+    {
+        int around = divisions * 2, rings = divisions;
+        corners.Add(new Vector3d(0, 0, -r));
+        for (int k = 1; k < rings; k++)
+        {
+            double lat = (Math.PI * k / rings) - (Math.PI / 2);
+            for (int i = 0; i < around; i++)
+            {
+                double lon = 2 * Math.PI * i / around;
+                corners.Add(new Vector3d(r * Math.Cos(lat) * Math.Cos(lon), r * Math.Cos(lat) * Math.Sin(lon), r * Math.Sin(lat)));
+            }
+        }
+
+        corners.Add(new Vector3d(0, 0, r));
+        int north = corners.Count - 1;
+        int Ring(int k, int i) => 1 + ((k - 1) * around) + (i % around);
+        for (int i = 0; i < around; i++)
+        {
+            faces.Add((0, Ring(1, i + 1), Ring(1, i)));
+            for (int k = 1; k < rings - 1; k++)
+            {
+                faces.Add((Ring(k, i), Ring(k, i + 1), Ring(k + 1, i + 1)));
+                faces.Add((Ring(k, i), Ring(k + 1, i + 1), Ring(k + 1, i)));
+            }
+
+            if (!open)
+            {
+                faces.Add((north, Ring(rings - 1, i), Ring(rings - 1, i + 1)));
+            }
+        }
+    }
+
+    // ---------------------------------------------------------------- drawing
+
+    // turn about the vertical axis, tilt towards the viewer, and drop the depth (an orthographic view)
+    private (double X, double Y) Project(Vector3d p)
+    {
+        double t = turn * Math.PI / 180, tilt = 1.1;
+        double x = (p.X * Math.Cos(t)) - (p.Y * Math.Sin(t));
+        double y = (p.X * Math.Sin(t)) + (p.Y * Math.Cos(t));
+        double up = (p.Z * Math.Sin(tilt)) - (y * Math.Cos(tilt));
+        const double scale = 55;
+        return ((Width / 2.0) + (x * scale), (Height / 2.0) - (up * scale));
+    }
+
+    private static string P((double X, double Y) p) => F(p.X) + "," + F(p.Y);
+
+    private static string F(double v) => v.ToString("0.##", CultureInfo.InvariantCulture);
+
+    private RenderFragment Slider(string label, double min, double max, double step, double value, Action<double> set) => @<label class="field slider">
+        <span>@label: @value.ToString("0.###", CultureInfo.InvariantCulture)</span>
+        <input type="range" min="@min" max="@max" step="@step" value="@value.ToString(CultureInfo.InvariantCulture)"
+               @oninput="e => { if (double.TryParse(Convert.ToString(e.Value, CultureInfo.InvariantCulture), NumberStyles.Any, CultureInfo.InvariantCulture, out var v)) set(v); }" />
+    </label>;
+}
