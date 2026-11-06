@@ -16,6 +16,13 @@ namespace RP.Math
 
         /// <summary>Inside where a ray from the point crosses the outlines an odd number of times, whichever way they run.</summary>
         EvenOdd,
+
+        /// <summary>
+        /// Inside only where the winding number is above zero: an outline running the "wrong" way (clockwise) adds
+        /// nothing and takes away from what it overlaps. Offsetting uses it to throw away the inside-out loops a
+        /// shrunk outline leaves behind.
+        /// </summary>
+        Positive,
     }
 
     /// <summary>
@@ -74,7 +81,21 @@ namespace RP.Math
         public bool Contains(Vector2d point)
         {
             int winding = this.outlines.Sum(o => o.WindingNumber(point));
-            return this.FillRule == FillRule.NonZero ? winding != 0 : winding % 2 != 0;
+            return IsInside(winding, this.FillRule);
+        }
+
+        /// <summary>Whether a winding number counts as inside under a fill rule.</summary>
+        public static bool IsInside(int winding, FillRule fillRule)
+        {
+            switch (fillRule)
+            {
+                case FillRule.EvenOdd:
+                    return winding % 2 != 0;
+                case FillRule.Positive:
+                    return winding > 0;
+                default:
+                    return winding != 0;
+            }
         }
 
         public IEnumerator<Polygon2d> GetEnumerator() => ((IEnumerable<Polygon2d>)this.outlines).GetEnumerator();
@@ -105,9 +126,11 @@ namespace RP.Math
     /// <para>
     /// These sound simple and are famously hard to get right: outlines that touch at a corner, share an edge,
     /// cross many times or nearly coincide all need care, and floating-point rounding turns "nearly" into
-    /// "sometimes". Robust implementations (Vatti's sweep-line algorithm, as in Angus Johnson's Clipper library)
-    /// run to thousands of lines, so this library describes the operations and leaves the work to such a
-    /// library through an adapter, keeping RP.Math itself free of dependencies.
+    /// "sometimes". <see cref="PolygonClipper"/> does them here with an <i>overlay</i>: cut every edge where it
+    /// crosses another, decide for each piece whether the result is inside on one side and outside on the
+    /// other, and join the pieces that are into outlines. It is written to be read. Production libraries such
+    /// as Angus Johnson's Clipper (Vatti's sweep-line algorithm) are faster on very large inputs; the
+    /// interface lets either be used.
     /// </para>
     /// <para>
     /// For the special case of clipping to a <i>convex</i> window, <see cref="Polygon2d.ClipTo"/> does it here,

@@ -92,6 +92,17 @@
                         @Cross(hit, "#4be0a8", "meet")
                     }
                     break;
+
+                case Demo.Boolean:
+                    <polygon points="@Svg(shape)" fill="none" stroke="#ffce47" stroke-width="1" stroke-dasharray="4 4" />
+                    <polygon points="@Svg(window)" fill="none" stroke="#b39ddb" stroke-width="1" stroke-dasharray="4 4" />
+                    <path d="@Path(BooleanResult)" fill="#4be0a844" fill-rule="nonzero" stroke="#4be0a8" stroke-width="2" />
+                    break;
+
+                case Demo.Offset:
+                    <path d="@Path(OffsetResult)" fill="#4be0a833" fill-rule="nonzero" stroke="#4be0a8" stroke-width="2" />
+                    <polygon points="@Svg(shape)" fill="none" stroke="#ffce47" stroke-width="2" />
+                    break;
             }
 
             @* the draggable corners *@
@@ -105,7 +116,7 @@
                     @Handle(corners[i], i, demo == Demo.Segments ? (i < 2 ? "#ffce47" : "#ff7ac6") : "#ffce47", null)
                 }
             }
-            @if (demo == Demo.Clip)
+            @if (demo is Demo.Clip or Demo.Boolean)
             {
                 @for (int i = 0; i < window.Count; i++)
                 {
@@ -116,7 +127,7 @@
 
         <div class="scene-tools">
             <button @onclick="Reset">⟳ Reset shape</button>
-            @if (demo is Demo.Area or Demo.Inside or Demo.Triangulate or Demo.Hull or Demo.Clip)
+            @if (demo is Demo.Area or Demo.Inside or Demo.Triangulate or Demo.Hull or Demo.Clip or Demo.Boolean or Demo.Offset)
             {
                 <button @onclick="AddCorner">+ Corner</button>
                 <button @onclick="RemoveCorner" disabled="@(shape.Count <= 3)">− Corner</button>
@@ -137,6 +148,8 @@
                 <option value="@Demo.Simplify">Fewer corners — Douglas-Peucker</option>
                 <option value="@Demo.Clip">Clipping to a window — Sutherland-Hodgman</option>
                 <option value="@Demo.Segments">Where two segments meet</option>
+                <option value="@Demo.Boolean">Union, intersection, difference — an overlay</option>
+                <option value="@Demo.Offset">Growing and shrinking — offsetting</option>
             </select>
         </label>
 
@@ -172,6 +185,32 @@
                     var k = new Segment2d(shape[0], shape[1]).Intersect(new Segment2d(shape[2], shape[3]), out var at);
                     <div class="result__vec">@(k == SegmentIntersectionKind.None ? "they do not meet" : k == SegmentIntersectionKind.Point ? $"they meet at ({F(at.X)}, {F(at.Y)})" : "they overlap")</div>
                     break;
+                case Demo.Boolean:
+                    <label class="field">
+                        <span>Operation</span>
+                        <select @bind="operation">
+                            <option value="@Operation.Union">Union — in either</option>
+                            <option value="@Operation.Intersection">Intersection — in both</option>
+                            <option value="@Operation.Difference">Difference — in the yellow, not the purple</option>
+                            <option value="@Operation.Xor">Exclusive or — in one, not both</option>
+                        </select>
+                    </label>
+                    <div class="result__vec">area @F(BooleanResult.Area)</div>
+                    <div class="result__sub">@BooleanResult.Outers.Count() outline(s), @BooleanResult.Holes.Count() hole(s)</div>
+                    break;
+                case Demo.Offset:
+                    @Slider("distance", -80, 80, 1, delta, v => delta = v)
+                    <label class="field">
+                        <span>Corners</span>
+                        <select @bind="join">
+                            <option value="@JoinStyle.Round">Round</option>
+                            <option value="@JoinStyle.Miter">Mitred</option>
+                            <option value="@JoinStyle.Square">Square</option>
+                        </select>
+                    </label>
+                    <div class="result__vec">area @F(OffsetResult.Area)</div>
+                    <div class="result__sub">from @F(shape.Area), in @OffsetResult.Count outline(s)</div>
+                    break;
             }
         </div>
 
@@ -184,7 +223,11 @@
     private const int Width = 540;
     private const int Height = 500;
 
-    private enum Demo { Area, Inside, Triangulate, Hull, Simplify, Clip, Segments }
+    private enum Demo { Area, Inside, Triangulate, Hull, Simplify, Clip, Segments, Boolean, Offset }
+
+    private enum Operation { Union, Intersection, Difference, Xor }
+
+    private static readonly PolygonClipper Clipper = new PolygonClipper();
 
     private Demo demo = Demo.Area;
     private Polygon2d shape = Start();
@@ -192,6 +235,19 @@
     private Polygon2d wiggle = Wiggle();
     private Vector2d probe = new Vector2d(270, 250);
     private double tolerance = 8;
+    private Operation operation = Operation.Union;
+    private double delta = 25;
+    private JoinStyle join = JoinStyle.Round;
+
+    private Region2d BooleanResult => operation switch
+    {
+        Operation.Intersection => Clipper.Intersection(new[] { shape }, new[] { window }),
+        Operation.Difference => Clipper.Difference(new[] { shape }, new[] { window }),
+        Operation.Xor => Clipper.Xor(new[] { shape }, new[] { window }),
+        _ => Clipper.Union(new[] { shape, window }),
+    };
+
+    private Region2d OffsetResult => Clipper.Offset(new[] { shape }, delta, join);
 
     // dragging: which corner (-1 the probe, 100+ the clip window) and where the pointer was
     private int dragging = int.MinValue;
@@ -223,6 +279,8 @@
         Demo.Hull => "Sort the points left to right. Walk along them building the lower edge: whenever the last two kept points and the new one turn clockwise, the middle point cannot be on the hull, so drop it. Walk back the other way for the upper edge and join the two. Sorting is the slow part, so it runs in n log n. Drag a corner inside to see it leave the hull.",
         Demo.Simplify => "Keep the two ends of a stretch and find the point furthest from the straight line between them. If even that point is within the tolerance, the line will do and everything between can go. Otherwise keep it and repeat on each half. The faint outline is the original; the solid one is what survives. Slide the tolerance to trade detail for corners.",
         Demo.Clip => "Clip against each edge of the convex window in turn. Each edge's line splits the plane in two; walk round the shape keeping the corners on the inside and adding a new corner wherever the outline crosses the line. After the last edge, what is left is inside them all. It needs a convex window — drag the window's corners and it still works as long as it stays convex.",
+        Demo.Boolean => "Cut every edge of both shapes where it crosses another, so no two pieces cross. Each piece now has the same thing on its left all the way along, and the same on its right: count how many times each shape winds round a point just to either side. Union keeps a piece when one side is in either shape and the other side is in neither; intersection when one side is in both; and so on. The kept pieces join end to end, always turning as far left as possible at a shared corner, into clean outlines: outer ones anticlockwise, holes clockwise. Drag the shapes so they cross or touch to see holes and separate pieces appear.",
+        Demo.Offset => "Push every edge out along its normal by the distance (in, when it is negative), then fill the gap at each corner: an arc for round, the two edges extended until they meet for mitred, a flat cut for square. Where a shrunk shape folds over itself, the folded parts run the wrong way round; a union under the positive fill rule keeps only what is wound anticlockwise, and the inside-out loops vanish. Shrink it far enough and a narrow neck splits the shape in two.",
         _ => "Write the segments as P + t·r and Q + u·s and solve P + t·r = Q + u·s. Taking the 2D cross product with s and then with r gives t = (Q − P) × s ⁄ (r × s) and u = (Q − P) × r ⁄ (r × s). They meet when both t and u lie between 0 and 1. When r × s is zero they are parallel, and meet only if they share a line and their ranges overlap.",
     };
 
@@ -234,6 +292,8 @@
         Demo.Hull => "Polygon2d? hull = Polygon2d.ConvexHull(points);",
         Demo.Simplify => "Polygon2d fewer = polygon.Simplify(tolerance);",
         Demo.Clip => "Polygon2d? inside = polygon.ClipTo(convexWindow);",
+        Demo.Boolean => "Region2d both = new PolygonClipper().Intersection(new[] { a }, new[] { b });",
+        Demo.Offset => "Region2d grown = new PolygonClipper().Offset(new[] { shape }, distance, JoinStyle.Round);",
         _ => "var kind = segmentA.Intersect(segmentB, out Vector2d point);",
     };
 
@@ -269,6 +329,10 @@
 
     private static string Svg(IEnumerable<Vector2d> points) =>
         string.Join(" ", points.Select(p => string.Create(CultureInfo.InvariantCulture, $"{X(p):0.#},{Y(p):0.#}")));
+
+    // a region as one SVG path: each outline a closed sub-path, so holes show through
+    private static string Path(Region2d region) =>
+        string.Concat(region.Select(o => "M" + Svg(o).Replace(" ", " L") + " Z "));
 
     private static string F(double v) => v.ToString("0.##", CultureInfo.InvariantCulture);
 

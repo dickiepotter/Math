@@ -1829,13 +1829,32 @@ removes one unknown, giving `t = (Q - P) x s / (r x s)` and `u = (Q - P) x r / (
 lie between 0 and 1; when `r x s` is zero they are parallel and meet only if they share a line and overlap
 (`Segment2d.Intersect`).
 
-### Booleans and offsetting — described, not implemented
+### Booleans and offsetting — an overlay
 
 Joining, subtracting and overlapping arbitrary polygons, and growing or shrinking them by a distance, sound easy
 and are famously hard: outlines that touch at a corner, share an edge or nearly coincide all need care, and
-floating-point rounding turns "nearly" into "sometimes". Robust implementations (Vatti's sweep line, as in Angus
-Johnson's Clipper) run to thousands of lines. RP.Math describes the operations as `IPolygonClipper` and leaves the
-work to such a library through an adapter, so RP.Math itself stays dependency-free.
+floating-point rounding turns "nearly" into "sometimes". `PolygonClipper` does them with an *overlay*, written
+to be read:
+
+1. **Snap** every point to a fine grid (a micron by default), so "nearly the same point" becomes "the same point".
+2. **Split** every edge wherever it crosses or touches another, so no two pieces cross.
+3. **Classify** each piece: count how many times each input winds round a point just to its left and just to its
+   right. The operation (union, intersection, difference, exclusive or) and the fill rule turn those counts into
+   inside or outside. Keep the piece when one side is inside the result and the other is not.
+4. **Link** the kept pieces end to end with the inside on the left, turning as far left as possible where several
+   meet, so shapes that only touch at a corner stay apart. Outer outlines come out anticlockwise, holes clockwise.
+
+Offsetting pushes each edge out along its normal, fills each corner with an arc, a mitre or a square cut, and then
+takes the union under the `Positive` fill rule, which throws away the inside-out loops a shrunk outline leaves.
+
+```csharp
+var clipper = new PolygonClipper();
+Region2d both = clipper.Intersection(new[] { a }, new[] { b });
+Region2d inset = clipper.Offset(new[] { shape }, -0.4, JoinStyle.Miter);
+```
+
+It favours clarity over speed. Production libraries (Vatti's sweep line, as in Angus Johnson's Clipper) are
+faster on very large inputs; anything implementing `IPolygonClipper` can stand in.
 
 ---
 
