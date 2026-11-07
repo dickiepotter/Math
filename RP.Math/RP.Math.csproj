@@ -1,7 +1,7 @@
 <Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
-    <TargetFrameworks>net8.0;netstandard2.0</TargetFrameworks>
+    <TargetFrameworks>net10.0;netstandard2.0</TargetFrameworks>
     <AssemblyName>RP.Math</AssemblyName>
     <RootNamespace>RP.Math</RootNamespace>
     <GenerateDocumentationFile>true</GenerateDocumentationFile>
@@ -10,7 +10,7 @@
     <NoWarn>$(NoWarn);CS1591;CS1573</NoWarn>
 
     <!-- The library uses modern C# and nullable annotations; enable both so the netstandard2.0
-         target (whose default LangVersion is 7.3, no nullable) compiles the same sources as net8.0. -->
+         target (whose default LangVersion is 7.3, no nullable) compiles the same sources as net10.0. -->
     <LangVersion>latest</LangVersion>
     <Nullable>annotations</Nullable>
 

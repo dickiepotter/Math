@@ -70,7 +70,7 @@ Then open the printed `http://localhost:<port>` URL.
 dotnet publish RP.Math.Visualizer -c Release
 ```
 
-The output under `bin/Release/net8.0/publish/wwwroot` is a static site that can be hosted anywhere
+The output under `bin/Release/net10.0/publish/wwwroot` is a static site that can be hosted anywhere
 (GitHub Pages, any static host).
 
 `.github/workflows/pages.yml` does this on every push to `master` and deploys the result to GitHub

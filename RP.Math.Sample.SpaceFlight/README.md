@@ -16,7 +16,7 @@ dotnet run --project RP.Math.Sample.SpaceFlight
 ```
 
 No content pipeline is needed: all geometry is generated procedurally and the HUD font is rasterised at
-runtime, so a bare `dotnet run` works. Requires the .NET 8 SDK on Windows.
+runtime, so a bare `dotnet run` works. Requires the .NET 10 SDK on Windows.
 
 ## Controls
 

@@ -1,7 +1,7 @@
 <Project Sdk="Microsoft.NET.Sdk.BlazorWebAssembly">
 
   <PropertyGroup>
-    <TargetFramework>net8.0</TargetFramework>
+    <TargetFramework>net10.0</TargetFramework>
     <ImplicitUsings>enable</ImplicitUsings>
     <!-- The Razor pages use nullable annotations (?); enable the context so they compile without CS8669. -->
     <Nullable>annotations</Nullable>
@@ -11,10 +11,10 @@
   </PropertyGroup>
 
   <!-- Versions were previously supplied by a central Directory.Packages.props (removed with the
-       former Vector subtree); pinned here to match the net8.0 target. -->
+       former Vector subtree); pinned here to match the net10.0 target. -->
   <ItemGroup>
-    <PackageReference Include="Microsoft.AspNetCore.Components.WebAssembly" Version="8.0.8" />
-    <PackageReference Include="Microsoft.AspNetCore.Components.WebAssembly.DevServer" Version="8.0.8" PrivateAssets="all" />
+    <PackageReference Include="Microsoft.AspNetCore.Components.WebAssembly" Version="10.0.14" />
+    <PackageReference Include="Microsoft.AspNetCore.Components.WebAssembly.DevServer" Version="10.0.14" PrivateAssets="all" />
   </ItemGroup>
 
   <ItemGroup>

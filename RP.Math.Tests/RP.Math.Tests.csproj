@@ -1,23 +1,26 @@
 <Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
-    <TargetFramework>net8.0</TargetFramework>
+    <TargetFramework>net10.0</TargetFramework>
     <IsPackable>false</IsPackable>
     <IsTestProject>true</IsTestProject>
     <AssemblyName>RP.Math.Tests</AssemblyName>
     <RootNamespace>RP.Math.Tests</RootNamespace>
     <!-- CS1718: several tests deliberately compare a value to itself to document framework (NaN / infinity) behaviour. -->
-    <NoWarn>$(NoWarn);CS1718</NoWarn>
+    <!-- MSTEST0039 / MSTEST0053: MSTest 3.11's style analyzers (prefer Assert.ThrowsExactly; prefer
+         interpolated messages). The test sources are vendored two-way into RADD.DesktopSuite, so they are
+         left as they are rather than churned for style; adopt them together when moving to MSTest 4. -->
+    <NoWarn>$(NoWarn);CS1718;MSTEST0039;MSTEST0053</NoWarn>
   </PropertyGroup>
 
   <!-- Versions were previously supplied by a central Directory.Packages.props (removed with the former
        Vector subtree); pinned here now that this project stands alone. Microsoft.NET.Test.Sdk keeps the
        classic VSTest runner so `dotnet test` works without the .NET 10 SDK's Testing-Platform opt-in. -->
   <ItemGroup>
-    <PackageReference Include="Microsoft.NET.Test.Sdk" Version="17.11.1" />
-    <PackageReference Include="MSTest.TestAdapter" Version="3.6.0" />
-    <PackageReference Include="MSTest.TestFramework" Version="3.6.0" />
-    <PackageReference Include="coverlet.collector" Version="6.0.2">
+    <PackageReference Include="Microsoft.NET.Test.Sdk" Version="17.14.1" />
+    <PackageReference Include="MSTest.TestAdapter" Version="3.11.1" />
+    <PackageReference Include="MSTest.TestFramework" Version="3.11.1" />
+    <PackageReference Include="coverlet.collector" Version="6.0.4">
       <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
       <PrivateAssets>all</PrivateAssets>
     </PackageReference>
